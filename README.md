@@ -1,7 +1,7 @@
 
 # api-gatekeeper-organisation-frontend
 
-This is a placeholder README.md for a new repository
+This is the frontend admin repo for the organisations on the API platform
 
 ### License
 
