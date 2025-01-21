@@ -1,21 +1,74 @@
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.Footer
 
 @this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
+        govukLayout: GovukLayout,
+        siteHeader: SiteHeader,
+        hmrcFooter: HmrcFooter,
+        hmrcHead: HmrcHead,
+        govukBreadcrumbs: GovukBreadcrumbs,
+        hmrcScripts: HmrcScripts
 )
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: Option[String] = None, breadcrumbs: Seq[BreadcrumbsItem] = Seq.empty)(contentBlock: Html)(implicit requestHeader: RequestHeader, messages: Messages)
 
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
-)(contentBlock)
-
-@{
-    //$COVERAGE-OFF$
+@scriptElem = {
+@hmrcScripts()
 }
+
+@userBanner = {
+    <div id="logged-in-user">
+        <p class="govuk-body-s govuk-!-margin-top-4">
+        @{
+            requestHeader match {
+                case loggedInRequest: LoggedInRequest[_] => loggedInRequest.name.getOrElse("")
+                case _ => ""
+            }
+        }
+        </p>
+    </div>
+}
+
+@beforeContentAndUser = {
+    <div style="display: flex;
+        justify-content: space-between;
+        align-items: center;">
+        @govukBreadcrumbs(Breadcrumbs(items = breadcrumbs))
+        @userBanner
+    </div>
+}
+
+@mainContentFullWidth = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+        @contentBlock
+        </div>
+    </div>
+}
+
+@govukLayout(
+    pageTitle = pageTitle,
+    headBlock = Some(hmrcHead()),
+    headerBlock = Some(siteHeader()),
+    scriptsBlock = Some(scriptElem),
+    beforeContentBlock = Some(beforeContentAndUser),
+    mainContentLayout = None,
+    footerBlock = Some(hmrcFooter(new Footer(meta = None, language = En))),
+    assetPath = None
+)(mainContentFullWidth)
