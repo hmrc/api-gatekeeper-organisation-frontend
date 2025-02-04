@@ -21,10 +21,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
 
 @Singleton
 class HelloWorldController @Inject() (
