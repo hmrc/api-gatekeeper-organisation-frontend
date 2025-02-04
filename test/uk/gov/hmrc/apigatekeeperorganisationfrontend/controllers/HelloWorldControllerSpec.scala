@@ -27,10 +27,10 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
 
 class HelloWorldControllerSpec extends HmrcSpec with GuiceOneAppPerSuite with StrideAuthorisationServiceMockModule with LdapAuthorisationServiceMockModule {
 

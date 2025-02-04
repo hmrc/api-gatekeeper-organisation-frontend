@@ -18,8 +18,8 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.config
 
 import com.google.inject.AbstractModule
 
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.HandleForbiddenWithView
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.HandleForbiddenWithView
 
 class Module extends AbstractModule {
 
