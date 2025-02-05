@@ -17,26 +17,30 @@
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 @Singleton
-class HelloWorldController @Inject() (
+class SubmissionsController @Inject() (
     mcc: MessagesControllerComponents,
+    submissionListPage: SubmissionListPage,
+    organisationService: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
-    val ldapAuthorisationService: LdapAuthorisationService,
-    helloWorldPage: HelloWorldPage
+    val ldapAuthorisationService: LdapAuthorisationService
   )(implicit ec: ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
-  val helloWorld: Action[AnyContent] = loggedInOnly() { implicit request =>
-    Future.successful(Ok(helloWorldPage()))
+  val submissionsView: Action[AnyContent] = loggedInOnly() { implicit request =>
+    organisationService
+      .fetchAll()
+      .map(subs => Ok(submissionListPage(subs)))
   }
 
 }
