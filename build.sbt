@@ -19,6 +19,10 @@ lazy val microservice = Project("api-gatekeeper-organisation-frontend", file("."
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(
+    Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
+  )
+  .settings(
     TwirlKeys.templateImports ++= Seq(
       "views.html.helper.CSPNonce",
       "uk.gov.hmrc.govukfrontend.views.html.components._",

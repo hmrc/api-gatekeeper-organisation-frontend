@@ -30,32 +30,41 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.HelloWorldPage
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.OrganisationServiceMockModule
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
-class HelloWorldControllerSpec extends HmrcSpec with GuiceOneAppPerSuite with StrideAuthorisationServiceMockModule with LdapAuthorisationServiceMockModule {
+class SubmissionsControllerSpec extends HmrcSpec
+    with GuiceOneAppPerSuite
+    with StrideAuthorisationServiceMockModule
+    with LdapAuthorisationServiceMockModule
+    with OrganisationServiceMockModule {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .build()
 
   private val fakeRequest = FakeRequest("GET", "/")
-  val page                = app.injector.instanceOf[HelloWorldPage]
+  val page                = app.injector.instanceOf[SubmissionListPage]
   val mcc                 = app.injector.instanceOf[MessagesControllerComponents]
-  private val controller  = new HelloWorldController(mcc, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock, page)
+  private val controller  = new SubmissionsController(mcc, page, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
 
   "GET /" should {
     "return 200 for Stride auth" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchAll.succeed()
 
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.submissionsView(fakeRequest)
+
       status(result) shouldBe Status.OK
     }
 
     "return 200 for Ldap auth" in {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.succeeds
+      OrganisationServiceMock.FetchAll.succeed()
 
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.submissionsView(fakeRequest)
+
       status(result) shouldBe Status.OK
     }
 
@@ -63,14 +72,17 @@ class HelloWorldControllerSpec extends HmrcSpec with GuiceOneAppPerSuite with St
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.notAuthorised
 
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.submissionsView(fakeRequest)
+
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return HTML" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchAll.succeed()
 
-      val result = controller.helloWorld(fakeRequest)
+      val result = controller.submissionsView(fakeRequest)
+
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }

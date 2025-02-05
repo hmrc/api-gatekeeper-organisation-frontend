@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.apiplatformorganisationfrontend
 
-@()(implicit request: RequestHeader, messages: Messages)
+import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
-@layout(pageTitle = Some("api-gatekeeper-organisation-frontend")) {
-    <h1 class="govuk-heading-xl">api-gatekeeper-organisation-frontend</h1>
-    <p class="govuk-body">@{messages("service.text")}</p>
-}
+import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 
-@{
-    //$COVERAGE-OFF$
-}
+abstract class AsyncHmrcSpec extends HmrcSpec with DefaultAwaitTimeout with FutureAwaits {}
