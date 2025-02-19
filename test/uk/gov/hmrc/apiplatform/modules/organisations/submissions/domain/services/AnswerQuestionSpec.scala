@@ -45,8 +45,8 @@ class AnswerQuestionSpec extends HmrcSpec with Inside with QuestionBuilder with 
   trait Setup extends SubmissionsTestData
   val blankContext: AskWhen.Context = Map.empty
 
-  val YesAnswer = List("Yes")
-  val NoAnswer  = List("No")
+  val YesAnswer = Map(Question.answerKey -> Seq("Yes"))
+  val NoAnswer  = Map(Question.answerKey -> Seq("No"))
 
   "AnswerQuestion" when {
     "answer is called" should {
@@ -91,7 +91,7 @@ class AnswerQuestionSpec extends HmrcSpec with Inside with QuestionBuilder with 
       }
 
       "return left when answer is not valid" in new Setup {
-        val after = AnswerQuestion.recordAnswer(aSubmission, ResponsibleIndividualDetails.question1.id, List("Bob"))
+        val after = AnswerQuestion.recordAnswer(aSubmission, ResponsibleIndividualDetails.question1.id, Map(Question.answerKey -> Seq("Bob")))
 
         after.left.value
       }

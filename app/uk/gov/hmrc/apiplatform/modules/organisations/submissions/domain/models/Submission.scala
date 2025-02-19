@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models
 
+import java.time.Instant
+
 import cats.data.NonEmptyList
+
 import play.api.libs.json.EnvReads
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.{InstantJsonFormatter, NonEmptyListFormatters}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.MarkAnswer
-
-import java.time.Instant
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ActualAnswersAsText, MarkAnswer}
 
 sealed trait QuestionnaireState
 
@@ -151,6 +153,19 @@ object Submission extends EnvReads with NonEmptyListFormatters {
     def isOpenToAnswers = isCreated || isAnswering
 
     def canBeMarked = isAnsweredCompletely || isSubmitted || isDeclined || isGranted || isGrantedWithWarnings || isFailed || isWarnings || isPendingResponsibleIndividual
+
+    def displayValue: String = this match {
+      case _: Submission.Status.Submitted                    => "Submitted"
+      case _: Submission.Status.Granted                      => "Granted"
+      case _: Submission.Status.GrantedWithWarnings          => "Granted With Warnings"
+      case _: Submission.Status.Declined                     => "Declined"
+      case _: Submission.Status.Failed                       => "Failed"
+      case _: Submission.Status.Warnings                     => "Warnings"
+      case _: Submission.Status.PendingResponsibleIndividual => "Pending Responsible Individual"
+      case _: Submission.Status.Answering                    => "Answering"
+      case _: Submission.Status.Created                      => "Created"
+      case _                                                 => "NA"
+    }
 
     def isAnsweredCompletely = this match {
       case Submission.Status.Answering(_, completed) => completed
@@ -369,6 +384,9 @@ object Submission extends EnvReads with NonEmptyListFormatters {
     .and[Created]("created")
     .format
 
+  import GroupOfQuestionnaires._
+  import Question._
+
   implicit val submissionInstanceFormat: OFormat[Submission.Instance] = Json.format[Submission.Instance]
   implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]
   implicit val extendedSubmissionFormat: OFormat[ExtendedSubmission]  = Json.format[ExtendedSubmission]
@@ -399,9 +417,22 @@ case class Submission(
       )
     )
 
-  lazy val latestInstance = instances.head
+  lazy val latestInstance: Submission.Instance = instances.head
+  lazy val status: Submission.Status           = latestInstance.statusHistory.head
 
-  lazy val status: Submission.Status = latestInstance.statusHistory.head
+  lazy val name: String = latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameGpId)
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameLlpId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameLpId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameCioId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameLtdId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameSlpId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameRsId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameSoleId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameGpId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameNonUkWithId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameNonUkWithoutId))
+    .orElse(latestInstance.answersToQuestions.get(questionIdsOfInterest.organisationNameSpId))
+    .map(answer => ActualAnswersAsText(answer)).getOrElse("N/A")
 }
 
 case class ExtendedSubmission(

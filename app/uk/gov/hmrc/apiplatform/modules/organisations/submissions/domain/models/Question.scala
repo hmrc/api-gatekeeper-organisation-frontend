@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models
 
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.apiplatform.modules.common.domain.services.MapJsonFormatters
-
 import scala.collection.immutable.{ListMap, ListSet}
+
+import play.api.libs.json.{Format, Json, OFormat}
+
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.MapJsonFormatters
 
 sealed trait Mark
 
@@ -92,6 +93,7 @@ object Wording {
 
 object Question extends MapJsonFormatters {
   case class Id(value: String) extends AnyVal
+  val answerKey = "answer"
 
   object Id {
     def random = Id(java.util.UUID.randomUUID.toString)
@@ -218,10 +220,13 @@ object Question extends MapJsonFormatters {
 
   implicit val jsonListMapKV: Reads[ListMap[PossibleAnswer, Mark]] = listMapReads[PossibleAnswer, Mark]
 
-  implicit val jsonFormatPossibleAnswer: Format[PossibleAnswer]            = Json.valueFormat[PossibleAnswer]
-  implicit val jsonFormatTextQuestion: OFormat[TextQuestion]               = Json.format[TextQuestion]
-  implicit val jsonFormatDateQuestion: OFormat[DateQuestion]               = Json.format[DateQuestion]
-  implicit val jsonFormatYesNoQuestion: OFormat[YesNoQuestion]             = Json.format[YesNoQuestion]
+  import Statement._
+
+  implicit val jsonFormatPossibleAnswer: Format[PossibleAnswer] = Json.valueFormat[PossibleAnswer]
+  implicit val jsonFormatTextQuestion: OFormat[TextQuestion]    = Json.format[TextQuestion]
+  implicit val jsonFormatYesNoQuestion: OFormat[YesNoQuestion]  = Json.format[YesNoQuestion]
+  implicit val jsonFormatDateQuestion: OFormat[DateQuestion]    = Json.format[DateQuestion]
+
   implicit val jsonFormatChooseOneOfQuestion: OFormat[ChooseOneOfQuestion] = Json.format[ChooseOneOfQuestion]
   implicit val jsonFormatMultiChoiceQuestion: OFormat[MultiChoiceQuestion] = Json.format[MultiChoiceQuestion]
   implicit val jsonFormatAcknowledgementOnly: OFormat[AcknowledgementOnly] = Json.format[AcknowledgementOnly]
@@ -229,8 +234,8 @@ object Question extends MapJsonFormatters {
   implicit val jsonFormatQuestion: Format[Question] = Union.from[Question]("questionType")
     .and[MultiChoiceQuestion]("multi")
     .and[YesNoQuestion]("yesNo")
-    .and[DateQuestion]("date")
     .and[ChooseOneOfQuestion]("choose")
+    .and[DateQuestion]("date")
     .and[TextQuestion]("text")
     .and[AcknowledgementOnly]("acknowledgement")
     .format

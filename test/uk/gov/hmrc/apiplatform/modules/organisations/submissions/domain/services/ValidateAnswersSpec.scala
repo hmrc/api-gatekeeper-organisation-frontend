@@ -18,16 +18,16 @@ package uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.service
 
 import org.scalatest.Inside
 
-import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
+import uk.gov.hmrc.apiplatform.modules.common.utils.{FixedClock, HmrcSpec}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.QuestionBuilder
 
-class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with AsIdsHelpers {
+class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with AsIdsHelpers with FixedClock {
 
   import org.scalatest.prop.TableDrivenPropertyChecks._
 
-  def answerOf(text: String*) = text.toList
-  def noAnswer: List[String]  = List.empty
+  def answerOf(text: String*)            = Map(Question.answerKey -> text.toList)
+  def noAnswer: Map[String, Seq[String]] = Map.empty
 
   "ValidateAnswers" should {
 
@@ -38,12 +38,12 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
       val validAnswer: AnswerMatching = Right(ActualAnswer.AcknowledgedAnswer)
 
       val passes = Table(
-        ("description", "question", "answer", "expects"),
+        ("description", "question", Question.answerKey, "expects"),
         ("valid answer", question, noAnswer, validAnswer),
         ("too many answers", question, answerOf("Yes"), aFailure)
       )
 
-      forAll(passes) { (_: String, question: Question, answers: List[String], expects: AnswerMatching) =>
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
         expects match {
           case Right(answer) =>
             ValidateAnswers.validate(question, answers) shouldBe Right(answer)
@@ -62,7 +62,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
       val validEmptyAnswer: AnswerMatching = Right(ActualAnswer.NoAnswer)
 
       val passes = Table(
-        ("description", "question", "answer", "expects"),
+        ("description", "question", Question.answerKey, "expects"),
         ("valid answer", question, answerOf("Yes"), validAnswer),
         ("too many answers", question, answerOf("Yes", "Bob"), aFailure),
         ("invalid answer", question, answerOf("Bob"), aFailure),
@@ -72,7 +72,36 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
         ("empty answer is valid on optional", optionalQuestion, noAnswer, validEmptyAnswer)
       )
 
-      forAll(passes) { (_: String, question: Question, answers: List[String], expects: AnswerMatching) =>
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
+        expects match {
+          case Right(answer) =>
+            ValidateAnswers.validate(question, answers) shouldBe Right(answer)
+          case Left(())      =>
+            ValidateAnswers.validate(question, answers).left.value
+        }
+      }
+    }
+
+    "for date questions" in {
+      val question = dateQuestion(1)
+      type AnswerMatching = Either[Unit, ActualAnswer]
+      val aFailure: AnswerMatching    = Left(())
+      val validAnswer: AnswerMatching = Right(ActualAnswer.DateAnswer(now.toLocalDate))
+      val validRawAnswers             = Map(
+        "day"   -> Seq(now.getDayOfMonth.toString),
+        "month" -> Seq(now.getMonthValue.toString),
+        "year"  -> Seq(now.getYear.toString)
+      )
+
+      val passes = Table(
+        ("description", "question", Question.answerKey, "expects"),
+        ("valid answer", question, validRawAnswers, validAnswer),
+        ("too many answers", question, validRawAnswers + ("day" -> Seq("1", "2")), aFailure),
+        ("invalid date", question, validRawAnswers + ("day"     -> Seq("120")), aFailure),
+        ("invalid answer", question, answerOf("Bob"), aFailure)
+      )
+
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
         expects match {
           case Right(answer) =>
             ValidateAnswers.validate(question, answers) shouldBe Right(answer)
@@ -92,7 +121,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
       val validEmptyAnswer: AnswerMatching  = Right(ActualAnswer.NoAnswer)
 
       val passes = Table(
-        ("description", "question", "answer", "expects"),
+        ("description", "question", Question.answerKey, "expects"),
         ("valid answer", question, answerOf("One"), validSingleAnswer),
         ("valid answers", question, answerOf("One", "Two"), validMultiAnswer),
         ("invalid answer", question, answerOf("Zero"), aFailure),
@@ -109,7 +138,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
         ("empty answer is valid on optional", optionalQuestion, noAnswer, validEmptyAnswer)
       )
 
-      forAll(passes) { (_: String, question: Question, answers: List[String], expects: AnswerMatching) =>
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
         expects match {
           case Right(answer) =>
             ValidateAnswers.validate(question, answers) shouldBe Right(answer)
@@ -128,7 +157,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
       val validEmptyAnswer: AnswerMatching = Right(ActualAnswer.NoAnswer)
 
       val passes = Table(
-        ("description", "question", "answer", "expects"),
+        ("description", "question", Question.answerKey, "expects"),
         ("valid answer", question, answerOf("Bobby"), validAnswer),
         ("too many answers", question, answerOf("Bobby", "Fred"), aFailure),
         ("valid answer on optional", optionalQuestion, answerOf("Bobby"), validAnswer),
@@ -136,7 +165,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
         ("empty answer is valid on optional", optionalQuestion, noAnswer, validEmptyAnswer)
       )
 
-      forAll(passes) { (_: String, question: Question, answers: List[String], expects: AnswerMatching) =>
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
         expects match {
           case Right(answer) =>
             ValidateAnswers.validate(question, answers) shouldBe Right(answer)
@@ -155,7 +184,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
       val validEmptyAnswer: AnswerMatching = Right(ActualAnswer.NoAnswer)
 
       val passes = Table(
-        ("description", "question", "answer", "expects"),
+        ("description", "question", Question.answerKey, "expects"),
         ("valid answer", question, answerOf("123"), validAnswer),
         ("invalid answer", question, answerOf("abc"), aFailure),
         ("too many answers", question, answerOf("123", "456"), aFailure),
@@ -164,7 +193,7 @@ class ValidateAnswersSpec extends HmrcSpec with Inside with QuestionBuilder with
         ("empty answer is valid on optional", optionalQuestion, noAnswer, validEmptyAnswer)
       )
 
-      forAll(passes) { (_: String, question: Question, answers: List[String], expects: AnswerMatching) =>
+      forAll(passes) { (_: String, question: Question, answers: Map[String, Seq[String]], expects: AnswerMatching) =>
         expects match {
           case Right(answer) =>
             ValidateAnswers.validate(question, answers) shouldBe Right(answer)
