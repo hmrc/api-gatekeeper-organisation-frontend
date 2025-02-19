@@ -16,27 +16,34 @@
 
 package uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services
 
+import java.time.LocalDate
+import scala.util.Try
+
 import cats.implicits._
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
 object ValidateAnswers {
 
-  def validate(question: Question, rawAnswers: List[String]): Either[String, ActualAnswer] = {
-    (question, rawAnswers) match {
-      case (_: Question.AcknowledgementOnly, Nil) => Either.right(ActualAnswer.AcknowledgedAnswer)
-      case (_: Question.AcknowledgementOnly, _)   => Either.left("Acknowledgement cannot accept answers")
-
-      case (_, Nil) if (question.isOptional) => Either.right(ActualAnswer.NoAnswer)
-      case (_, Nil)                          => Either.left("Question requires an answer")
-
-      case (q: Question.MultiChoiceQuestion, answers) => validateAgainstPossibleAnswers(q, answers.toSet)
-      case (_, a :: b :: Nil)                         => Either.left("Question only accepts one answer")
-
-      case (q: Question.TextQuestion, head :: Nil)         => validateAgainstPossibleTextValidationRule(q, head)
-      case (q: Question.SingleChoiceQuestion, head :: Nil) => validateAgainstPossibleAnswers(q, head)
-
+  def validate(question: Question, rawAnswers: Map[String, Seq[String]]): Either[String, ActualAnswer] = {
+    question match {
+      case _: Question.AcknowledgementOnly                                      => validateAcknowledgement(rawAnswers.get(Question.answerKey).exists(_.nonEmpty))
+      case _ if question.isOptional && !rawAnswers.contains(Question.answerKey) => Either.right(ActualAnswer.NoAnswer)
+      case q: Question.MultiChoiceQuestion                                      => rawAnswers.get(Question.answerKey).map(a => validateAgainstPossibleAnswers(q, a.toSet))
+          .getOrElse(Either.left("Question requires an answer"))
+      case q: Question.SingleChoiceQuestion                                     =>
+        rawAnswers.get(Question.answerKey).filter(_.length == 1).map(a => validateAgainstPossibleAnswers(q, a.head)).getOrElse(Either.left("Question requires a single answer"))
+      case q: Question.TextQuestion                                             =>
+        rawAnswers.get(Question.answerKey).filter(_.length == 1).map(a => validateAgainstPossibleTextValidationRule(q, a.head)).getOrElse(Either.left(
+          "Question requires a single answer"
+        ))
+      case _: Question.DateQuestion                                             => validateDate(rawAnswers)
     }
+
+  }
+
+  def validateAcknowledgement(hasAnswer: Boolean) = {
+    if (hasAnswer) Either.left("Acknowledgement cannot accept answers") else Either.right(ActualAnswer.AcknowledgedAnswer)
   }
 
   def validateAgainstPossibleTextValidationRule(question: Question.TextQuestion, rawAnswer: String): Either[String, ActualAnswer] = {
@@ -50,6 +57,15 @@ object ValidateAnswers {
       Either.right(ActualAnswer.MultipleChoiceAnswer(rawAnswers))
     } else {
       Either.left("Not all answers are valid")
+    }
+  }
+
+  def validateDate(rawAnswers: Map[String, Seq[String]]): Either[String, ActualAnswer] = {
+    (rawAnswers.get("day"), rawAnswers.get("month"), rawAnswers.get("year")) match {
+      case (Some(day :: Nil), Some(month :: Nil), Some(year :: Nil)) =>
+        Try(LocalDate.of(year.toInt, month.toInt, day.toInt)).fold(_ => Either.left("Invalid Date"), date => Either.right(ActualAnswer.DateAnswer(date)))
+      case _                                                         => Either.left("Invalid Date")
+
     }
   }
 
