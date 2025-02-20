@@ -93,6 +93,7 @@ object Wording {
 
 object Question extends MapJsonFormatters {
   case class Id(value: String) extends AnyVal
+  val answerKey = "answer"
 
   object Id {
     def random = Id(java.util.UUID.randomUUID.toString)
@@ -114,6 +115,17 @@ object Question extends MapJsonFormatters {
       label: Option[Question.Label] = None,
       hintText: Option[NonBulletStatementFragment] = None,
       validation: Option[TextValidation] = None,
+      absence: Option[(String, Mark)] = None,
+      errorInfo: Option[ErrorInfo] = None
+    ) extends Question with LabelAndHints with ErrorMessaging
+
+  case class DateQuestion(
+      id: Question.Id,
+      wording: Wording,
+      statement: Option[Statement],
+      afterStatement: Option[Statement] = None,
+      label: Option[Question.Label] = None,
+      hintText: Option[NonBulletStatementFragment] = None,
       absence: Option[(String, Mark)] = None,
       errorInfo: Option[ErrorInfo] = None
     ) extends Question with LabelAndHints with ErrorMessaging
@@ -210,9 +222,11 @@ object Question extends MapJsonFormatters {
 
   import Statement._
 
-  implicit val jsonFormatPossibleAnswer: Format[PossibleAnswer]            = Json.valueFormat[PossibleAnswer]
-  implicit val jsonFormatTextQuestion: OFormat[TextQuestion]               = Json.format[TextQuestion]
-  implicit val jsonFormatYesNoQuestion: OFormat[YesNoQuestion]             = Json.format[YesNoQuestion]
+  implicit val jsonFormatPossibleAnswer: Format[PossibleAnswer] = Json.valueFormat[PossibleAnswer]
+  implicit val jsonFormatTextQuestion: OFormat[TextQuestion]    = Json.format[TextQuestion]
+  implicit val jsonFormatYesNoQuestion: OFormat[YesNoQuestion]  = Json.format[YesNoQuestion]
+  implicit val jsonFormatDateQuestion: OFormat[DateQuestion]    = Json.format[DateQuestion]
+
   implicit val jsonFormatChooseOneOfQuestion: OFormat[ChooseOneOfQuestion] = Json.format[ChooseOneOfQuestion]
   implicit val jsonFormatMultiChoiceQuestion: OFormat[MultiChoiceQuestion] = Json.format[MultiChoiceQuestion]
   implicit val jsonFormatAcknowledgementOnly: OFormat[AcknowledgementOnly] = Json.format[AcknowledgementOnly]
@@ -221,6 +235,7 @@ object Question extends MapJsonFormatters {
     .and[MultiChoiceQuestion]("multi")
     .and[YesNoQuestion]("yesNo")
     .and[ChooseOneOfQuestion]("choose")
+    .and[DateQuestion]("date")
     .and[TextQuestion]("text")
     .and[AcknowledgementOnly]("acknowledgement")
     .format

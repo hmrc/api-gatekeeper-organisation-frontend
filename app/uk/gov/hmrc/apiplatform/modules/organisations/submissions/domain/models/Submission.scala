@@ -391,6 +391,7 @@ object Submission extends EnvReads with NonEmptyListFormatters {
   implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]
   implicit val extendedSubmissionFormat: OFormat[ExtendedSubmission]  = Json.format[ExtendedSubmission]
   implicit val markedSubmissionFormat: OFormat[MarkedSubmission]      = Json.format[MarkedSubmission]
+
 }
 
 case class Submission(

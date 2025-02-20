@@ -36,7 +36,7 @@ object AnswerQuestion {
     }
   }
 
-  def recordAnswer(submission: Submission, questionId: Question.Id, rawAnswers: List[String]): Either[String, ExtendedSubmission] = {
+  def recordAnswer(submission: Submission, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Either[String, ExtendedSubmission] = {
     for {
       question         <- fromOption(submission.findQuestion(questionId), "Not valid for this submission")
       context           = submission.context

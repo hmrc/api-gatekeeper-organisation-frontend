@@ -76,7 +76,6 @@ object QuestionItem extends NonEmptyListFormatters {
   def apply(question: Question, askWhen: AskWhen): QuestionItem = new QuestionItem(question, askWhen)
 
   import play.api.libs.json._
-  import AskWhen._
 
   implicit val jsonFormatQuestionItem: OFormat[QuestionItem] = Json.format[QuestionItem]
 }
@@ -96,7 +95,6 @@ object Questionnaire {
   }
 
   import play.api.libs.json._
-  import QuestionItem._
 
   implicit val jsonFormatquestionnaire: OFormat[Questionnaire] = Json.format[Questionnaire]
 }

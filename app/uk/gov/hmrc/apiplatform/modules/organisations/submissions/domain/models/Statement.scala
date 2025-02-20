@@ -43,8 +43,8 @@ case class Statement(fragments: NonEmptyList[StatementFragment])
 object Statement extends NonEmptyListFormatters {
   def apply(fragment: StatementFragment, fragments: StatementFragment*) = new Statement(NonEmptyList.of(fragment, fragments: _*))
 
-  import play.api.libs.json._
   import play.api.libs.functional.syntax._
+  import play.api.libs.json._
   import uk.gov.hmrc.play.json.Union
 
   implicit val jsonFormatStatementText: OFormat[StatementText] = Json.format[StatementText]
