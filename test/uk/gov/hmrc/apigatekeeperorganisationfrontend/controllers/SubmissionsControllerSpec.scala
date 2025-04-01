@@ -52,23 +52,36 @@ class SubmissionsControllerSpec extends HmrcSpec
 
   val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
-  val submissionReview =
-    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+  val submissionReviewSubmitted =
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 1"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+
+  val submissionReviewInProgress =
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 2"), instant, "bob@example.com", instant, SubmissionReview.State.InProgress, List(submissionReviewEvent))
+
+  val submissionReviewApproved =
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 3"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
+
+  val submissionReviewFailed =
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 4"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
 
   "GET /" should {
     "return 200 for Stride auth" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
 
       val result = controller.submissionsView(fakeRequest)
 
       status(result) shouldBe Status.OK
+      contentAsString(result) should include("New")
+      contentAsString(result) should include("In progress")
+      contentAsString(result) should include("Approved")
+      contentAsString(result) should include("Failed")
     }
 
     "return 200 for Ldap auth" in {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.succeeds
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewApproved))
 
       val result = controller.submissionsView(fakeRequest)
 
@@ -86,7 +99,7 @@ class SubmissionsControllerSpec extends HmrcSpec
 
     "return HTML" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewSubmitted))
 
       val result = controller.submissionsView(fakeRequest)
 

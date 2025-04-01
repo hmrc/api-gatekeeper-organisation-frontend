@@ -25,23 +25,31 @@
 
 @(submissionReviews: List[SubmissionReview])(implicit request: RequestHeader, messages: Messages)
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Organisation Submissions")) {
+@buildStatusHtml(state: SubmissionReview.State) = @{
+  state match {
+    case SubmissionReview.State.Submitted  => "<strong class='govuk-tag govuk-tag--green'>New</strong>"
+    case SubmissionReview.State.InProgress => "<strong class='govuk-tag govuk-tag--blue'>In progress</strong>"
+    case SubmissionReview.State.Approved   => "<strong class='govuk-tag govuk-tag--purple'>Approved</strong>"
+    case SubmissionReview.State.Failed     => "<strong class='govuk-tag govuk-tag--red'>Failed</strong>"
+    case _                                 => "<strong class='govuk-tag'>{state.toString}</strong>"
+  }
+}
+
+@layout(pageTitle = Some("HMRC API Gatekeeper - Business checks")) {
     @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
 
         @govukTable(Table(
-            caption = Some("Organisation Submissions"),
+            caption = Some("Business checks"),
             captionClasses = "govuk-table__caption--l",
             head = Some(Seq(
-                HeadCell(content = Text("Name")),
-                HeadCell(content = Text("Date")),
-                HeadCell(content = Text("Started By")),
+                HeadCell(content = Text("Business name")),
+                HeadCell(content = Text("Last update")),
                 HeadCell(content = Text("Status"))
             )),
             rows = submissionReviews.map(sub => Seq(
                 TableRow(content = Text(sub.organisationName.toString())),
                 TableRow(content = Text(dateFormatter.format(sub.lastUpdate.atOffset(ZoneOffset.UTC).toLocalDateTime))),
-                TableRow(content = Text(sub.requestedBy)),
-                TableRow(content = Text(sub.state.toString()))
+                TableRow(content = HtmlContent(buildStatusHtml(sub.state)))
             ))
         ))
     }
