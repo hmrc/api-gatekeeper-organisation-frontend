@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission
+@import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
 
@@ -23,7 +23,7 @@
 
 @this(layout: Layout, govukTable: GovukTable)
 
-@(submissions: List[Submission])(implicit request: RequestHeader, messages: Messages)
+@(submissionReviews: List[SubmissionReview])(implicit request: RequestHeader, messages: Messages)
 
 @layout(pageTitle = Some("HMRC API Gatekeeper - Organisation Submissions")) {
     @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
@@ -35,13 +35,13 @@
                 HeadCell(content = Text("Name")),
                 HeadCell(content = Text("Date")),
                 HeadCell(content = Text("Started By")),
-                HeadCell(content = Text("Status")),
+                HeadCell(content = Text("Status"))
             )),
-            rows = submissions.map(sub => Seq(
-                TableRow(content = Text(sub.name)),
-                TableRow(content = Text(dateFormatter.format(sub.startedOn.atOffset(ZoneOffset.UTC).toLocalDateTime))),
-                TableRow(content = Text(sub.latestInstance.statusHistory.last.asInstanceOf[Submission.Status.Created].requestedBy)),
-                TableRow(content = Text(sub.status.displayValue)),
+            rows = submissionReviews.map(sub => Seq(
+                TableRow(content = Text(sub.organisationName.toString())),
+                TableRow(content = Text(dateFormatter.format(sub.lastUpdate.atOffset(ZoneOffset.UTC).toLocalDateTime))),
+                TableRow(content = Text(sub.requestedBy)),
+                TableRow(content = Text(sub.state.toString()))
             ))
         ))
     }

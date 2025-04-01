@@ -39,7 +39,7 @@ class SubmissionsController @Inject() (
 
   val submissionsView: Action[AnyContent] = loggedInOnly() { implicit request =>
     organisationService
-      .fetchAll()
+      .fetchAllSubmissionReviews()
       .map(subs => Ok(submissionListPage(subs)))
   }
 

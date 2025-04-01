@@ -30,6 +30,8 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.OrganisationServiceMockModule
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
@@ -48,10 +50,15 @@ class SubmissionsControllerSpec extends HmrcSpec
   val mcc                 = app.injector.instanceOf[MessagesControllerComponents]
   private val controller  = new SubmissionsController(mcc, page, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
 
+  val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
+
+  val submissionReview =
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+
   "GET /" should {
     "return 200 for Stride auth" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAll.succeed()
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
 
       val result = controller.submissionsView(fakeRequest)
 
@@ -61,7 +68,7 @@ class SubmissionsControllerSpec extends HmrcSpec
     "return 200 for Ldap auth" in {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.succeeds
-      OrganisationServiceMock.FetchAll.succeed()
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
 
       val result = controller.submissionsView(fakeRequest)
 
@@ -79,7 +86,7 @@ class SubmissionsControllerSpec extends HmrcSpec
 
     "return HTML" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAll.succeed()
+      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReview))
 
       val result = controller.submissionsView(fakeRequest)
 

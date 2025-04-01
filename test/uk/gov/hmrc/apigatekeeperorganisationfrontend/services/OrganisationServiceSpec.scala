@@ -19,20 +19,27 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.services
 import uk.gov.hmrc.apiplatformorganisationfrontend.AsyncHmrcSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.OrganisationConnectorMockModule
 
 class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule {
 
-  trait Setup extends SubmissionsTestData {
+  trait Setup extends FixedClock {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val underTest                  = new OrganisationService(OrganisationConnectorMock.aMock)
+
+    val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
+
+    val submissionReview =
+      SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
   }
   "fetchSubmissions" should {
-    "fetch all submissions" in new Setup {
-      OrganisationConnectorMock.FetchAll.willReturn(aSubmission)
-      val result = await(underTest.fetchAll())
-      result shouldBe List(aSubmission)
+    "fetch all submission reviews" in new Setup {
+      OrganisationConnectorMock.FetchAllSubmissionReviews.willReturn(List(submissionReview))
+      val result = await(underTest.fetchAllSubmissionReviews())
+      result shouldBe List(submissionReview)
     }
   }
 }

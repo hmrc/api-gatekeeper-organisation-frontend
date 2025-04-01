@@ -28,8 +28,8 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
   object OrganisationConnectorMock {
     val aMock = mock[OrganisationConnector]
 
-    object FetchAll {
-      def willReturn(sub: Submission) = when(aMock.fetchAll()(*)).thenReturn(Future.successful(List(sub)))
+    object FetchAllSubmissionReviews {
+      def willReturn(submissionReviews: List[SubmissionReview]) = when(aMock.fetchAllSubmissionReviews()(*)).thenReturn(Future.successful(submissionReviews))
     }
   }
 }
