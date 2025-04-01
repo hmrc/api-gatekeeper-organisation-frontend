@@ -40,7 +40,7 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
-    val submissionReview      =
+    val submissionReview =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
   }
 
