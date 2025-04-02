@@ -20,6 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
 
@@ -29,8 +30,8 @@ trait OrganisationServiceMockModule extends SubmissionsTestData {
   object OrganisationServiceMock {
     val aMock = mock[OrganisationService]
 
-    object FetchAll {
-      def succeed() = when(aMock.fetchAll()(*)).thenReturn(Future.successful(List(aSubmission)))
+    object FetchAllSubmissionReviews {
+      def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.fetchAllSubmissionReviews()(*)).thenReturn(Future.successful(submissionReviews))
     }
   }
 }

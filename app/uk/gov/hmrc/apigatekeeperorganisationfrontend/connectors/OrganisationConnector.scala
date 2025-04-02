@@ -24,14 +24,14 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 
 @Singleton
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
 
-  def fetchAll()(implicit hc: HeaderCarrier): Future[List[Submission]] = {
-    http.get(url"${config.serviceBaseUrl}/submissions")
-      .execute[List[Submission]]
+  def fetchAllSubmissionReviews()(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
+    http.get(url"${config.serviceBaseUrl}/submission-reviews")
+      .execute[List[SubmissionReview]]
   }
 }
 

@@ -23,6 +23,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ApiPlatformOrganisationStub
 
@@ -35,6 +37,11 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
   trait Setup extends SubmissionsTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val underTest                  = app.injector.instanceOf[OrganisationConnector]
+
+    val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
+
+    val submissionReview =
+      SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
   }
 
   override def fakeApplication(): PlayApplication =
@@ -45,18 +52,18 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
   "fetchAllSubmission" should {
     "successfully get all" in new Setup {
-      ApiPlatformOrganisationStub.FetchAll.succeeds(aSubmission)
+      ApiPlatformOrganisationStub.FetchAllSubmissionReviews.succeeds(submissionReview)
 
-      val result = await(underTest.fetchAll())
+      val result = await(underTest.fetchAllSubmissionReviews())
 
-      result shouldBe List(aSubmission)
+      result shouldBe List(submissionReview)
     }
 
     "fail when the call returns an error" in new Setup {
-      ApiPlatformOrganisationStub.FetchAll.fails(INTERNAL_SERVER_ERROR)
+      ApiPlatformOrganisationStub.FetchAllSubmissionReviews.fails(INTERNAL_SERVER_ERROR)
 
       intercept[UpstreamErrorResponse] {
-        await(underTest.fetchAll())
+        await(underTest.fetchAllSubmissionReviews())
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
