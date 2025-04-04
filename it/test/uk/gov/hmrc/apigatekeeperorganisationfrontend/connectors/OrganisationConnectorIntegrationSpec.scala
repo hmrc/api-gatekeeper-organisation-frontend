@@ -50,20 +50,21 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       .in(Mode.Test)
       .build()
 
-  "fetchAllSubmission" should {
+  "searchSubmissionReviews" should {
     "successfully get all" in new Setup {
-      ApiPlatformOrganisationStub.FetchAllSubmissionReviews.succeeds(submissionReview)
+      val params: Seq[(String, String)] = Seq(("status", "SUBMITTED"))
+      ApiPlatformOrganisationStub.SearchSubmissionReviews.succeeds("SUBMITTED", submissionReview)
 
-      val result = await(underTest.fetchAllSubmissionReviews())
+      val result = await(underTest.searchSubmissionReviews(params))
 
       result shouldBe List(submissionReview)
     }
 
     "fail when the call returns an error" in new Setup {
-      ApiPlatformOrganisationStub.FetchAllSubmissionReviews.fails(INTERNAL_SERVER_ERROR)
+      ApiPlatformOrganisationStub.SearchSubmissionReviews.fails(INTERNAL_SERVER_ERROR)
 
       intercept[UpstreamErrorResponse] {
-        await(underTest.fetchAllSubmissionReviews())
+        await(underTest.searchSubmissionReviews(Seq.empty))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
