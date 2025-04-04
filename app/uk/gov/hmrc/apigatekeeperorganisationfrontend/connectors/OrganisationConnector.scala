@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.S
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
 
   def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
-    http.get(url"${config.serviceBaseUrl}/submission-reviews/search?$params")
+    http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")
       .execute[List[SubmissionReview]]
   }
 }

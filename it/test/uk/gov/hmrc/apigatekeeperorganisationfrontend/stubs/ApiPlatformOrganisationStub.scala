@@ -30,7 +30,7 @@ object ApiPlatformOrganisationStub {
 
     def succeeds(status: String, submissionReview: SubmissionReview): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/submission-reviews/search?status=$status"))
+        get(urlEqualTo(s"/submission-reviews?status=$status"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -42,7 +42,7 @@ object ApiPlatformOrganisationStub {
 
     def fails(status: Int): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/submission-reviews/search"))
+        get(urlEqualTo(s"/submission-reviews"))
           .willReturn(
             aResponse()
               .withStatus(status)
