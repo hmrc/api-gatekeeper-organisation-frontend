@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.SubmissionsController.FilterForm
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
@@ -23,7 +24,7 @@
 
 @this(layout: Layout, govukTable: GovukTable)
 
-@(submissionReviews: List[SubmissionReview])(implicit request: RequestHeader, messages: Messages)
+@(form: Form[FilterForm], submissionReviews: List[SubmissionReview])(implicit request: RequestHeader, messages: Messages)
 
 @buildStatusHtml(state: SubmissionReview.State) = @{
   state match {
@@ -36,11 +37,77 @@
 }
 
 @layout(pageTitle = Some("HMRC API Gatekeeper - Business checks")) {
-    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
 
+    <h1 class="govuk-heading-l">@{messages("submissionreview.title")}</h1>
+
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView, Symbol("class") -> "form") {
+      @helper.CSRF.formField
+      
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-heading-m govuk-!-margin-bottom-1 govuk-!-font-weight-bold">
+            @{messages("submissionreview.filterbystatus")}
+          </legend>
+          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            <div class="govuk-grid-row">
+              @defining(if(form("submittedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+                <div class="govuk-grid-column-one-third">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" type="checkbox" id="submittedStatusFilter" 
+                      name="submittedStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="submittedStatusFilter">
+                      @{messages("submissionreview.submitted")}
+                    </label>
+                  </div>
+                </div>
+              }
+              @defining(if(form("inProgressStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+                <div class="govuk-grid-column-one-third">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" type="checkbox" id="inProgressStatusFilter" 
+                      name="inProgressStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="inProgressStatusFilter">
+                      @{messages("submissionreview.inprogress")}
+                    </label>
+                  </div>
+                </div>
+              }
+              @defining(if(form("approvedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+                <div class="govuk-grid-column-one-third">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" type="checkbox" id="approvedStatusFilter" 
+                      name="approvedStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="approvedStatusFilter">
+                      @{messages("submissionreview.approved")}
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+            <div class="govuk-grid-row">
+              @defining(if(form("failedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+                <div class="govuk-grid-column-one-third">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" type="checkbox" id="failedStatusFilter" 
+                      name="failedStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="failedStatusFilter">
+                      @{messages("submissionreview.failed")}
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>  
+          </div>
+        </fieldset>
+      </div>          
+
+      <div class="govuk-form-group govuk-!-margin-bottom-0">
+        <button id="filterResults" class="govuk-button" type="submit">@{messages("submissionreview.filter")}</button>
+      </div>
+    }
+    
+    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
         @govukTable(Table(
-            caption = Some("Business checks"),
-            captionClasses = "govuk-table__caption--l",
             head = Some(Seq(
                 HeadCell(content = Text("Business name")),
                 HeadCell(content = Text("Last update")),

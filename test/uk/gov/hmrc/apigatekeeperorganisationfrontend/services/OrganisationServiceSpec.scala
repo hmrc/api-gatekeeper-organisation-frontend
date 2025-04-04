@@ -37,8 +37,8 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
   }
   "fetchSubmissions" should {
     "fetch all submission reviews" in new Setup {
-      OrganisationConnectorMock.FetchAllSubmissionReviews.willReturn(List(submissionReview))
-      val result = await(underTest.fetchAllSubmissionReviews())
+      OrganisationConnectorMock.SearchSubmissionReviews.willReturn(List(submissionReview))
+      val result = await(underTest.searchSubmissionReviews(Seq.empty))
       result shouldBe List(submissionReview)
     }
   }

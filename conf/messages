@@ -1,2 +1,10 @@
 service.name = HMRC API Gatekeeper
 service.text = This is your new service
+
+submissionreview.title = Business checks
+submissionreview.filterbystatus = Filter by status
+submissionreview.filter = Filter
+submissionreview.submitted = New
+submissionreview.inprogress = In progress
+submissionreview.approved = Approved
+submissionreview.failed = Failed

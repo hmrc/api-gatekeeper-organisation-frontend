@@ -30,8 +30,10 @@ trait OrganisationServiceMockModule extends SubmissionsTestData {
   object OrganisationServiceMock {
     val aMock = mock[OrganisationService]
 
-    object FetchAllSubmissionReviews {
-      def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.fetchAllSubmissionReviews()(*)).thenReturn(Future.successful(submissionReviews))
+    object SearchSubmissionReviews {
+      def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(*)).thenReturn(Future.successful(submissionReviews))
+
+      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchSubmissionReviews(eqTo(params))(*)
     }
   }
 }
