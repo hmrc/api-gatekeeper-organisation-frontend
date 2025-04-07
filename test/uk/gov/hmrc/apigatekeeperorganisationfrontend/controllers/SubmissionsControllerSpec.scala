@@ -85,11 +85,41 @@ class SubmissionsControllerSpec extends HmrcSpec
     SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
 
   "GET /" should {
-    "return 200 for Stride auth" in {
+    "return 200 for no filter and Stride auth" in {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress))
+
+      val result = controller.submissionsView(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) should include("InProgress org")
+      contentAsString(result) shouldNot include("Approved org")
+      contentAsString(result) shouldNot include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS"))
+    }
+
+    "filter submitted submission reviews" in {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted))
+
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true", "submittedStatus" -> "true"))
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) shouldNot include("InProgress org")
+      contentAsString(result) shouldNot include("Approved org")
+      contentAsString(result) shouldNot include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED"))
+    }
+
+    "filter with no statuses selected" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
 
-      val result = controller.submissionsView(fakeRequest)
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
@@ -100,19 +130,25 @@ class SubmissionsControllerSpec extends HmrcSpec
       OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq.empty)
     }
 
-    "filter submitted and in progress submission reviews" in {
+    "filter with all statuses selected" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress))
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("submittedStatus" -> "true", "inProgressStatus" -> "true"))
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody(
+        "control"          -> "true",
+        "submittedStatus"  -> "true",
+        "inProgressStatus" -> "true",
+        "approvedStatus"   -> "true",
+        "failedStatus"     -> "true"
+      ))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
       contentAsString(result) should include("InProgress org")
-      contentAsString(result) shouldNot include("Approved org")
-      contentAsString(result) shouldNot include("Failed org")
+      contentAsString(result) should include("Approved org")
+      contentAsString(result) should include("Failed org")
 
-      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS"))
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS", "status" -> "APPROVED", "status" -> "FAILED"))
     }
 
     "return 200 for Ldap auth" in {

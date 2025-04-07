@@ -42,7 +42,8 @@
 
     @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView, Symbol("class") -> "form") {
       @helper.CSRF.formField
-      
+      <input id="control" name="control" type="hidden" value="true"/>
+
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-heading-m govuk-!-margin-bottom-1 govuk-!-font-weight-bold">

@@ -32,14 +32,16 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 object SubmissionsController {
 
   case class FilterForm(
-      submittedStatus: Option[String],
-      inProgressStatus: Option[String],
-      approvedStatus: Option[String],
-      failedStatus: Option[String]
+      control: String = "true",
+      submittedStatus: Option[String] = Some("true"),
+      inProgressStatus: Option[String] = Some("true"),
+      approvedStatus: Option[String] = None,
+      failedStatus: Option[String] = None
     )
 
   val filterForm: Form[FilterForm] = Form(
     mapping(
+      "control"          -> text,
       "submittedStatus"  -> optional(text),
       "inProgressStatus" -> optional(text),
       "approvedStatus"   -> optional(text),
@@ -60,7 +62,7 @@ class SubmissionsController @Inject() (
   import SubmissionsController._
 
   val submissionsView: Action[AnyContent] = loggedInOnly() { implicit request =>
-    def handleValidForm(form: FilterForm) = {
+    def doSearch(form: FilterForm) = {
       val params: Seq[(String, String)] = getQueryParamsFromForm(form)
       val queryForm                     = filterForm.fill(form)
 
@@ -69,10 +71,13 @@ class SubmissionsController @Inject() (
         .map(subs => Ok(submissionListPage(queryForm, subs)))
     }
 
+    def handleValidForm(form: FilterForm) = {
+      doSearch(form)
+    }
+
     def handleInvalidForm(form: Form[FilterForm]) = {
-      organisationService
-        .searchSubmissionReviews(Seq.empty)
-        .map(subs => Ok(submissionListPage(form, subs)))
+      val defaultForm = FilterForm()
+      doSearch(defaultForm)
     }
 
     SubmissionsController.filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
