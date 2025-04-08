@@ -47,7 +47,7 @@ class SubmissionsControllerSpec extends HmrcSpec
     new GuiceApplicationBuilder()
       .build()
 
-  private val fakeRequest = FakeRequest("GET", "/").withCSRFToken
+  private val fakeRequest = FakeRequest("GET", "/")
   val page                = app.injector.instanceOf[SubmissionListPage]
   val mcc                 = app.injector.instanceOf[MessagesControllerComponents]
   private val controller  = new SubmissionsController(mcc, page, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
