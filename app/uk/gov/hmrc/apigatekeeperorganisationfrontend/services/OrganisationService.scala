@@ -28,7 +28,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConn
 @Singleton
 class OrganisationService @Inject() (orgConnector: OrganisationConnector) {
 
-  def fetchAllSubmissionReviews()(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
-    orgConnector.fetchAllSubmissionReviews()
+  def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
+    orgConnector.searchSubmissionReviews(params)
   }
 }

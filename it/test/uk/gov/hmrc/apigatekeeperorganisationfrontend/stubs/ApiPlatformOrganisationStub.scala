@@ -26,11 +26,11 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.S
 
 object ApiPlatformOrganisationStub {
 
-  object FetchAllSubmissionReviews {
+  object SearchSubmissionReviews {
 
-    def succeeds(submissionReview: SubmissionReview): StubMapping = {
+    def succeeds(status: String, submissionReview: SubmissionReview): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/submission-reviews"))
+        get(urlEqualTo(s"/submission-reviews?status=$status"))
           .willReturn(
             aResponse()
               .withStatus(OK)

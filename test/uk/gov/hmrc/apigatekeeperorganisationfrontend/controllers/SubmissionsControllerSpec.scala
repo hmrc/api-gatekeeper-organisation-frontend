@@ -26,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.apiplatformorganisationfrontend.WithCSRFAddToken
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -37,6 +38,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 class SubmissionsControllerSpec extends HmrcSpec
     with GuiceOneAppPerSuite
+    with WithCSRFAddToken
     with StrideAuthorisationServiceMockModule
     with LdapAuthorisationServiceMockModule
     with OrganisationServiceMockModule {
@@ -53,35 +55,106 @@ class SubmissionsControllerSpec extends HmrcSpec
   val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
   val submissionReviewSubmitted =
-    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 1"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+    SubmissionReview(
+      SubmissionId.random,
+      0,
+      OrganisationName("Submitted org"),
+      instant,
+      "bob@example.com",
+      instant,
+      SubmissionReview.State.Submitted,
+      List(submissionReviewEvent)
+    )
 
   val submissionReviewInProgress =
-    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 2"), instant, "bob@example.com", instant, SubmissionReview.State.InProgress, List(submissionReviewEvent))
+    SubmissionReview(
+      SubmissionId.random,
+      0,
+      OrganisationName("InProgress org"),
+      instant,
+      "bob@example.com",
+      instant,
+      SubmissionReview.State.InProgress,
+      List(submissionReviewEvent)
+    )
 
   val submissionReviewApproved =
-    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 3"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
 
   val submissionReviewFailed =
-    SubmissionReview(SubmissionId.random, 0, OrganisationName("My org 4"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
+    SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
 
   "GET /" should {
-    "return 200 for Stride auth" in {
+    "return 200 for no filter and Stride auth" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress))
 
       val result = controller.submissionsView(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("New")
-      contentAsString(result) should include("In progress")
-      contentAsString(result) should include("Approved")
-      contentAsString(result) should include("Failed")
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) should include("InProgress org")
+      contentAsString(result) shouldNot include("Approved org")
+      contentAsString(result) shouldNot include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS"))
+    }
+
+    "filter submitted submission reviews" in {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted))
+
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true", "submittedStatus" -> "true"))
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) shouldNot include("InProgress org")
+      contentAsString(result) shouldNot include("Approved org")
+      contentAsString(result) shouldNot include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED"))
+    }
+
+    "filter with no statuses selected" in {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
+
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true"))
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) should include("InProgress org")
+      contentAsString(result) should include("Approved org")
+      contentAsString(result) should include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq.empty)
+    }
+
+    "filter with all statuses selected" in {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
+
+      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody(
+        "control"          -> "true",
+        "submittedStatus"  -> "true",
+        "inProgressStatus" -> "true",
+        "approvedStatus"   -> "true",
+        "failedStatus"     -> "true"
+      ))
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Submitted org")
+      contentAsString(result) should include("InProgress org")
+      contentAsString(result) should include("Approved org")
+      contentAsString(result) should include("Failed org")
+
+      OrganisationServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS", "status" -> "APPROVED", "status" -> "FAILED"))
     }
 
     "return 200 for Ldap auth" in {
       StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
       LdapAuthorisationServiceMock.Auth.succeeds
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewApproved))
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewApproved))
 
       val result = controller.submissionsView(fakeRequest)
 
@@ -99,7 +172,7 @@ class SubmissionsControllerSpec extends HmrcSpec
 
     "return HTML" in {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchAllSubmissionReviews.succeed(List(submissionReviewSubmitted))
+      OrganisationServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted))
 
       val result = controller.submissionsView(fakeRequest)
 
