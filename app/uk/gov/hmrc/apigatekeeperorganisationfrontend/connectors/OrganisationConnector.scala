@@ -20,21 +20,42 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.{Inject, Singleton}
 
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
 
 @Singleton
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
+
+  import OrganisationConnector._
 
   def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")
       .execute[List[SubmissionReview]]
   }
+
+  def fetchSubmissionReview(submissionId: SubmissionId, instanceIndex: Int)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
+    http.get(url"${config.serviceBaseUrl}/submission-review/$submissionId/$instanceIndex")
+      .execute[Option[SubmissionReview]]
+  }
+
+  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
+
+    http.post(url"${config.serviceBaseUrl}/submission/${submissionId}/approve")
+      .withBody(Json.toJson(ApproveSubmissionRequest(approvedBy, comment)))
+      .execute[Either[UpstreamErrorResponse, Submission]]
+      .map(_.leftMap(failed))
+  }
 }
 
 object OrganisationConnector {
   case class Config(serviceBaseUrl: String)
+
+  case class ApproveSubmissionRequest(approvedBy: String, comment: Option[String])
+  implicit val writesApproveSubmissionRequest: Writes[ApproveSubmissionRequest] = Json.writes[ApproveSubmissionRequest]
 }

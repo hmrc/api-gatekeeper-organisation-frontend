@@ -8,3 +8,7 @@ submissionreview.submitted = New
 submissionreview.inprogress = In progress
 submissionreview.approved = Approved
 submissionreview.failed = Failed
+
+approvesubmission.title = Are you sure that you want to approve {0}?
+approvesubmission.subtitle = Business checks
+approvesubmission.hinttext = This will allow {0} to request credentials to use live tax data in our production environment.

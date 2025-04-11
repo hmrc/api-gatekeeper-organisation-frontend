@@ -15,6 +15,11 @@ lazy val microservice = Project("api-gatekeeper-organisation-frontend", file("."
     scalacOptions += "-Wconf:src=routes/.*:s",
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
     pipelineStages := Seq(gzip),
+    routesImport ++= Seq(
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+      "uk.gov.hmrc.apiplatform.modules.organisations.domain.models._",
+      "uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._"
+    )
   )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
