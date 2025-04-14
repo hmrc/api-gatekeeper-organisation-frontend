@@ -35,11 +35,20 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
     val submissionReview =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
   }
-  "fetchSubmissions" should {
+
+  "searchSubmissionReviews" should {
     "fetch all submission reviews" in new Setup {
       OrganisationConnectorMock.SearchSubmissionReviews.willReturn(List(submissionReview))
       val result = await(underTest.searchSubmissionReviews(Seq.empty))
       result shouldBe List(submissionReview)
+    }
+  }
+
+  "fetchSubmissionReview" should {
+    "fetch a submission review" in new Setup {
+      OrganisationConnectorMock.FetchSubmissionReview.willReturn(Some(submissionReview))
+      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
+      result shouldBe Some(submissionReview)
     }
   }
 }
