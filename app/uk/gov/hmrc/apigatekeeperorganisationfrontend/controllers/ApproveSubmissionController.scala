@@ -53,6 +53,7 @@ object ApproveSubmissionController {
 class ApproveSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     approveSubmissionPage: ApproveSubmissionPage,
+    approveSubmissionConfirmPage: ApproveSubmissionConfirmPage,
     organisationService: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
@@ -86,7 +87,7 @@ class ApproveSubmissionController @Inject() (
           case Some("Yes") => {
             organisationService.approveSubmission(submissionId, request.name.get, confirmData.comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.SubmissionsController.submissionsView())
+                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId, instanceIndex))
                 case Left(msg)  => BadRequest(msg)
               })
           }
@@ -95,4 +96,12 @@ class ApproveSubmissionController @Inject() (
       }
     )
   }
+
+  def confirmPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+    organisationService.fetchSubmissionReview(submissionId, instanceIndex) map {
+      case Some(sr) => Ok(approveSubmissionConfirmPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName)))
+      case _        => BadRequest("Submission review not found")
+    }
+  }
+
 }

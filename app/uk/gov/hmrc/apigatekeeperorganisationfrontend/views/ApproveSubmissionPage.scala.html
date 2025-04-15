@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.{ApproveSubmissionViewModel, ApproveSubmissionForm}
-@import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Text}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
@@ -58,11 +57,14 @@
           )
         ).withFormField(form("confirm")))
 
-        @govukButton(Button(
-          id = Some("confirm"), 
-          isStartButton = false,
-          content = Text("Confirm and send")))
+        <div class="govuk-button-group">
+          @govukButton(Button(
+            id = Some("confirm"), 
+            isStartButton = false,
+            content = Text(messages("approvesubmission.confirm"))))
 
-        <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-button govuk-button--secondary">Cancel</a>
-    }
+          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
+        </div>
+
+      }
 }

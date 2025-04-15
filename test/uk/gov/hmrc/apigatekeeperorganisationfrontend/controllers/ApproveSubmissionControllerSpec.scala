@@ -48,9 +48,10 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val page       = app.injector.instanceOf[ApproveSubmissionPage]
-    val mcc        = app.injector.instanceOf[MessagesControllerComponents]
-    val controller = new ApproveSubmissionController(mcc, page, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
+    val page        = app.injector.instanceOf[ApproveSubmissionPage]
+    val confirmPage = app.injector.instanceOf[ApproveSubmissionConfirmPage]
+    val mcc         = app.injector.instanceOf[MessagesControllerComponents]
+    val controller  = new ApproveSubmissionController(mcc, page, confirmPage, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
@@ -138,7 +139,7 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
 
   "post approve action" should {
     val fakeRequest = FakeRequest("POST", "/submission/approve").withCSRFToken
-    "return 303 for form validation successful and submission approval successful" in new Setup {
+    "return 303 for form validation successful and submission approval successful with comment" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       OrganisationServiceMock.ApproveSubmission.succeed(aSubmission)
 
@@ -147,6 +148,17 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.SEE_OTHER
       OrganisationServiceMock.ApproveSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", Some("approve comment"))
+    }
+
+    "return 303 for form validation successful and submission approval successful with no comment" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.ApproveSubmission.succeed(aSubmission)
+
+      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
+      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+
+      status(result) shouldBe Status.SEE_OTHER
+      OrganisationServiceMock.ApproveSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", None)
     }
 
     "return 400 for form validation failed" in new Setup {
@@ -158,6 +170,23 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Please select an option")
       OrganisationServiceMock.ApproveSubmission.verifyNeverCalled()
+    }
+  }
+
+  "get approve confirmation page" should {
+    val fakeRequest = FakeRequest("GET", "/submission/approve-confirm").withCSRFToken
+    "return 200 for submission review found" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewApproved))
+
+      val result = controller.confirmPage(submissionReviewApproved.submissionId, submissionReviewApproved.instanceIndex)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(s"The business check for ${submissionReviewApproved.organisationName.value} has been approved")
+      contentAsString(result) should include(
+        s"${submissionReviewApproved.organisationName.value} can now request access to tax data in our production environment."
+      )
+      contentAsString(result) should include("Back to business checks")
     }
   }
 }
