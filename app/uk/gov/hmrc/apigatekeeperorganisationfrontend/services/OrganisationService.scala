@@ -22,7 +22,7 @@ import com.google.inject.{Inject, Singleton}
 
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
 
 @Singleton
@@ -36,7 +36,7 @@ class OrganisationService @Inject() (orgConnector: OrganisationConnector) {
     orgConnector.fetchSubmissionReview(submissionId, instanceIndex)
   }
 
-  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier) = {
+  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     orgConnector.approveSubmission(submissionId, approvedBy, comment)
   }
 }

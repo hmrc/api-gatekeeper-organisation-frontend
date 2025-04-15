@@ -20,12 +20,11 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
 
-trait OrganisationServiceMockModule extends SubmissionsTestData {
-  self: MockitoSugar with ArgumentMatchersSugar =>
+trait OrganisationServiceMockModule extends SubmissionsTestData with MockitoSugar with ArgumentMatchersSugar {
 
   object OrganisationServiceMock {
     val aMock = mock[OrganisationService]
@@ -38,6 +37,15 @@ trait OrganisationServiceMockModule extends SubmissionsTestData {
 
     object FetchSubmissionReview {
       def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId], *)(*)).thenReturn(Future.successful(submissionReview))
+    }
+
+    object ApproveSubmission {
+      def succeed(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+
+      def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: Option[String]) =
+        verify(aMock).approveSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
+
+      def verifyNeverCalled() = verify(aMock, never).approveSubmission(*[SubmissionId], *, *)(*)
     }
   }
 }

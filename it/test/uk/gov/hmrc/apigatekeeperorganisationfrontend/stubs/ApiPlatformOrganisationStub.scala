@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, stubFor, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
 
 object ApiPlatformOrganisationStub {
 
@@ -68,6 +68,31 @@ object ApiPlatformOrganisationStub {
     def fails(submissionId: SubmissionId, instanceIndex: Int, status: Int): StubMapping = {
       stubFor(
         get(urlEqualTo(s"/submission-review/$submissionId/$instanceIndex"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object ApproveSubmission {
+
+    def succeeds(submissionId: SubmissionId, submission: Submission): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/submission/${submissionId}/approve"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(submission).toString())
+          )
+      )
+    }
+
+    def fails(submissionId: SubmissionId, status: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/submission/${submissionId}/approve"))
           .willReturn(
             aResponse()
               .withStatus(status)

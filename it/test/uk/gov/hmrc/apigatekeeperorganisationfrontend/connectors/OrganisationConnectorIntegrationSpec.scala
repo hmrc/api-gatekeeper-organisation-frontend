@@ -94,4 +94,22 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
+
+  "approveSubmission" should {
+    "successfully approve" in new Setup {
+      ApiPlatformOrganisationStub.ApproveSubmission.succeeds(aSubmission.id, aSubmission)
+
+      val result = await(underTest.approveSubmission(aSubmission.id, "approvedBy", Some("some comment")))
+
+      result shouldBe Right(aSubmission)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.ApproveSubmission.fails(aSubmission.id, INTERNAL_SERVER_ERROR)
+
+      val result = await(underTest.approveSubmission(aSubmission.id, "approvedBy", Some("some comment")))
+
+      result shouldBe Left(s"Failed to approve submission ${aSubmission.id}")
+    }
+  }
 }

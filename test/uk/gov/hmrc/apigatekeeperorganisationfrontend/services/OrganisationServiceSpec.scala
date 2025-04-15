@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.services
 
-import uk.gov.hmrc.apiplatformorganisationfrontend.AsyncHmrcSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.AsyncHmrcSpec
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.OrganisationConnectorMockModule
 
 class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule {
 
-  trait Setup extends FixedClock {
+  trait Setup extends FixedClock with SubmissionsTestData {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val underTest                  = new OrganisationService(OrganisationConnectorMock.aMock)
 
@@ -49,6 +50,14 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
       OrganisationConnectorMock.FetchSubmissionReview.willReturn(Some(submissionReview))
       val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
       result shouldBe Some(submissionReview)
+    }
+  }
+
+  "approveSubmission" should {
+    "approve a submission" in new Setup {
+      OrganisationConnectorMock.ApproveSubmission.willReturn(aSubmission)
+      val result = await(underTest.approveSubmission(aSubmission.id, "approvedBy", Some("comment")))
+      result shouldBe Right(aSubmission)
     }
   }
 }

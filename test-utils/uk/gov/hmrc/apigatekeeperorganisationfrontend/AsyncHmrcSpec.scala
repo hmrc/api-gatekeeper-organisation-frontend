@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisationfrontend
+package uk.gov.hmrc.apigatekeeperorganisationfrontend
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 

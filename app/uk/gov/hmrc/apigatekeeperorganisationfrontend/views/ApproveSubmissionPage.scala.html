@@ -14,19 +14,20 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.ApproveSubmissionViewModel
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.{ApproveSubmissionViewModel, ApproveSubmissionForm}
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
 
-@this(layout: Layout, govukRadios: GovukRadios)
+@this(layout: Layout, govukRadios: GovukRadios, govukButton: GovukButton)
 
-@(model: ApproveSubmissionViewModel)(implicit request: RequestHeader, messages: Messages)
+@(model: ApproveSubmissionViewModel, form: Form[ApproveSubmissionForm])(implicit request: RequestHeader, messages: Messages)
 
 @buildConditionalHtml() = @{
-  Html("<label class='govuk-label'>Give your reasons for approving this check</label><textarea class='govuk-textarea' name='comment'></textarea>")
+  Html("<label class='govuk-label' for='comment' id='comment-label'>Give your reasons for approving this check</label><textarea class='govuk-textarea' name='comment' id='comment' rows='3' describedby='comment-label'></textarea>")
 }
 
 @layout(pageTitle = Some("HMRC API Gatekeeper - Are you sure you want to approve?")) {
@@ -34,24 +35,34 @@
     <span class="govuk-caption-l">@{messages("approvesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("approvesubmission.title", model.organisationName.toString())}</h1>
 
-    @govukRadios(Radios(
-      name = "approveSubmissionYesNo",
-      fieldset = Some(Fieldset(
-        legend = Some(Legend(
-          content = Text(messages("approvesubmission.hinttext", model.organisationName.toString()))
-        ))
-      )),
-      items = Seq(
-        RadioItem(
-          content = Text("Yes"),
-          value = Some("yes"),
-          conditionalHtml = Some(buildConditionalHtml())
-        ),
-        RadioItem(
-          content = Text("No"),
-          value = Some("no")
-        )
-      )
-    ))
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ApproveSubmissionController.action(model.submissionId, model.instanceIndex)) {
+      @helper.CSRF.formField
 
+        @govukRadios(Radios(
+          name = "confirm",
+          fieldset = Some(Fieldset(
+            legend = Some(Legend(
+              content = Text(messages("approvesubmission.hinttext", model.organisationName.toString()))
+            ))
+          )),
+          items = Seq(
+            RadioItem(
+              content = Text("Yes"),
+              value = Some("Yes"),
+              conditionalHtml = Some(buildConditionalHtml())
+            ),
+            RadioItem(
+              content = Text("No"),
+              value = Some("No")
+            )
+          )
+        ).withFormField(form("confirm")))
+
+        @govukButton(Button(
+          id = Some("confirm"), 
+          isStartButton = false,
+          content = Text("Confirm and send")))
+
+        <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-button govuk-button--secondary">Cancel</a>
+    }
 }
