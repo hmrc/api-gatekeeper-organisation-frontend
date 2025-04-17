@@ -12,6 +12,7 @@ submissionreview.failed = Failed
 viewsubmission.title = Business checks
 viewsubmission.review = Review this check
 viewsubmission.comment = Add a comment on this check
+viewsubmission.viewanswers = View check answers
 viewsubmission.history = Check history
 
 approvesubmission.title = Are you sure that you want to approve {0}?

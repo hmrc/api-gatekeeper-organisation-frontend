@@ -87,7 +87,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
   "get view summary page" should {
     val fakeRequest = FakeRequest("GET", "/submission").withCSRFToken
-    "return 200 for submission review found" in new Setup {
+    "return 200 for submission review found and isSubmitted" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
@@ -96,6 +96,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
       contentAsString(result) should include(submissionReviewSubmitted.organisationName.value)
+      contentAsString(result) should include("New")
       contentAsString(result) should include("Review this check")
       contentAsString(result) should include("Add a comment on this check")
       contentAsString(result) should include("Check history")
@@ -111,10 +112,45 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
       contentAsString(result) should include(submissionReviewInProgress.organisationName.value)
+      contentAsString(result) should include("In progress")
       contentAsString(result) should include("Review this check")
       contentAsString(result) should include("Add a comment on this check")
       contentAsString(result) should include("Check history")
       contentAsString(result) should include(submissionReviewInProgress.events.head.description)
+    }
+
+    "return 200 for submission review found and isApproved" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewApproved))
+
+      val result = controller.page(submissionReviewApproved.submissionId, submissionReviewApproved.instanceIndex)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include(submissionReviewApproved.organisationName.value)
+      contentAsString(result) should include("Approved")
+      contentAsString(result) should include("View check answers")
+      contentAsString(result) shouldNot include("Review this check")
+      contentAsString(result) shouldNot include("Add a comment on this check")
+      contentAsString(result) should include("Check history")
+      contentAsString(result) should include(submissionReviewApproved.events.head.description)
+    }
+
+    "return 200 for submission review found and isFailed" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewFailed))
+
+      val result = controller.page(submissionReviewFailed.submissionId, submissionReviewFailed.instanceIndex)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include(submissionReviewFailed.organisationName.value)
+      contentAsString(result) should include("Failed")
+      contentAsString(result) should include("View check answers")
+      contentAsString(result) shouldNot include("Review this check")
+      contentAsString(result) shouldNot include("Add a comment on this check")
+      contentAsString(result) should include("Check history")
+      contentAsString(result) should include(submissionReviewFailed.events.head.description)
     }
 
     "return 400 if submission review not found" in new Setup {

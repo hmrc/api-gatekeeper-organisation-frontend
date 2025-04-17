@@ -54,13 +54,17 @@
       ))
 
       <div class="govuk-button-group">
-        @govukButton(Button(
-          id = Some("confirm"), 
-          isStartButton = false,
-          content = Text(messages("viewsubmission.review"))))
+        @if(submissionReview.state.isSubmitted || submissionReview.state.isInProgress) {
+          @govukButton(Button(
+            id = Some("confirm"), 
+            isStartButton = false,
+            content = Text(messages("viewsubmission.review"))))
 
-        <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
-      </div>
+          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
+        } else {
+          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
+        }
+        </div>
 
       <h2 class="govuk-heading-l">@messages("viewsubmission.history")</h2>
 
