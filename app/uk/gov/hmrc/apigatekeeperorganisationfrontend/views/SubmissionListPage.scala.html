@@ -32,8 +32,12 @@
     case SubmissionReview.State.InProgress => "<strong class='govuk-tag govuk-tag--blue'>In progress</strong>"
     case SubmissionReview.State.Approved   => "<strong class='govuk-tag govuk-tag--purple'>Approved</strong>"
     case SubmissionReview.State.Failed     => "<strong class='govuk-tag govuk-tag--red'>Failed</strong>"
-    case _                                 => "<strong class='govuk-tag'>{state.toString}</strong>"
+    case _                                 => "<strong class='govuk-tag'>" + {state.toString} + "</strong>"
   }
+}
+
+@buildOrganisationLinkHtml(sr: SubmissionReview) = {
+  <a href='@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.page(sr.submissionId, sr.instanceIndex)' class='govuk-link govuk-link--no-visited-state'>@{sr.organisationName.toString()}</a>
 }
 
 @layout(pageTitle = Some("HMRC API Gatekeeper - Business checks")) {
@@ -114,7 +118,7 @@
                 HeadCell(content = Text("Status"))
             )),
             rows = submissionReviews.map(sub => Seq(
-                TableRow(content = Text(sub.organisationName.toString())),
+                TableRow(content = HtmlContent(buildOrganisationLinkHtml(sub))),
                 TableRow(content = Text(dateFormatter.format(sub.lastUpdate.atOffset(ZoneOffset.UTC).toLocalDateTime))),
                 TableRow(content = HtmlContent(buildStatusHtml(sub.state)))
             ))
