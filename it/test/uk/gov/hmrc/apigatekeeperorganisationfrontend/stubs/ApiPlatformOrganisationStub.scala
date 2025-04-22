@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 
 object ApiPlatformOrganisationStub {
 
@@ -93,6 +93,33 @@ object ApiPlatformOrganisationStub {
     def fails(submissionId: SubmissionId, status: Int): StubMapping = {
       stubFor(
         post(urlEqualTo(s"/submission/${submissionId}/approve"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object FetchSubmission {
+
+    import Submission._
+
+    def succeeds(submissionId: SubmissionId, submission: ExtendedSubmission): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/submission/$submissionId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(submission).toString())
+          )
+      )
+    }
+
+    def fails(submissionId: SubmissionId, status: Int): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/submission/$submissionId"))
           .willReturn(
             aResponse()
               .withStatus(status)

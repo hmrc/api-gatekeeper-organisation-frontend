@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcTimeline, Timeline, Event}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukTable, HeadCell, HtmlContent, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
@@ -56,13 +57,14 @@
       <div class="govuk-button-group">
         @if(submissionReview.state.isSubmitted || submissionReview.state.isInProgress) {
           @govukButton(Button(
-            id = Some("confirm"), 
+            id = Some("reviewCheck"), 
             isStartButton = false,
-            content = Text(messages("viewsubmission.review"))))
+            content = Text(messages("viewsubmission.review")),
+            href=Some(routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex).url)))
 
-          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
+          <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
         } else {
-          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
+          <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
         }
         </div>
 

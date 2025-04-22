@@ -25,6 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseControll
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
@@ -32,16 +33,26 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 class ViewSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     viewSubmissionSummaryPage: ViewSubmissionSummaryPage,
+    viewSubmittedAnswersPage: ViewSubmittedAnswersPage,
     organisationService: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(implicit ec: ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
-  def page(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def summaryPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
     organisationService.fetchSubmissionReview(submissionId, instanceIndex) map {
       case Some(sr) => Ok(viewSubmissionSummaryPage(sr))
       case _        => BadRequest("Submission review not found")
+    }
+  }
+
+  def checkAnswersPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+    organisationService.fetchSubmission(submissionId).map {
+      case Some(extSubmission) =>
+        val viewModel = convertSubmissionToViewModel(extSubmission, instanceIndex)
+        Ok(viewSubmittedAnswersPage(viewModel))
+      case None                => BadRequest("Submission not found")
     }
   }
 }

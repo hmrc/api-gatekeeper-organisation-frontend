@@ -25,12 +25,13 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 
 @Singleton
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
 
   import OrganisationConnector._
+  import Submission._
 
   def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")
@@ -40,6 +41,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   def fetchSubmissionReview(submissionId: SubmissionId, instanceIndex: Int)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-review/$submissionId/$instanceIndex")
       .execute[Option[SubmissionReview]]
+  }
+
+  def fetchSubmission(id: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+    http.get(url"${config.serviceBaseUrl}/submission/${id.value}")
+      .execute[Option[ExtendedSubmission]]
   }
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
