@@ -32,7 +32,7 @@
     @answersFragment(model)
 
     <div class="govuk-button-group">
-        @if(model.isLatestInstanceIndex) {
+        @if(model.allowUpdate) {
           @govukButton(Button(
             id = Some("approve"), 
             isStartButton = false,
@@ -45,7 +45,8 @@
             isStartButton = false,
             classes = "govuk-button--secondary",
             content = Text(messages("viewsubmittedanswers.fail"))))
-    
+        } else {
+          <a href="@routes.ViewSubmissionController.summaryPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmittedanswers.backtosummary")</a>
         }
         </div>
 

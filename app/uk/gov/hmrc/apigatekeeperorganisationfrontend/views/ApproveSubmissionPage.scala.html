@@ -63,7 +63,7 @@
             isStartButton = false,
             content = Text(messages("approvesubmission.confirm"))))
 
-          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
+          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.summaryPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
         </div>
 
       }

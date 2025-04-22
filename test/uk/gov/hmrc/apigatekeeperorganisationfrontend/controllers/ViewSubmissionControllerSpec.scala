@@ -88,6 +88,11 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     val submissionReviewFailed =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
+
+    val extendedSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
+      .hasCompletelyAnsweredWith(answersToQuestions)
+      .withSubmittedProgress()
+
   }
 
   "get view summary page" should {
@@ -171,28 +176,29 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
   "get check summitted answers page" should {
     val fakeRequest = FakeRequest("GET", "/submission/answers").withCSRFToken
+
     "return 200 for submission found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmission.succeed(Some(completelyAnswerExtendedSubmission))
+      OrganisationServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
 
-      val result = controller.checkAnswersPage(completelyAnswerExtendedSubmission.submission.id, completelyAnswerExtendedSubmission.submission.latestInstance.index)(fakeRequest)
+      val result = controller.checkAnswersPage(extendedSubmittedSubmission.submission.id, extendedSubmittedSubmission.submission.latestInstance.index)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
-      contentAsString(result) should include(completelyAnswerExtendedSubmission.submission.name)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.name)
       contentAsString(result) should include("Approve this check")
       contentAsString(result) should include("Fail this check")
     }
 
     "return 200 for submission found but instance not latest" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmission.succeed(Some(completelyAnswerExtendedSubmission))
+      OrganisationServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
 
-      val result = controller.checkAnswersPage(completelyAnswerExtendedSubmission.submission.id, 3)(fakeRequest)
+      val result = controller.checkAnswersPage(extendedSubmittedSubmission.submission.id, 3)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
-      contentAsString(result) should include(completelyAnswerExtendedSubmission.submission.name)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.name)
       contentAsString(result) shouldNot include("Approve this check")
       contentAsString(result) shouldNot include("Fail this check")
     }

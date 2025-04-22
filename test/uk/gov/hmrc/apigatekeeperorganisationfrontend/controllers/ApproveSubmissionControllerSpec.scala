@@ -177,7 +177,10 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView().url)
+      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.checkAnswersPage(
+        submissionReviewSubmitted.submissionId,
+        submissionReviewSubmitted.instanceIndex
+      ).url)
       OrganisationServiceMock.ApproveSubmission.verifyNeverCalled()
     }
 

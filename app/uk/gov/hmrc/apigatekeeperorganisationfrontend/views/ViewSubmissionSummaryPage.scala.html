@@ -64,7 +64,7 @@
 
           <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
         } else {
-          <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
         }
         </div>
 

@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 object AnswersViewModel {
   case class ViewQuestion(id: Question.Id, text: String, answer: String)
   case class ViewQuestionnaire(label: String, state: String, id: Questionnaire.Id, questions: NonEmptyList[ViewQuestion])
-  case class ViewModel(submissionId: SubmissionId, instanceIndex: Int, isLatestInstanceIndex: Boolean, organisationName: OrganisationName, questionnaires: List[ViewQuestionnaire])
+  case class ViewModel(submissionId: SubmissionId, instanceIndex: Int, allowUpdate: Boolean, organisationName: OrganisationName, questionnaires: List[ViewQuestionnaire])
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
   private def convertAnswer(answer: ActualAnswer): Option[String] = answer match {
@@ -65,7 +65,7 @@ object AnswersViewModel {
       .map(convertQuestionnaire(extSubmission, instanceIndex))
       .collect { case Some(x) => x }
 
-    val isLatestInstanceIndex: Boolean = instanceIndex == extSubmission.submission.latestInstance.index
-    ViewModel(extSubmission.submission.id, instanceIndex, isLatestInstanceIndex, OrganisationName(extSubmission.submission.name), questionnaires)
+    val allowUpdate: Boolean = (instanceIndex == extSubmission.submission.latestInstance.index) && extSubmission.submission.status.isSubmitted
+    ViewModel(extSubmission.submission.id, instanceIndex, allowUpdate, OrganisationName(extSubmission.submission.name), questionnaires)
   }
 }

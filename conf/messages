@@ -18,6 +18,7 @@ viewsubmission.history = Check history
 viewsubmittedanswers.title = Business checks
 viewsubmittedanswers.approve = Approve this check
 viewsubmittedanswers.fail = Fail this check
+viewsubmittedanswers.backtosummary = Back to business checks
 
 approvesubmission.title = Are you sure that you want to approve {0}?
 approvesubmission.subtitle = Business checks
