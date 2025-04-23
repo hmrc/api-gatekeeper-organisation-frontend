@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+@import include._
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
@@ -25,16 +26,6 @@
 @this(layout: Layout, govukTable: GovukTable)
 
 @(form: Form[FilterForm], submissionReviews: List[SubmissionReview])(implicit request: RequestHeader, messages: Messages)
-
-@buildStatusHtml(state: SubmissionReview.State) = @{
-  state match {
-    case SubmissionReview.State.Submitted  => "<strong class='govuk-tag govuk-tag--green'>New</strong>"
-    case SubmissionReview.State.InProgress => "<strong class='govuk-tag govuk-tag--blue'>In progress</strong>"
-    case SubmissionReview.State.Approved   => "<strong class='govuk-tag govuk-tag--purple'>Approved</strong>"
-    case SubmissionReview.State.Failed     => "<strong class='govuk-tag govuk-tag--red'>Failed</strong>"
-    case _                                 => "<strong class='govuk-tag'>" + {state.toString} + "</strong>"
-  }
-}
 
 @buildOrganisationLinkHtml(sr: SubmissionReview) = {
   <a href='@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.summaryPage(sr.submissionId, sr.instanceIndex)' class='govuk-link govuk-link--no-visited-state'>@{sr.organisationName.toString()}</a>
