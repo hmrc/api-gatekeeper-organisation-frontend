@@ -24,7 +24,10 @@
 
 @(model: ViewModel)(implicit request: RequestHeader, messages: Messages)
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Organisation verification request details")) {
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Organisation verification request details"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url))),
+) {
   
     <span class="govuk-caption-l">@messages("viewsubmittedanswers.title")</span>
     <h1 class="govuk-heading-l">@{model.organisationName.toString()}</h1>

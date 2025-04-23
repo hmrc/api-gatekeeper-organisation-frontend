@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.{ApproveSubmissionViewModel, ApproveSubmissionForm}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Text}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
@@ -25,7 +26,10 @@
 
 @(model: ApproveSubmissionViewModel)(implicit request: RequestHeader, messages: Messages)
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Business check approved")) {
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Business check approved"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+) {
 
   @govukPanel(Panel(
     title = Text(messages("approvesubmissionconfirm.title", model.organisationName.toString()))
@@ -36,6 +40,6 @@
   <p class="govuk-body">@messages("approvesubmissionconfirm.hinttext", model.organisationName.toString())</p>
 
   <div class="govuk-button-group">
-    <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
+    <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
   </div>
 }

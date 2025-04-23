@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcTimeline, Timeline, Event}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukTable, HeadCell, HtmlContent, Table, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukTable, BreadcrumbsItem, HeadCell, HtmlContent, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
@@ -37,7 +37,10 @@
   }
 }
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Business checks")) {
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Business checks"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+) {
 
     <span class="govuk-caption-l">@messages("viewsubmission.title")</span>
     <h1 class="govuk-heading-l">@{submissionReview.organisationName.toString()}</h1>
