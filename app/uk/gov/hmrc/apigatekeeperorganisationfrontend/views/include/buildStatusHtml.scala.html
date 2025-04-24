@@ -16,13 +16,13 @@
 
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 
-@(state: SubmissionReview.State)
-
-  state match {
-    case SubmissionReview.State.Submitted  => "<strong class='govuk-tag govuk-tag--green'>New</strong>"
-    case SubmissionReview.State.InProgress => "<strong class='govuk-tag govuk-tag--blue'>In progress</strong>"
-    case SubmissionReview.State.Approved   => "<strong class='govuk-tag govuk-tag--purple'>Approved</strong>"
-    case SubmissionReview.State.Failed     => "<strong class='govuk-tag govuk-tag--red'>Failed</strong>"
-    case _                                 => "<strong class='govuk-tag'>" + {state.toString} + "</strong>"
+@(state: SubmissionReview.State)  
+  @{
+    state match {
+      case SubmissionReview.State.Submitted  => <strong class='govuk-tag govuk-tag--green'>New</strong>
+      case SubmissionReview.State.InProgress => <strong class='govuk-tag govuk-tag--blue'>In progress</strong>
+      case SubmissionReview.State.Approved   => <strong class='govuk-tag govuk-tag--purple'>Approved</strong>
+      case SubmissionReview.State.Failed     => <strong class='govuk-tag govuk-tag--red'>Failed</strong>
+      case _                                 => <strong class='govuk-tag'> + @{state.toString} + </strong>
+    }
   }
-

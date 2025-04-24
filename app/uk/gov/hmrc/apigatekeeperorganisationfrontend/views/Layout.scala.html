@@ -39,16 +39,12 @@
 @hmrcScripts()
 }
 
-@buildABackLink(link: Option[BackLink]) = {
-    @if(link.isDefined) {
+@buildBreadcrumbs(crumbs: Seq[BreadcrumbsItem], link: Option[BackLink]) = {
+    @if(link.isDefined) { 
       @govukBackLink(link.get)
-    } else {}
-  }
-
-@buildBreadcrumbs(crumbs: Seq[BreadcrumbsItem]) = {
-    @if(!crumbs.isEmpty) {
+    } else {
       @govukBreadcrumbs(Breadcrumbs(items = crumbs))
-    } else {}
+    }
   }
 
 @userBanner = {
@@ -68,8 +64,7 @@
     <div style="display: flex;
         justify-content: space-between;
         align-items: center;">
-        @buildBreadcrumbs(breadcrumbs)
-        @buildABackLink(backLink)
+        @buildBreadcrumbs(breadcrumbs, backLink)
         @userBanner
     </div>
 }
