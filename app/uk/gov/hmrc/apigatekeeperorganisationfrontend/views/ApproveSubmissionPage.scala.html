@@ -15,8 +15,9 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.{ApproveSubmissionViewModel, ApproveSubmissionForm}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, BackLink, Text}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
@@ -29,12 +30,15 @@
   Html("<label class='govuk-label' for='comment' id='comment-label'>Give your reasons for approving this check</label><textarea class='govuk-textarea' name='comment' id='comment' rows='3' describedby='comment-label'></textarea>")
 }
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Are you sure you want to approve?")) {
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Are you sure you want to approve?"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+) {
 
     <span class="govuk-caption-l">@{messages("approvesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("approvesubmission.title", model.organisationName.toString())}</h1>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ApproveSubmissionController.action(model.submissionId, model.instanceIndex)) {
+    @helper.form(action = routes.ApproveSubmissionController.action(model.submissionId, model.instanceIndex)) {
       @helper.CSRF.formField
 
         @govukRadios(Radios(
@@ -63,7 +67,7 @@
             isStartButton = false,
             content = Text(messages("approvesubmission.confirm"))))
 
-          <a href="@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
         </div>
 
       }

@@ -1,0 +1,77 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcTimeline, Timeline, Event}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukTable, BreadcrumbsItem, HeadCell, HtmlContent, Table, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+@import include._
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukTable: GovukTable, hmrcTimeline: HmrcTimeline, govukButton: GovukButton)
+
+@(submissionReview: SubmissionReview)(implicit request: RequestHeader, messages: Messages)
+
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Business checks"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+) {
+
+    <span class="govuk-caption-l">@messages("viewsubmission.title")</span>
+    <h1 class="govuk-heading-l">@{submissionReview.organisationName.toString()}</h1>
+
+    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
+    
+      @govukTable(Table(
+        firstCellIsHeader = true,
+        rows = Seq(
+            Seq(TableRow(content = Text("Status")), TableRow(content = HtmlContent(buildStatusHtml(submissionReview.state)))),
+            Seq(TableRow(content = Text("Submitted by")), TableRow(content = Text(submissionReview.requestedBy))),
+            Seq(TableRow(content = Text("Last update")), TableRow(content = Text(dateFormatter.format(submissionReview.lastUpdate.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
+            Seq(TableRow(content = Text("Submission date")), TableRow(content = Text(dateFormatter.format(submissionReview.requestedOn.atOffset(ZoneOffset.UTC).toLocalDateTime))))
+        )
+      ))
+
+      <div class="govuk-button-group">
+        @if(submissionReview.state.isSubmitted || submissionReview.state.isInProgress) {
+          @govukButton(Button(
+            id = Some("reviewCheck"), 
+            isStartButton = false,
+            content = Text(messages("viewsubmission.review")),
+            href=Some(routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex).url)))
+
+          <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
+        } else {
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
+        }
+        </div>
+
+      <h2 class="govuk-heading-l">@messages("viewsubmission.history")</h2>
+
+      @hmrcTimeline(Timeline(
+        events = submissionReview.events.map(event => 
+          Event(
+            title = event.description + " by " + event.name , 
+            content = "<h2 class='govuk-heading-s'>Comment</h2><p class='govuk-body'>" + event.comment.getOrElse("No comment") + "</p>", 
+            time = dateFormatter.format(event.timestamp.atOffset(ZoneOffset.UTC).toLocalDateTime)
+          )
+        )
+      ))
+    }
+}

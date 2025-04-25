@@ -91,7 +91,7 @@ class ApproveSubmissionController @Inject() (
                 case Left(msg)  => BadRequest(msg)
               })
           }
-          case _           => successful(Redirect(routes.SubmissionsController.submissionsView()))
+          case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId, instanceIndex)))
         }
       }
     )

@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
 
@@ -39,8 +39,14 @@ trait OrganisationServiceMockModule extends SubmissionsTestData with MockitoSuga
       def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId], *)(*)).thenReturn(Future.successful(submissionReview))
     }
 
+    object FetchSubmission {
+      def succeed(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(*)).thenReturn(Future.successful(submission))
+    }
+
     object ApproveSubmission {
       def succeed(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+
+      def failed(msg: String) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Left(msg)))
 
       def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: Option[String]) =
         verify(aMock).approveSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)

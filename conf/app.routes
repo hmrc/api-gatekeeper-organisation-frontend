@@ -2,6 +2,10 @@
 
 ->         /hmrc-frontend                         hmrcfrontend.Routes
 GET        /                                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.SubmissionsController.submissionsView()
+
+GET        /submission/:sid/:idx                  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.summaryPage(sid: SubmissionId, idx: Int)
+GET        /submission/:sid/:idx/answers          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.checkAnswersPage(sid: SubmissionId, idx: Int)
+
 GET        /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.page(sid: SubmissionId, idx: Int)
 POST       /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId, idx: Int)
 GET        /submission/:sid/:idx/approve-confirm  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId, idx: Int)

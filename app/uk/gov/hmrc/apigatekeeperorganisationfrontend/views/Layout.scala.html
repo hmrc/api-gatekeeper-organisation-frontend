@@ -22,15 +22,30 @@
         siteHeader: SiteHeader,
         hmrcFooter: HmrcFooter,
         hmrcHead: HmrcHead,
+        govukBackLink: GovukBackLink,
         govukBreadcrumbs: GovukBreadcrumbs,
         hmrcScripts: HmrcScripts
 )
 
-@(pageTitle: Option[String] = None, breadcrumbs: Seq[BreadcrumbsItem] = Seq.empty)(contentBlock: Html)(implicit requestHeader: RequestHeader, messages: Messages)
+@(
+    pageTitle: Option[String] = None, 
+    backLink: Option[BackLink] = None,
+    breadcrumbs: Seq[BreadcrumbsItem] = Seq.empty
+)(
+    contentBlock: Html
+)(implicit requestHeader: RequestHeader, messages: Messages)
 
 @scriptElem = {
 @hmrcScripts()
 }
+
+@buildBreadcrumbs(crumbs: Seq[BreadcrumbsItem], link: Option[BackLink]) = {
+    @if(link.isDefined) { 
+      @govukBackLink(link.get)
+    } else {
+      @govukBreadcrumbs(Breadcrumbs(items = crumbs))
+    }
+  }
 
 @userBanner = {
     <div id="logged-in-user">
@@ -49,7 +64,7 @@
     <div style="display: flex;
         justify-content: space-between;
         align-items: center;">
-        @govukBreadcrumbs(Breadcrumbs(items = breadcrumbs))
+        @buildBreadcrumbs(breadcrumbs, backLink)
         @userBanner
     </div>
 }

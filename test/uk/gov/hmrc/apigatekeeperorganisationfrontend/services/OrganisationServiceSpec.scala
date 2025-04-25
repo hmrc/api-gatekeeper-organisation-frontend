@@ -60,4 +60,12 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
       result shouldBe Right(aSubmission)
     }
   }
+
+  "fetchSubmission" should {
+    "fetch a submission" in new Setup {
+      OrganisationConnectorMock.FetchSubmission.willReturn(Some(completelyAnswerExtendedSubmission))
+      val result = await(underTest.fetchSubmission(completelyAnswerExtendedSubmission.submission.id))
+      result shouldBe Some(completelyAnswerExtendedSubmission)
+    }
+  }
 }
