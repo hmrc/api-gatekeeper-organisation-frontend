@@ -32,7 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.OrganisationServiceMockModule
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, WithCSRFAddToken}
 
@@ -45,7 +45,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       .build()
 
   trait Setup
-      extends OrganisationServiceMockModule
+      extends SubmissionServiceMockModule
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule
       with SubmissionsTestData {
@@ -55,7 +55,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
     val mcc         = app.injector.instanceOf[MessagesControllerComponents]
 
     val controller =
-      new ViewSubmissionController(mcc, summaryPage, answersPage, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
+      new ViewSubmissionController(mcc, summaryPage, answersPage, SubmissionServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, Some("comment"))
 
@@ -99,7 +99,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
     val fakeRequest = FakeRequest("GET", "/submission").withCSRFToken
     "return 200 for submission review found and isSubmitted" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val result = controller.summaryPage(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 
@@ -115,7 +115,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission review found and isInProgress" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewInProgress))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewInProgress))
 
       val result = controller.summaryPage(submissionReviewInProgress.submissionId, submissionReviewInProgress.instanceIndex)(fakeRequest)
 
@@ -131,7 +131,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission review found and isApproved" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewApproved))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewApproved))
 
       val result = controller.summaryPage(submissionReviewApproved.submissionId, submissionReviewApproved.instanceIndex)(fakeRequest)
 
@@ -148,7 +148,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission review found and isFailed" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewFailed))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewFailed))
 
       val result = controller.summaryPage(submissionReviewFailed.submissionId, submissionReviewFailed.instanceIndex)(fakeRequest)
 
@@ -165,7 +165,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 400 if submission review not found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmissionReview.succeed(None)
+      SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.summaryPage(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 
@@ -179,7 +179,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
+      SubmissionServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
 
       val result = controller.checkAnswersPage(extendedSubmittedSubmission.submission.id, extendedSubmittedSubmission.submission.latestInstance.index)(fakeRequest)
 
@@ -192,7 +192,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission found but instance not latest" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
+      SubmissionServiceMock.FetchSubmission.succeed(Some(extendedSubmittedSubmission))
 
       val result = controller.checkAnswersPage(extendedSubmittedSubmission.submission.id, 3)(fakeRequest)
 
@@ -205,7 +205,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 400 if submission not found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchSubmission.succeed(None)
+      SubmissionServiceMock.FetchSubmission.succeed(None)
 
       val result = controller.checkAnswersPage(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 

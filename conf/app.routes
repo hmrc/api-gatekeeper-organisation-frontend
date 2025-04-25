@@ -10,4 +10,8 @@ GET        /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorgan
 POST       /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId, idx: Int)
 GET        /submission/:sid/:idx/approve-confirm  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
 
+GET        /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.page(sid: SubmissionId, idx: Int)
+POST       /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId, idx: Int)
+GET        /submission/:sid/:idx/update-confirm   uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+
 GET        /assets/*file                          controllers.Assets.versioned(path = "/public", file: Asset)

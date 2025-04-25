@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel._
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 @Singleton
@@ -34,21 +34,21 @@ class ViewSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
     viewSubmissionSummaryPage: ViewSubmissionSummaryPage,
     viewSubmittedAnswersPage: ViewSubmittedAnswersPage,
-    organisationService: OrganisationService,
+    service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(implicit ec: ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   def summaryPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    organisationService.fetchSubmissionReview(submissionId, instanceIndex) map {
+    service.fetchSubmissionReview(submissionId, instanceIndex) map {
       case Some(sr) => Ok(viewSubmissionSummaryPage(sr))
       case _        => BadRequest("Submission review not found")
     }
   }
 
   def checkAnswersPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    organisationService.fetchSubmission(submissionId).map {
+    service.fetchSubmission(submissionId).map {
       case Some(extSubmission) =>
         val viewModel = convertSubmissionToViewModel(extSubmission, instanceIndex)
         Ok(viewSubmittedAnswersPage(viewModel))

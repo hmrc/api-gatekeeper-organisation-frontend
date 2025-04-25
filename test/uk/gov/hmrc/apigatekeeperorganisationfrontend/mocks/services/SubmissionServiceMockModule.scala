@@ -22,12 +22,12 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 
-trait OrganisationServiceMockModule extends SubmissionsTestData with MockitoSugar with ArgumentMatchersSugar {
+trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar with ArgumentMatchersSugar {
 
-  object OrganisationServiceMock {
-    val aMock = mock[OrganisationService]
+  object SubmissionServiceMock {
+    val aMock = mock[SubmissionService]
 
     object SearchSubmissionReviews {
       def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(*)).thenReturn(Future.successful(submissionReviews))

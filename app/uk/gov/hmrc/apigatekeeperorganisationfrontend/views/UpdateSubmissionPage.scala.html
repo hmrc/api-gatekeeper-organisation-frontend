@@ -1,0 +1,56 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.{UpdateSubmissionViewModel, UpdateSubmissionForm}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, GovukTextarea, Text, Textarea}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukTextarea: GovukTextarea, govukButton: GovukButton)
+
+@(model: UpdateSubmissionViewModel, form: Form[UpdateSubmissionForm])(implicit request: RequestHeader, messages: Messages)
+
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Add a comment"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+) {
+
+    <span class="govuk-caption-l">@{messages("updatesubmission.subtitle")}</span>
+    <h1 class="govuk-heading-l">@{messages("updatesubmission.title", model.organisationName.toString())}</h1>
+
+    @helper.form(action = routes.UpdateSubmissionController.action(model.submissionId, model.instanceIndex)) {
+      @helper.CSRF.formField
+
+        @govukTextarea(Textarea(
+          name = "comment",
+          id = "comment",
+          label = Label(content = Text(messages("updatesubmission.hinttext")))
+        ).withFormField(form("comment")))
+
+        <div class="govuk-button-group">
+          @govukButton(Button(
+            id = Some("confirm"), 
+            isStartButton = false,
+            content = Text(messages("updatesubmission.confirm"))))
+
+          <a href="@routes.ViewSubmissionController.summaryPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("updatesubmission.cancel")</a>
+        </div>
+
+      }
+}
