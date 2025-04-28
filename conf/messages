@@ -23,7 +23,7 @@ viewsubmittedanswers.backtosummary = Back to business checks
 updatesubmission.title = Add a comment for the {0} business check
 updatesubmission.subtitle = Business checks
 updatesubmission.hinttext = Leave a comment if you have an update about this business check, it will be added to the business check history.
-updatesubmission.error.comment.empty = Please add a comment
+updatesubmission.error.comment.blank = Please add a comment
 updatesubmission.confirm = Send comment
 updatesubmission.cancel = Cancel
 

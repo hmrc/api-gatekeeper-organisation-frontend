@@ -61,6 +61,14 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMock
     }
   }
 
+  "updateSubmissionReview" should {
+    "update a submission review" in new Setup {
+      OrganisationConnectorMock.UpdateSubmissionReview.willReturn(submissionReview)
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "comment"))
+      result shouldBe Right(submissionReview)
+    }
+  }
+
   "fetchSubmission" should {
     "fetch a submission" in new Setup {
       OrganisationConnectorMock.FetchSubmission.willReturn(Some(completelyAnswerExtendedSubmission))

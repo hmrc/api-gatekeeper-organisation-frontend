@@ -77,9 +77,9 @@ class ApproveSubmissionController @Inject() (
       formWithErrors => {
         service.fetchSubmissionReview(submissionId, instanceIndex)
           .map(_ match {
-            case Some(sr) if (sr.state.isSubmitted) =>
+            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
               BadRequest(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
-            case _                                  => BadRequest("Submission review not found or not submitted")
+            case _                                                           => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {

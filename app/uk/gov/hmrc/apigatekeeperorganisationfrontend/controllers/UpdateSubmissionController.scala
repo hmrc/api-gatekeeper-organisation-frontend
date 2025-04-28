@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.{mapping, text}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -40,7 +40,8 @@ object UpdateSubmissionController {
 
     def form: Form[UpdateSubmissionForm] = Form(
       mapping(
-        "comment" -> nonEmptyText
+        "comment" -> text(maxLength = 500)
+          .verifying("updatesubmission.error.comment.blank", !_.isBlank())
       )(UpdateSubmissionForm.apply)(UpdateSubmissionForm.unapply)
     )
   }
@@ -74,9 +75,9 @@ class UpdateSubmissionController @Inject() (
       formWithErrors => {
         service.fetchSubmissionReview(submissionId, instanceIndex)
           .map(_ match {
-            case Some(sr) if (sr.state.isSubmitted) =>
+            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
               BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
-            case _                                  => BadRequest("Submission review not found or not submitted")
+            case _                                                           => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {

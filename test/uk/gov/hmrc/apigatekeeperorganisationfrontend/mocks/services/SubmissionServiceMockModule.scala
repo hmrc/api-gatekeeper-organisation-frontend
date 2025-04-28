@@ -53,5 +53,16 @@ trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar 
 
       def verifyNeverCalled() = verify(aMock, never).approveSubmission(*[SubmissionId], *, *)(*)
     }
+
+    object UpdateSubmissionReview {
+      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+
+      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Left(msg)))
+
+      def verifyCalled(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String) =
+        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(instanceIndex), eqTo(approvedBy), eqTo(comment))(*)
+
+      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *, *)(*)
+    }
   }
 }
