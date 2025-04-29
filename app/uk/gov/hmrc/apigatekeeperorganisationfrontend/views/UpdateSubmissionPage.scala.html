@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.{UpdateSubmissionViewModel, UpdateSubmissionForm}
-@import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, GovukTextarea, Text, Textarea}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, CharacterCount, GovukCharacterCount, Text, Textarea}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
 
-@this(layout: Layout, govukTextarea: GovukTextarea, govukButton: GovukButton)
+@this(layout: Layout, govukCharacterCount: GovukCharacterCount, govukButton: GovukButton)
 
 @(model: UpdateSubmissionViewModel, form: Form[UpdateSubmissionForm])(implicit request: RequestHeader, messages: Messages)
 
@@ -37,10 +37,11 @@
     @helper.form(action = routes.UpdateSubmissionController.action(model.submissionId, model.instanceIndex)) {
       @helper.CSRF.formField
 
-        @govukTextarea(Textarea(
+        @govukCharacterCount(CharacterCount(
           name = "comment",
           id = "comment",
-          label = Label(content = Text(messages("updatesubmission.hinttext")))
+          label = Label(content = Text(messages("updatesubmission.hinttext"))),
+          maxLength = Some(500)
         ).withFormField(form("comment")))
 
         <div class="govuk-button-group">
