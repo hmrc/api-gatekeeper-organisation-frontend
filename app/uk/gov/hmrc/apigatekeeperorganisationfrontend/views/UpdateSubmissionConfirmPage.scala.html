@@ -1,0 +1,45 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.{UpdateSubmissionViewModel, UpdateSubmissionForm}
+@import uk.gov.hmrc.govukfrontend.views.html.components.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukPanel: GovukPanel)
+
+@(model: UpdateSubmissionViewModel)(implicit request: RequestHeader, messages: Messages)
+
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Your comment has been added"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+) {
+
+  @govukPanel(Panel(
+    title = Text(messages("updatesubmissionconfirm.title", model.organisationName.toString()))
+  ))
+
+  <h2 class="govuk-heading-m">@messages("updatesubmissionconfirm.subtitle")</h2>
+
+  <p class="govuk-body">@messages("updatesubmissionconfirm.hinttext", model.organisationName.toString())</p>
+
+  <div class="govuk-button-group">
+    <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("updatesubmissionconfirm.back")</a>
+  </div>
+}

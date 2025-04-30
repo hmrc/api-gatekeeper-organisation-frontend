@@ -52,9 +52,19 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
     import cats.implicits._
     val failed = (err: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
 
-    http.post(url"${config.serviceBaseUrl}/submission/${submissionId}/approve")
+    http.post(url"${config.serviceBaseUrl}/submission/$submissionId/approve")
       .withBody(Json.toJson(ApproveSubmissionRequest(approvedBy, comment)))
       .execute[Either[UpstreamErrorResponse, Submission]]
+      .map(_.leftMap(failed))
+  }
+
+  def updateSubmissionReview(submissionId: SubmissionId, instanceIndex: Int, updatedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to update submission review $submissionId, index $instanceIndex"
+
+    http.put(url"${config.serviceBaseUrl}/submission-review/$submissionId/$instanceIndex")
+      .withBody(Json.toJson(UpdateSubmissionRequest(updatedBy, comment)))
+      .execute[Either[UpstreamErrorResponse, SubmissionReview]]
       .map(_.leftMap(failed))
   }
 }
@@ -64,4 +74,7 @@ object OrganisationConnector {
 
   case class ApproveSubmissionRequest(approvedBy: String, comment: Option[String])
   implicit val writesApproveSubmissionRequest: Writes[ApproveSubmissionRequest] = Json.writes[ApproveSubmissionRequest]
+
+  case class UpdateSubmissionRequest(updatedBy: String, comment: String)
+  implicit val writesUpdateSubmissionRequest: Writes[UpdateSubmissionRequest] = Json.writes[UpdateSubmissionRequest]
 }

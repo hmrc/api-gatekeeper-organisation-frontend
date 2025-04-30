@@ -22,12 +22,12 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 
-trait OrganisationServiceMockModule extends SubmissionsTestData with MockitoSugar with ArgumentMatchersSugar {
+trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar with ArgumentMatchersSugar {
 
-  object OrganisationServiceMock {
-    val aMock = mock[OrganisationService]
+  object SubmissionServiceMock {
+    val aMock = mock[SubmissionService]
 
     object SearchSubmissionReviews {
       def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(*)).thenReturn(Future.successful(submissionReviews))
@@ -52,6 +52,17 @@ trait OrganisationServiceMockModule extends SubmissionsTestData with MockitoSuga
         verify(aMock).approveSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
 
       def verifyNeverCalled() = verify(aMock, never).approveSubmission(*[SubmissionId], *, *)(*)
+    }
+
+    object UpdateSubmissionReview {
+      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+
+      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Left(msg)))
+
+      def verifyCalled(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String) =
+        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(instanceIndex), eqTo(approvedBy), eqTo(comment))(*)
+
+      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *, *)(*)
     }
   }
 }

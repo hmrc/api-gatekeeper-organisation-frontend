@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 object SubmissionsController {
@@ -54,7 +54,7 @@ object SubmissionsController {
 class SubmissionsController @Inject() (
     mcc: MessagesControllerComponents,
     submissionListPage: SubmissionListPage,
-    organisationService: OrganisationService,
+    service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(implicit ec: ExecutionContext
@@ -66,7 +66,7 @@ class SubmissionsController @Inject() (
       val params: Seq[(String, String)] = getQueryParamsFromForm(form)
       val queryForm                     = filterForm.fill(form)
 
-      organisationService
+      service
         .searchSubmissionReviews(params)
         .map(subs => Ok(submissionListPage(queryForm, subs)))
     }

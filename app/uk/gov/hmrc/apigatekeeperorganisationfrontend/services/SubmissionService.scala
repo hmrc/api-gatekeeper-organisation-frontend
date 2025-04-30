@@ -26,7 +26,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
 
 @Singleton
-class OrganisationService @Inject() (orgConnector: OrganisationConnector) {
+class SubmissionService @Inject() (orgConnector: OrganisationConnector) {
 
   def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
     orgConnector.searchSubmissionReviews(params)
@@ -42,5 +42,10 @@ class OrganisationService @Inject() (orgConnector: OrganisationConnector) {
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     orgConnector.approveSubmission(submissionId, approvedBy, comment)
+  }
+
+  def updateSubmissionReview(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String)(implicit hc: HeaderCarrier)
+      : Future[Either[String, SubmissionReview]] = {
+    orgConnector.updateSubmissionReview(submissionId, instanceIndex, approvedBy, comment)
   }
 }

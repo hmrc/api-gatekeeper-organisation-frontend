@@ -113,6 +113,24 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
     }
   }
 
+  "updateSubmissionReview" should {
+    "successfully update" in new Setup {
+      ApiPlatformOrganisationStub.UpdateSubmissionReview.succeeds(submissionReview.submissionId, submissionReview.instanceIndex, submissionReview)
+
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "some comment"))
+
+      result shouldBe Right(submissionReview)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.UpdateSubmissionReview.fails(submissionReview.submissionId, submissionReview.instanceIndex, INTERNAL_SERVER_ERROR)
+
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "some comment"))
+
+      result shouldBe Left(s"Failed to update submission review ${submissionReview.submissionId}, index ${submissionReview.instanceIndex}")
+    }
+  }
+
   "fetchSubmission" should {
     "successfully get one" in new Setup {
       ApiPlatformOrganisationStub.FetchSubmission.succeeds(submissionReview.submissionId, completelyAnswerExtendedSubmission)

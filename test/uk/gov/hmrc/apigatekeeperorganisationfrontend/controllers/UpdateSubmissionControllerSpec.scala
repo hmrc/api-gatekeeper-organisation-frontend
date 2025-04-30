@@ -35,7 +35,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.SubmissionSe
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, WithCSRFAddToken}
 
-class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
+class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     with GuiceOneAppPerSuite
     with WithCSRFAddToken {
 
@@ -48,10 +48,10 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val page        = app.injector.instanceOf[ApproveSubmissionPage]
-    val confirmPage = app.injector.instanceOf[ApproveSubmissionConfirmPage]
+    val page        = app.injector.instanceOf[UpdateSubmissionPage]
+    val confirmPage = app.injector.instanceOf[UpdateSubmissionConfirmPage]
     val mcc         = app.injector.instanceOf[MessagesControllerComponents]
-    val controller  = new ApproveSubmissionController(mcc, page, confirmPage, SubmissionServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
+    val controller  = new UpdateSubmissionController(mcc, page, confirmPage, SubmissionServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
@@ -79,15 +79,12 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
         List(submissionReviewEvent)
       )
 
-    val submissionReviewApproved =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
-
     val submissionReviewFailed =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
   }
 
-  "get approve page" should {
-    val fakeRequest = FakeRequest("GET", "/submission/approve").withCSRFToken
+  "get update page" should {
+    val fakeRequest = FakeRequest("GET", "/submission/update").withCSRFToken
     "return 200 for submission review found and isSubmitted" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
@@ -95,9 +92,9 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.page(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(s"Are you sure that you want to approve ${submissionReviewSubmitted.organisationName.value}?")
+      contentAsString(result) should include(s"Add a comment for the ${submissionReviewSubmitted.organisationName.value} business check")
       contentAsString(result) should include(
-        s"This will allow ${submissionReviewSubmitted.organisationName.value} to request credentials to use live tax data in our production environment."
+        s"Leave a comment if you have an update about this business check, it will be added to the business check history."
       )
       contentAsString(result) should include("Business checks")
     }
@@ -109,9 +106,9 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.page(submissionReviewInProgress.submissionId, submissionReviewInProgress.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(s"Are you sure that you want to approve ${submissionReviewInProgress.organisationName.value}?")
+      contentAsString(result) should include(s"Add a comment for the ${submissionReviewInProgress.organisationName.value} business check")
       contentAsString(result) should include(
-        s"This will allow ${submissionReviewInProgress.organisationName.value} to request credentials to use live tax data in our production environment."
+        s"Leave a comment if you have an update about this business check, it will be added to the business check history."
       )
       contentAsString(result) should include("Business checks")
     }
@@ -137,73 +134,44 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
     }
   }
 
-  "post approve action" should {
-    val fakeRequest = FakeRequest("POST", "/submission/approve").withCSRFToken
-    "return 303 for form validation successful and submission approval successful with comment" in new Setup {
+  "post update action" should {
+    val fakeRequest = FakeRequest("POST", "/submission/update").withCSRFToken
+    "return 303 for form validation successful and submission update successful with comment" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.ApproveSubmission.succeed(aSubmission)
+      SubmissionServiceMock.UpdateSubmissionReview.succeed(submissionReviewSubmitted)
 
-      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "approve comment")
+      val request = fakeRequest.withFormUrlEncodedBody("comment" -> "update comment")
       val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
 
       status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ApproveSubmissionController.confirmPage(
+      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.UpdateSubmissionController.confirmPage(
         submissionReviewSubmitted.submissionId,
         submissionReviewSubmitted.instanceIndex
       ).url)
-      SubmissionServiceMock.ApproveSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", Some("approve comment"))
-    }
-
-    "return 303 for form validation successful and submission approval successful with no comment" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.ApproveSubmission.succeed(aSubmission)
-
-      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
-
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ApproveSubmissionController.confirmPage(
-        submissionReviewSubmitted.submissionId,
-        submissionReviewSubmitted.instanceIndex
-      ).url)
-      SubmissionServiceMock.ApproveSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", None)
-    }
-
-    "return 303 for user selected No" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.ApproveSubmission.succeed(aSubmission)
-
-      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "No")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
-
-      status(result) shouldBe Status.SEE_OTHER
-      redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.checkAnswersPage(
-        submissionReviewSubmitted.submissionId,
-        submissionReviewSubmitted.instanceIndex
-      ).url)
-      SubmissionServiceMock.ApproveSubmission.verifyNeverCalled()
+      SubmissionServiceMock.UpdateSubmissionReview.verifyCalled(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex, "Bobby Example", "update comment")
     }
 
     "return 400 for form validation failed" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
-      val result = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
-
-      status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) should include("Please select an option")
-      SubmissionServiceMock.ApproveSubmission.verifyNeverCalled()
-    }
-
-    "return 400 for submission approval failed" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.ApproveSubmission.failed("Approval failed")
-
-      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "approve comment")
+      val request = fakeRequest.withFormUrlEncodedBody("comment" -> "")
       val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
 
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) should include("Approval failed")
+      contentAsString(result) should include("Please add a comment")
+      SubmissionServiceMock.UpdateSubmissionReview.verifyNeverCalled()
+    }
+
+    "return 400 for submission update failed" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      SubmissionServiceMock.UpdateSubmissionReview.failed("Update failed")
+
+      val request = fakeRequest.withFormUrlEncodedBody("comment" -> "update comment")
+      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) should include("Update failed")
     }
 
     "return 400 for form validation failed and submission review not found" in new Setup {
@@ -214,22 +182,22 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")
-      SubmissionServiceMock.ApproveSubmission.verifyNeverCalled()
+      SubmissionServiceMock.UpdateSubmissionReview.verifyNeverCalled()
     }
   }
 
-  "get approve confirmation page" should {
-    val fakeRequest = FakeRequest("GET", "/submission/approve-confirm").withCSRFToken
+  "get update confirmation page" should {
+    val fakeRequest = FakeRequest("GET", "/submission/update-confirm").withCSRFToken
     "return 200 for submission review found" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewApproved))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
-      val result = controller.confirmPage(submissionReviewApproved.submissionId, submissionReviewApproved.instanceIndex)(fakeRequest)
+      val result = controller.confirmPage(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include(s"The business check for ${submissionReviewApproved.organisationName.value} has been approved")
+      contentAsString(result) should include(s"Your comment has been added for the ${submissionReviewSubmitted.organisationName.value} business check")
       contentAsString(result) should include(
-        s"${submissionReviewApproved.organisationName.value} can now request access to tax data in our production environment."
+        s"Your comment is visible on the business check history of ${submissionReviewSubmitted.organisationName.value}."
       )
       contentAsString(result) should include("Back to business checks")
     }
@@ -238,7 +206,7 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
-      val result = controller.confirmPage(submissionReviewApproved.submissionId, submissionReviewApproved.instanceIndex)(fakeRequest)
+      val result = controller.confirmPage(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found")

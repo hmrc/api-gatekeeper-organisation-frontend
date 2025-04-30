@@ -18,10 +18,9 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future.successful
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text}
+import play.api.data.Forms.{mapping, text}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -32,74 +31,68 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.Gatekee
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
-object ApproveSubmissionController {
-  case class ApproveSubmissionViewModel(submissionId: SubmissionId, instanceIndex: Int, organisationName: OrganisationName)
+object UpdateSubmissionController {
+  case class UpdateSubmissionViewModel(submissionId: SubmissionId, instanceIndex: Int, organisationName: OrganisationName)
 
-  case class ApproveSubmissionForm(comment: Option[String], confirm: Option[String] = Some(""))
+  case class UpdateSubmissionForm(comment: String)
 
-  object ApproveSubmissionForm {
+  object UpdateSubmissionForm {
 
-    def form: Form[ApproveSubmissionForm] = Form(
+    def form: Form[UpdateSubmissionForm] = Form(
       mapping(
-        "comment" -> optional(text(maxLength = 500)),
-        "confirm" -> optional(text)
-          .verifying("approvesubmission.error.confirmation.no.choice.field", _.isDefined)
-      )(ApproveSubmissionForm.apply)(ApproveSubmissionForm.unapply)
+        "comment" -> text(maxLength = 500)
+          .verifying("updatesubmission.error.comment.blank", !_.isBlank())
+      )(UpdateSubmissionForm.apply)(UpdateSubmissionForm.unapply)
     )
   }
 }
 
 @Singleton
-class ApproveSubmissionController @Inject() (
+class UpdateSubmissionController @Inject() (
     mcc: MessagesControllerComponents,
-    approveSubmissionPage: ApproveSubmissionPage,
-    approveSubmissionConfirmPage: ApproveSubmissionConfirmPage,
+    updateSubmissionPage: UpdateSubmissionPage,
+    updateSubmissionConfirmPage: UpdateSubmissionConfirmPage,
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(implicit ec: ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
-  import ApproveSubmissionController._
+  import UpdateSubmissionController._
 
-  val approveSubmissionForm: Form[ApproveSubmissionForm] = ApproveSubmissionForm.form
+  val updateSubmissionForm: Form[UpdateSubmissionForm] = UpdateSubmissionForm.form
 
   def page(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
     service.fetchSubmissionReview(submissionId, instanceIndex) map {
       case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-        Ok(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), approveSubmissionForm))
+        Ok(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), updateSubmissionForm))
       case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
   def action(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    approveSubmissionForm.bindFromRequest().fold(
+    updateSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
         service.fetchSubmissionReview(submissionId, instanceIndex)
           .map(_ match {
             case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-              BadRequest(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
+              BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
             case _                                                           => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {
-        confirmData.confirm match {
-          case Some("Yes") => {
-            service.approveSubmission(submissionId, request.name.get, confirmData.comment)
-              .map(_ match {
-                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId, instanceIndex))
-                case Left(msg)  => BadRequest(msg)
-              })
-          }
-          case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId, instanceIndex)))
-        }
+        service.updateSubmissionReview(submissionId, instanceIndex, request.name.get, confirmData.comment)
+          .map(_ match {
+            case Right(sub) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId, instanceIndex))
+            case Left(msg)  => BadRequest(msg)
+          })
       }
     )
   }
 
   def confirmPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
     service.fetchSubmissionReview(submissionId, instanceIndex) map {
-      case Some(sr) => Ok(approveSubmissionConfirmPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName)))
+      case Some(sr) => Ok(updateSubmissionConfirmPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName)))
       case _        => BadRequest("Submission review not found")
     }
   }

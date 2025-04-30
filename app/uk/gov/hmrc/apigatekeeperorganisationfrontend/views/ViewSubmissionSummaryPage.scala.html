@@ -56,7 +56,7 @@
             content = Text(messages("viewsubmission.review")),
             href=Some(routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex).url)))
 
-          <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
+          <a href="@routes.UpdateSubmissionController.page(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
         } else {
           <a href="@routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
         }
