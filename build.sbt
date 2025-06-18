@@ -21,7 +21,6 @@ lazy val microservice = Project("api-gatekeeper-organisation-frontend", file("."
       "uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._"
     )
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(
     Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
