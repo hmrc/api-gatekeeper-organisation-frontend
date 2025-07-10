@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 
 object ApiPlatformOrganisationStub {
@@ -152,4 +153,42 @@ object ApiPlatformOrganisationStub {
       )
     }
   }
+
+  object SearchOrganisations {
+
+    def succeedsNoParams(organisations: List[Organisation]): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/organisations"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(organisations).toString())
+          )
+      )
+    }
+
+    def succeedsParams(organisationName: String, organisations: List[Organisation]): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/organisations?organisationName=$organisationName"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(organisations).toString())
+          )
+      )
+    }
+
+    def fails(status: Int): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/organisations"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
 }

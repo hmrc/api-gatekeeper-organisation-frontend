@@ -1,0 +1,65 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.OrganisationsController.FilterForm
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+@import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
+@import include._
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukTable: GovukTable)
+
+@(form: Form[FilterForm], organisations: List[Organisation])(implicit request: RequestHeader, messages: Messages)
+
+@layout(pageTitle = Some("HMRC API Gatekeeper - Organisations")) {
+
+    <h1 class="govuk-heading-l">@{messages("organisationslist.title")}</h1>
+
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.OrganisationsController.organisationsView, Symbol("class") -> "form") {
+        <div class="govuk-form-group js-visible">
+            <label class="govuk-label govuk-!-font-weight-bold">
+                Search
+                <input
+                class="govuk-input"
+                name="organisationName"
+                type="text"
+                value="@{form("organisationName").value}"
+                placeholder="Organisation name"
+                />
+            </label>
+        </div>
+
+      <div class="govuk-form-group govuk-!-margin-bottom-0">
+        <button id="filterResults" class="govuk-button" type="submit">@{messages("submissionreview.filter")}</button>
+      </div>
+    }
+    
+    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
+        @govukTable(Table(
+            head = Some(Seq(
+                HeadCell(content = Text("Organisation name")),
+                HeadCell(content = Text("Created date"))
+            )),
+            rows = organisations.map(org => Seq(
+                TableRow(content = Text(org.organisationName.toString())),
+                TableRow(content = Text(dateFormatter.format(org.createdDateTime.atOffset(ZoneOffset.UTC).toLocalDateTime)))
+            ))
+        ))
+    }
+}

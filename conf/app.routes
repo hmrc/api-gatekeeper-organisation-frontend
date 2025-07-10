@@ -14,4 +14,6 @@ GET        /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorgan
 POST       /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId, idx: Int)
 GET        /submission/:sid/:idx/update-confirm   uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
 
+GET        /organisations                         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.OrganisationsController.organisationsView()
+
 GET        /assets/*file                          controllers.Assets.versioned(path = "/public", file: Asset)

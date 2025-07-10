@@ -23,9 +23,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application => PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.OrganisationFixtures
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ApiPlatformOrganisationStub
 
 class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite {
@@ -34,7 +35,7 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
     "microservice.services.api-platform-organisation.port" -> stubPort
   )
 
-  trait Setup extends SubmissionsTestData {
+  trait Setup extends SubmissionsTestData with OrganisationFixtures {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val underTest                  = app.injector.instanceOf[OrganisationConnector]
 
@@ -153,6 +154,34 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchSubmission(submissionReview.submissionId))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "searchOrganisations" should {
+    "successfully get all" in new Setup {
+      val standardOrg2 = standardOrg.copy(id = OrganisationId.random, organisationName = OrganisationName("Organisation 2"))
+
+      ApiPlatformOrganisationStub.SearchOrganisations.succeedsNoParams(List(standardOrg, standardOrg2))
+
+      val result = await(underTest.searchOrganisations(Seq.empty))
+
+      result shouldBe List(standardOrg, standardOrg2)
+    }
+
+    "successfully get all when doing filtered search" in new Setup {
+      ApiPlatformOrganisationStub.SearchOrganisations.succeedsParams(standardOrg.organisationName.value, List(standardOrg))
+
+      val result = await(underTest.searchOrganisations(Seq(("organisationName", standardOrg.organisationName.value))))
+
+      result shouldBe List(standardOrg)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.SearchOrganisations.fails(INTERNAL_SERVER_ERROR)
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.searchOrganisations(Seq.empty))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }

@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
 
 @Singleton
@@ -66,6 +67,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .withBody(Json.toJson(UpdateSubmissionRequest(updatedBy, comment)))
       .execute[Either[UpstreamErrorResponse, SubmissionReview]]
       .map(_.leftMap(failed))
+  }
+
+  def searchOrganisations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[Organisation]] = {
+    http.get(url"${config.serviceBaseUrl}/organisations?$params")
+      .execute[List[Organisation]]
   }
 }
 
