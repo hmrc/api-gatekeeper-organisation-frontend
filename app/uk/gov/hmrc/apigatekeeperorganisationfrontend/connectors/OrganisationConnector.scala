@@ -70,7 +70,8 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def searchOrganisations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[Organisation]] = {
-    http.get(url"${config.serviceBaseUrl}/organisations?$params")
+    http.post(url"${config.serviceBaseUrl}/organisations?$params")
+      .withBody(Json.toJson(SearchOrganisationRequest(params)))
       .execute[List[Organisation]]
   }
 }
@@ -83,4 +84,7 @@ object OrganisationConnector {
 
   case class UpdateSubmissionRequest(updatedBy: String, comment: String)
   implicit val writesUpdateSubmissionRequest: Writes[UpdateSubmissionRequest] = Json.writes[UpdateSubmissionRequest]
+
+  case class SearchOrganisationRequest(params: Seq[(String, String)])
+  implicit val writeSearchOrganisationRequest: Writes[SearchOrganisationRequest] = Json.writes[SearchOrganisationRequest]
 }

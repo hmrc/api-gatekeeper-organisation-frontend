@@ -169,7 +169,7 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       result shouldBe List(standardOrg, standardOrg2)
     }
 
-    "successfully get all when doing filtered search" in new Setup {
+    "successfully get results when doing filtered search" in new Setup {
       ApiPlatformOrganisationStub.SearchOrganisations.succeedsParams(standardOrg.organisationName.value, List(standardOrg))
 
       val result = await(underTest.searchOrganisations(Seq(("organisationName", standardOrg.organisationName.value))))

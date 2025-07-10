@@ -24,6 +24,7 @@ import play.api.libs.json.Json
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
 
 object ApiPlatformOrganisationStub {
 
@@ -158,7 +159,8 @@ object ApiPlatformOrganisationStub {
 
     def succeedsNoParams(organisations: List[Organisation]): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/organisations"))
+        post(urlEqualTo(s"/organisations"))
+          .withRequestBody(equalToJson(Json.toJson(SearchOrganisationRequest(Seq.empty)).toString()))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -170,7 +172,8 @@ object ApiPlatformOrganisationStub {
 
     def succeedsParams(organisationName: String, organisations: List[Organisation]): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/organisations?organisationName=$organisationName"))
+        post(urlEqualTo(s"/organisations?organisationName=$organisationName"))
+          .withRequestBody(equalToJson(Json.toJson(SearchOrganisationRequest(Seq(("organisationName", organisationName)))).toString()))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -182,7 +185,7 @@ object ApiPlatformOrganisationStub {
 
     def fails(status: Int): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/organisations"))
+        post(urlEqualTo(s"/organisations"))
           .willReturn(
             aResponse()
               .withStatus(status)
