@@ -20,6 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
 
@@ -47,5 +48,13 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     object FetchSubmission {
       def willReturn(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(*)).thenReturn(Future.successful(submission))
     }
+
+    object SearchOrganisations {
+      def willReturn(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(*)).thenReturn(Future.successful(organisations))
+
+      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(*)
+
+    }
+
   }
 }

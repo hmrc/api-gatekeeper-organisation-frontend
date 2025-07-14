@@ -22,7 +22,9 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
 
 object ApiPlatformOrganisationStub {
 
@@ -152,4 +154,44 @@ object ApiPlatformOrganisationStub {
       )
     }
   }
+
+  object SearchOrganisations {
+
+    def succeedsNoParams(organisations: List[Organisation]): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/organisations"))
+          .withRequestBody(equalToJson(Json.toJson(SearchOrganisationRequest(Seq.empty)).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(organisations).toString())
+          )
+      )
+    }
+
+    def succeedsParams(organisationName: String, organisations: List[Organisation]): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/organisations?organisationName=$organisationName"))
+          .withRequestBody(equalToJson(Json.toJson(SearchOrganisationRequest(Seq(("organisationName", organisationName)))).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(organisations).toString())
+          )
+      )
+    }
+
+    def fails(status: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/organisations"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
 }

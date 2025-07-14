@@ -43,3 +43,5 @@ approvesubmissionconfirm.title = The business check for {0} has been approved
 approvesubmissionconfirm.subtitle = What happens next
 approvesubmissionconfirm.hinttext = {0} can now request access to tax data in our production environment.
 approvesubmissionconfirm.back = Back to business checks
+
+organisationslist.title = Organisations
