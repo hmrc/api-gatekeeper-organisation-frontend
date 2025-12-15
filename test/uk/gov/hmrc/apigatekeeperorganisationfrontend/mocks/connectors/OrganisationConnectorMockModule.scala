@@ -23,6 +23,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
 trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
@@ -56,5 +57,8 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
 
     }
 
+    object FetchByCompanyNumber {
+      def willReturn(result: Option[CompaniesHouseCompanyProfile]) = when(aMock.fetchByCompanyNumber(*)(*)).thenReturn(Future.successful(result))
+    }
   }
 }

@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
 @Singleton
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
@@ -47,6 +48,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   def fetchSubmission(id: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     http.get(url"${config.serviceBaseUrl}/submission/${id.value}")
       .execute[Option[ExtendedSubmission]]
+  }
+
+  def fetchByCompanyNumber(companyNumber: String)(implicit hc: HeaderCarrier): Future[Option[CompaniesHouseCompanyProfile]] = {
+    http.get(url"${config.serviceBaseUrl}/company/${companyNumber}")
+      .execute[Option[CompaniesHouseCompanyProfile]]
   }
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {

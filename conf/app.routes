@@ -1,19 +1,29 @@
 # microservice specific routes
 
-->         /hmrc-frontend                         hmrcfrontend.Routes
-GET        /                                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.SubmissionsController.submissionsView()
+->          /hmrc-frontend                               hmrcfrontend.Routes
+GET         /                                            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.SubmissionsController.submissionsView()
 
-GET        /submission/:sid/:idx                  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.summaryPage(sid: SubmissionId, idx: Int)
-GET        /submission/:sid/:idx/answers          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.checkAnswersPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx                        uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.summaryPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx/answers                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.checkAnswersPage(sid: SubmissionId, idx: Int)
 
-GET        /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.page(sid: SubmissionId, idx: Int)
-POST       /submission/:sid/:idx/approve          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId, idx: Int)
-GET        /submission/:sid/:idx/approve-confirm  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx/approve                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.page(sid: SubmissionId, idx: Int)
+POST        /submission/:sid/:idx/approve                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx/approve-confirm        uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
 
-GET        /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.page(sid: SubmissionId, idx: Int)
-POST       /submission/:sid/:idx/update           uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId, idx: Int)
-GET        /submission/:sid/:idx/update-confirm   uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx/update                 uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.page(sid: SubmissionId, idx: Int)
+POST        /submission/:sid/:idx/update                 uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/:idx/update-confirm         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
 
-GET        /organisations                         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.OrganisationsController.organisationsView()
+GET         /organisations                               uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.OrganisationsController.organisationsView()
 
-GET        /assets/*file                          controllers.Assets.versioned(path = "/public", file: Asset)
+GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+
+GET         /migrations/overview                         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.overviewPage()
+GET         /migrations/:questionType/:answer            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.detailsPage(questionType:String, answer: String)
+GET         /migrations/controls                         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.controlPage()
+GET         /migrations/admin                            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.adminPage()
+
+POST        /migrations/load/:questionType               uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.load(questionType: String)
+POST        /migrations/process-vat                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processVat(count: Int ?= 10)
+POST        /migrations/process-companies-house          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processCompaniesHouse(count: Int ?= 10)
+
