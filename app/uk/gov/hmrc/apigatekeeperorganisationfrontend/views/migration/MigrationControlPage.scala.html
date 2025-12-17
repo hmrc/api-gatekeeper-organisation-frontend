@@ -1,0 +1,38 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+
+@this(layout: Layout, govukButton: GovukButton)
+
+@()(implicit request: RequestHeader, messages: Messages)
+
+@layout(pageTitle = Some("HMRC API Gatekeeper - Organisations Migration"),
+    breadcrumbs = Seq(BreadcrumbsItem(Text("Overview"), Some(routes.MigrationController.overviewPage().url)))
+) {
+    <h1 class="govuk-heading-l">Organisation Migration</h1>
+
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.MigrationController.processVat(), Symbol("class") -> "form") {
+        @helper.CSRF.formField
+        @govukButton(Button(content = Text("Process 10 Vat Records"),preventDoubleClick = Some(true)))
+    }
+
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.MigrationController.processCompaniesHouse(), Symbol("class") -> "form") {
+        @helper.CSRF.formField
+        @govukButton(Button(content = Text("Process 10 Companies House Records"),preventDoubleClick = Some(true)))
+    }
+}
