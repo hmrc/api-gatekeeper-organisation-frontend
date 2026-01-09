@@ -14,38 +14,35 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.Header
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language.En
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.GatekeeperConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardHeader
 
 @this(
-  hmrcHeader: HmrcHeader,
-  gatekeeperConfig: GatekeeperConfig
+        hmrcStandardHeader: HmrcStandardHeader,
+        gatekeeperConfig: GatekeeperConfig
 )
 
-@()(implicit messages: Messages)
+@()(implicit messages: Messages, requestHeader: RequestHeader)
 
 @navigation = @{
-  Seq(
-    NavigationItem(content = Text("APIs"), href = Some(gatekeeperConfig.apisPageUri)),
-    NavigationItem(content = Text("Applications"), href = Some(gatekeeperConfig.applicationsPageUri)),
-    NavigationItem(content = Text("Developers"), href = Some(gatekeeperConfig.developersPageUri)),
-    NavigationItem(content = Text("Terms of use"), href = Some(gatekeeperConfig.termsOfUsePageUri)),
-    NavigationItem(content = Text("Email"), href = Some(gatekeeperConfig.emailsPageUri)),
-    NavigationItem(content = Text("API Approvals"), href = Some(gatekeeperConfig.pendingUri)),
-    NavigationItem(content = Text("XML"), href = Some(gatekeeperConfig.xmlUri))
-  )
+    Seq(
+        ServiceNavigationItem(content = Text("APIs"), href = gatekeeperConfig.apisPageUri),
+        ServiceNavigationItem(content = Text("Applications"), href = gatekeeperConfig.applicationsPageUri),
+        ServiceNavigationItem(content = Text("Developers"), href = gatekeeperConfig.developersPageUri),
+        ServiceNavigationItem(content = Text("Terms of use"), href = gatekeeperConfig.termsOfUsePageUri),
+        ServiceNavigationItem(content = Text("Email"), href = gatekeeperConfig.emailsPageUri),
+        ServiceNavigationItem(content = Text("API Approvals"), href = gatekeeperConfig.pendingUri),
+        ServiceNavigationItem(content = Text("XML"), href = gatekeeperConfig.xmlUri)
+    )
 }
 
-@hmrcHeader(
-  Header(
-    homepageUrl ="https://www.gov.uk",
+@hmrcStandardHeader(
     serviceName = Some(messages("service.name")),
-    navigation = Some(navigation),
-    serviceUrl = "",
+    serviceNavigation = Some(ServiceNavigation(
+        serviceName = Some(messages("service.name")),
+        navigation = navigation
+    )),
+    serviceUrl = None,
     displayHmrcBanner = false,
-    containerClasses = "govuk-width-container",
-    signOutHref = None,
-    language = En
-  )
+    containerClasses = "govuk-width-container"
 )
