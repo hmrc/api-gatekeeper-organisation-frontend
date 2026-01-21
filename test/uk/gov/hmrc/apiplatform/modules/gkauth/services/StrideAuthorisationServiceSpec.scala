@@ -34,7 +34,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRole, Gat
 
 class StrideAuthorisationServiceSpec extends HmrcSpec with DefaultAwaitTimeout with FutureAwaits with StrideAuthConnectorMockModule with StubMessagesFactory
     with TableDrivenPropertyChecks {
-  val strideAuthRoles = StrideAuthRoles(adminRole = "test-admin", superUserRole = "test-superUser", userRole = "test-user")
+  val strideAuthRoles = StrideAuthRoles(adminRole = "test-admin", superUserRole = "test-superUser", advancedUserRole = "test-advancedUser", userRole = "test-user")
   val fakeRequest     = FakeRequest()
   val msgRequest      = new MessagesRequest(fakeRequest, stubMessagesApi())
 
