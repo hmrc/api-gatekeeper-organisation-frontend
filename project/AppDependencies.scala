@@ -4,12 +4,12 @@ object AppDependencies {
 
   private val bootstrapVersion = "10.5.0"
   private val orgDomainVersion = "0.12.0"
-  private val hmrcMongoVersion = "2.11.0"
+  private val hmrcMongoVersion = "2.12.0"
 
   val compile = Seq(
     "uk.gov.hmrc"      %% "bootstrap-frontend-play-30"       % bootstrapVersion,
     "uk.gov.hmrc"      %% "api-platform-organisation-domain" % orgDomainVersion,
-    "uk.gov.hmrc"      %% "play-frontend-hmrc-play-30"       % "12.26.0",
+    "uk.gov.hmrc"      %% "play-frontend-hmrc-play-30"       % "12.31.0",
     "uk.gov.hmrc"      %% "internal-auth-client-play-30"     % "3.1.0",
     "commons-validator" % "commons-validator"                % "1.7",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"               % hmrcMongoVersion
