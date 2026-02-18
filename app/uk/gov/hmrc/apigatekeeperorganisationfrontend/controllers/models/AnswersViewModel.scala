@@ -66,6 +66,6 @@ object AnswersViewModel {
       .collect { case Some(x) => x }
 
     val allowUpdate: Boolean = (instanceIndex == extSubmission.submission.latestInstance.index) && extSubmission.submission.status.isSubmitted
-    ViewModel(extSubmission.submission.id, instanceIndex, allowUpdate, OrganisationName(extSubmission.submission.name), questionnaires)
+    ViewModel(extSubmission.submission.id, instanceIndex, allowUpdate, OrganisationName(extSubmission.submission.organisationName), questionnaires)
   }
 }

@@ -185,7 +185,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
-      contentAsString(result) should include(extendedSubmittedSubmission.submission.name)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName)
       contentAsString(result) should include("Approve this check")
       contentAsString(result) should include("Fail this check")
     }
@@ -198,7 +198,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
-      contentAsString(result) should include(extendedSubmittedSubmission.submission.name)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName)
       contentAsString(result) shouldNot include("Approve this check")
       contentAsString(result) shouldNot include("Fail this check")
     }
