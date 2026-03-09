@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
 
 object OrganisationIdData {
   val one: OrganisationId = OrganisationId.random
@@ -37,7 +37,7 @@ object UserIdData {
 }
 
 object MemberData {
-  val one: Member = Member(UserIdData.one)
+  val one: Collaborator = Collaborators.Member(UserIdData.one)
 }
 
 object OrganisationData extends FixedClock {
