@@ -26,7 +26,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
 @Singleton
@@ -79,6 +79,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
     http.post(url"${config.serviceBaseUrl}/organisations?$params")
       .withBody(Json.toJson(SearchOrganisationRequest(params)))
       .execute[List[Organisation]]
+  }
+
+  def fetchAllOrganisationAllowLists()(implicit hc: HeaderCarrier): Future[List[OrganisationAllowList]] = {
+    http.get(url"${config.serviceBaseUrl}/allow-lists")
+      .execute[List[OrganisationAllowList]]
   }
 }
 

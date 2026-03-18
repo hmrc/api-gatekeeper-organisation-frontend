@@ -19,7 +19,12 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.config
 import com.google.inject.AbstractModule
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{OrganisationConnector, ThirdPartyOrchestratorConnector, VatRegisteredCompaniesConnector}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{
+  OrganisationConnector,
+  ThirdPartyDeveloperConnector,
+  ThirdPartyOrchestratorConnector,
+  VatRegisteredCompaniesConnector
+}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.HandleForbiddenWithView
 
 class Module extends AbstractModule {
@@ -29,6 +34,7 @@ class Module extends AbstractModule {
     bind(classOf[GatekeeperConfig]).toProvider(classOf[GatekeeperConfigProvider])
     bind(classOf[OrganisationConnector.Config]).toProvider(classOf[OrganisationConnectorConfigProvider])
     bind(classOf[ThirdPartyOrchestratorConnector.Config]).toProvider(classOf[ThirdPartyOrchestratorConnectorConfigProvider])
+    bind(classOf[ThirdPartyDeveloperConnector.Config]).toProvider(classOf[ThirdPartyDeveloperConnectorConfigProvider])
     bind(classOf[VatRegisteredCompaniesConnector.Config]).toProvider(classOf[VatRegisteredCompaniesConnectorConfigProvider])
 
     bind(classOf[AppConfig]).asEagerSingleton()

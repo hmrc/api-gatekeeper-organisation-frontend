@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{OrganisationAllowList, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.OrganisationFixtures
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ApiPlatformOrganisationStub
@@ -44,6 +44,8 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
     val submissionReview =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+
+    val allowList = OrganisationAllowList(userId, OrganisationName("My Org 1"), "requestedBy", instant)
   }
 
   override def fakeApplication(): PlayApplication =
@@ -183,6 +185,24 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
       intercept[UpstreamErrorResponse] {
         await(underTest.searchOrganisations(Seq.empty))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "fetchAllOrganisationAllowLists" should {
+    "successfully fetch all" in new Setup {
+      ApiPlatformOrganisationStub.FetchAllOrganisationAllowLists.succeeds(List(allowList))
+
+      val result = await(underTest.fetchAllOrganisationAllowLists())
+
+      result shouldBe List(allowList)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.FetchAllOrganisationAllowLists.fails(INTERNAL_SERVER_ERROR)
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.fetchAllOrganisationAllowLists())
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }

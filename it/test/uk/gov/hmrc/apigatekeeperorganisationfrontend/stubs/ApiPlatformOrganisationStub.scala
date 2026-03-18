@@ -23,7 +23,7 @@ import play.api.http.Status.OK
 import play.api.libs.json.Json
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, Submission, SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
 
 object ApiPlatformOrganisationStub {
@@ -194,4 +194,28 @@ object ApiPlatformOrganisationStub {
     }
   }
 
+  object FetchAllOrganisationAllowLists {
+
+    def succeeds(allowLists: List[OrganisationAllowList]): StubMapping = {
+      stubFor(
+        get(urlEqualTo("/allow-lists"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(allowLists).toString())
+          )
+      )
+    }
+
+    def fails(status: Int): StubMapping = {
+      stubFor(
+        get(urlEqualTo("/allow-lists"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
 }

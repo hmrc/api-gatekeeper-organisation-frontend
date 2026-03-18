@@ -45,3 +45,10 @@ approvesubmissionconfirm.hinttext = {0} can now request access to tax data in ou
 approvesubmissionconfirm.back = Back to business checks
 
 organisationslist.title = Organisations
+
+allowlist.title = Organisation allow list
+allowlist.subtitle = Users on the allow list
+allowlist.name = Name
+allowlist.email = Email address
+allowlist.organisation = Organisation
+allowlist.action = Action
