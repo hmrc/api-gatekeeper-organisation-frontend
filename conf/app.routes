@@ -27,3 +27,4 @@ POST        /migrations/load/:questionType               uk.gov.hmrc.apigatekeep
 POST        /migrations/process-vat                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processVat(count: Int ?= 10)
 POST        /migrations/process-companies-house          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processCompaniesHouse(count: Int ?= 10)
 
+GET         /allow-list                                  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.allowListView()

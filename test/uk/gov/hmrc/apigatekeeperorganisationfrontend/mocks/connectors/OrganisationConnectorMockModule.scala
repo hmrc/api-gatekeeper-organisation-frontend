@@ -60,5 +60,9 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     object FetchByCompanyNumber {
       def willReturn(result: Option[CompaniesHouseCompanyProfile]) = when(aMock.fetchByCompanyNumber(*)(*)).thenReturn(Future.successful(result))
     }
+
+    object FetchAllOrganisationAllowLists {
+      def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(*)).thenReturn(Future.successful(allowLists))
+    }
   }
 }
