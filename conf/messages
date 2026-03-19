@@ -47,8 +47,10 @@ approvesubmissionconfirm.back = Back to business checks
 organisationslist.title = Organisations
 
 allowlist.title = Organisation allow list
+allowlist.adduser = Add a user to the allow list
 allowlist.subtitle = Users on the allow list
 allowlist.name = Name
 allowlist.email = Email address
 allowlist.organisation = Organisation
 allowlist.action = Action
+allowlist.removeuser = Remove

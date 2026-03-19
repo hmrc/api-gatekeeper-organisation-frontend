@@ -36,6 +36,6 @@ class AllowListService @Inject() (
     for {
       orgAllowList <- orgConnector.fetchAllOrganisationAllowLists()
       userList     <- thirdPartyDeveloperConnector.fetchDevelopers(orgAllowList.map(a => a.userId))
-    } yield orgAllowList.map(o => AllowList(o, userList.find(u => u.userId == o.userId))).flatten
+    } yield orgAllowList.map(o => AllowList.applyFromMaybeUser(o, userList.find(u => u.userId == o.userId))).flatten
   }
 }

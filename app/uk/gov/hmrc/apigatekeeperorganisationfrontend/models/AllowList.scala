@@ -27,7 +27,7 @@ case class AllowList(userId: UserId, organisationName: OrganisationName, firstNa
 
 object AllowList {
 
-  def apply(orgAllowList: OrganisationAllowList, maybeUser: Option[User]): Option[AllowList] = {
+  def applyFromMaybeUser(orgAllowList: OrganisationAllowList, maybeUser: Option[User]): Option[AllowList] = {
     maybeUser match {
       case Some(user) => Some(AllowList(user.userId, orgAllowList.organisationName, user.firstName, user.lastName, user.email))
       case _          => None
