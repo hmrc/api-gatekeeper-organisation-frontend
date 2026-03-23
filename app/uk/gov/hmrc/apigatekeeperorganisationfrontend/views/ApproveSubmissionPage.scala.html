@@ -32,7 +32,8 @@
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Are you sure you want to approve?"),
-  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+  currentCheck = true,
 ) {
 
     <span class="govuk-caption-l">@{messages("approvesubmission.subtitle")}</span>

@@ -15,6 +15,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "internal-auth-client-play-30"     % "3.1.0",
     "commons-validator"  % "commons-validator"                % "1.7",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"               % hmrcMongoVersion
+
   )
 
   val test = Seq(

@@ -27,7 +27,10 @@
 
 @(form: Form[FilterForm], organisations: List[Organisation])(implicit request: RequestHeader, messages: Messages)
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Organisations")) {
+@layout(
+    pageTitle = Some("HMRC API Gatekeeper - Organisations"),
+    currentOrg = true
+) {
 
     <h1 class="govuk-heading-l">@{messages("organisationslist.title")}</h1>
 

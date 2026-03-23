@@ -31,7 +31,7 @@
   <a href='@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.summaryPage(sr.submissionId, sr.instanceIndex)' class='govuk-link govuk-link--no-visited-state'>@{sr.organisationName.toString()}</a>
 }
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Business checks")) {
+@layout(pageTitle = Some("HMRC API Gatekeeper - Business checks"), currentCheck = true) {
 
     <h1 class="govuk-heading-l">@{messages("submissionreview.title")}</h1>
 

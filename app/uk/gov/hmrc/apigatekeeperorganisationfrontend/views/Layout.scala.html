@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.footer.Footer
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
 @this(
         govukLayout: GovukLayout,
@@ -30,7 +31,10 @@
 @(
     pageTitle: Option[String] = None, 
     backLink: Option[BackLink] = None,
-    breadcrumbs: Seq[BreadcrumbsItem] = Seq.empty
+    breadcrumbs: Seq[BreadcrumbsItem] = Seq.empty,
+    currentOrg: Boolean = false,
+    currentCheck: Boolean = false,
+    currentAllow: Boolean = false
 )(
     contentBlock: Html
 )(implicit requestHeader: RequestHeader, messages: Messages)
@@ -60,7 +64,45 @@
     </div>
 }
 
+@submenu = {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <ul class="govuk-pagination__list">
+                <li class="govuk-pagination__item">
+                    @if(currentOrg) {
+                        Organisations
+                    } else {
+                        <a class="govuk-link govuk-link--no-visited-state" href="@routes.OrganisationsController.organisationsView()">
+                            Organisations
+                        </a>
+                    }
+                </li>
+                <li class="govuk-pagination__item">
+                    @if(currentCheck) {
+                        Organisation checks
+                    } else {
+                        <a class="govuk-link govuk-link--no-visited-state" href="@routes.SubmissionsController.submissionsView()">
+                            Organisation checks
+                        </a>
+                    }
+                </li>
+                <li class="govuk-pagination__item">
+                    @if(currentAllow) {
+                        Organisation allow list
+                    } else {
+                        <a class="govuk-link govuk-link--no-visited-state" href="@routes.SubmissionsController.submissionsView()">
+                            Organisation allow list
+                        </a>
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible">
+}
+
 @beforeContentAndUser = {
+    @submenu
     <div style="display: flex;
         justify-content: space-between;
         align-items: center;">
