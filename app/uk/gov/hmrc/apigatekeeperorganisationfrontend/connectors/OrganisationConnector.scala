@@ -25,7 +25,8 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
@@ -85,6 +86,20 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
     http.get(url"${config.serviceBaseUrl}/allow-lists")
       .execute[List[OrganisationAllowList]]
   }
+
+  def fetchOrganisationAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Option[OrganisationAllowList]] = {
+    http.get(url"${config.serviceBaseUrl}/allow-list/$userId")
+      .execute[Option[OrganisationAllowList]]
+  }
+
+  def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => s"Failed to create organisation allow list for userId $userId"
+    http.post(url"${config.serviceBaseUrl}/allow-list/$userId")
+      .withBody(Json.toJson(AddOrganisationAllowListRequest(requestedBy, organisationName)))
+      .execute[Either[UpstreamErrorResponse, OrganisationAllowList]]
+      .map(_.leftMap(failed))
+  }
 }
 
 object OrganisationConnector {
@@ -98,4 +113,7 @@ object OrganisationConnector {
 
   case class SearchOrganisationRequest(params: Seq[(String, String)])
   implicit val writeSearchOrganisationRequest: Writes[SearchOrganisationRequest] = Json.writes[SearchOrganisationRequest]
+
+  case class AddOrganisationAllowListRequest(requestedBy: String, organisationName: OrganisationName)
+  implicit val writeAddOrganisationAllowListRequest: Writes[AddOrganisationAllowListRequest] = Json.writes[AddOrganisationAllowListRequest]
 }

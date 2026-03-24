@@ -28,3 +28,7 @@ POST        /migrations/process-vat                      uk.gov.hmrc.apigatekeep
 POST        /migrations/process-companies-house          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processCompaniesHouse(count: Int ?= 10)
 
 GET         /allow-list                                  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.allowListView()
+GET         /allow-list/add                              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListView()
+POST        /allow-list/add                              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListAction()
+GET         /allow-list/add-confirm                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListConfirmView()
+

@@ -54,3 +54,17 @@ allowlist.email = Email address
 allowlist.organisation = Organisation
 allowlist.action = Action
 allowlist.removeuser = Remove
+
+addallowlist.title = Enter the details of the user you want to add to the allow list
+addallowlist.subtitle = This will allow the user to access the organisation registration journey on the Developer Hub.
+addallowlist.email = Developer Hub account email address
+addallowlist.organisation = Organisation
+
+addallowlistconfirm.title = User added to the allow list
+addallowlistconfirm.next = What happens next
+addallowlistconfirm.back = Back to organisation allow list
+
+emailAddress.error.required.field = Enter an email address
+emailAddress.error.not.valid.field = Provide a valid email address
+emailAddress.error.maxLength.field = Provide an email address with fewer than 320 characters
+emailAddress.error.not.found = Developer Hub account not found - user must exist and be verified

@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
 
@@ -40,6 +40,13 @@ class ThirdPartyDeveloperConnector @Inject() (
     http.post(url"${config.serviceBaseUrl}/developers/get-users")
       .withBody(Json.toJson(GetUsersRequest(users)))
       .execute[List[User]]
+  }
+
+  def fetchByEmails(emails: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[Seq[User]] = {
+    http
+      .post(url"${config.serviceBaseUrl}/developers/get-by-emails")
+      .withBody(Json.toJson(emails))
+      .execute[Seq[User]]
   }
 }
 

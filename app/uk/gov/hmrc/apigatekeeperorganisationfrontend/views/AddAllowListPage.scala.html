@@ -1,0 +1,67 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.AddAllowListForm
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+@import include._
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukButton: GovukButton)
+
+@(form: Form[AddAllowListForm])(implicit request: RequestHeader, messages: Messages)
+
+@layout(pageTitle = Some("HMRC API Gatekeeper - Add to the organisation allow list")) {
+
+  <h1 class="govuk-heading-l">@{messages("addallowlist.title")}</h1>
+    
+  <p class="govuk-body">@{messages("addallowlist.subtitle")}</p>
+
+  @helper.form(action = routes.AllowListController.addAllowListAction()) {
+    @helper.CSRF.formField
+
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="email" id="email-label">
+          @{messages("addallowlist.email")}
+        </label>
+        <span id="add-email-error" class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> @fieldError(form.errors, "email")
+        </span>
+        <input type="text" class="govuk-input @if(form.errors("email").nonEmpty) {govuk-input--error}" id="email" name="email" value="@form.data.getOrElse("email", "")" aria-labelledby="email-label" aria-describedby="add-email-error">
+      </div>
+
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="organisation" id="organisation-label">
+          @{messages("addallowlist.organisation")}
+        </label>
+        <span id="add-organisation-error" class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> @fieldError(form.errors, "organisation")
+        </span>
+        <input type="text" class="govuk-input @if(form.errors("organisation").nonEmpty) {govuk-input--error}" id="organisation" name="organisation" value="@form.data.getOrElse("organisation", "")" aria-labelledby="organisation-label" aria-describedby="add-organisation-error">
+      </div>
+
+      <div class="govuk-button-group">
+        @govukButton(Button(
+          id = Some("addAllowList"), 
+          isStartButton = false,
+          content = Text("Add user to the allow list")))
+       </div>
+    }
+}
