@@ -206,4 +206,40 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
+
+  "fetchOrganisationAllowList" should {
+    "successfully fetch" in new Setup {
+      ApiPlatformOrganisationStub.FetchOrganisationAllowList.succeeds(userId, allowList)
+
+      val result = await(underTest.fetchOrganisationAllowList(userId))
+
+      result shouldBe Some(allowList)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.FetchOrganisationAllowList.fails(userId, INTERNAL_SERVER_ERROR)
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.fetchOrganisationAllowList(userId))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "createOrganisationAllowList" should {
+    "successfully create" in new Setup {
+      ApiPlatformOrganisationStub.CreateOrganisationAllowList.succeeds(userId, allowList)
+
+      val result = await(underTest.createOrganisationAllowList(userId, "requestedBy", OrganisationName("My Org 2")))
+
+      result shouldBe Right(allowList)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.CreateOrganisationAllowList.fails(userId, INTERNAL_SERVER_ERROR)
+
+      val result = await(underTest.createOrganisationAllowList(userId, "requestedBy", OrganisationName("My Org 2")))
+
+      result shouldBe Left("Failed to create organisation allow list - check user doesn't already exist in allow list")
+    }
+  }
 }

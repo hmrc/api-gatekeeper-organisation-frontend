@@ -94,7 +94,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to create organisation allow list for userId $userId"
+    val failed = (err: UpstreamErrorResponse) => "Failed to create organisation allow list - check user doesn't already exist in allow list"
     http.post(url"${config.serviceBaseUrl}/allow-list/$userId")
       .withBody(Json.toJson(AddOrganisationAllowListRequest(requestedBy, organisationName)))
       .execute[Either[UpstreamErrorResponse, OrganisationAllowList]]

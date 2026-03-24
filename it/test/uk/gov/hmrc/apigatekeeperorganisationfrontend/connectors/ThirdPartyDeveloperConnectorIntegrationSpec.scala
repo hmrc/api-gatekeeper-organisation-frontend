@@ -56,7 +56,7 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
       .in(Mode.Test)
       .build()
 
-  "TPD Connector" should {
+  "fetchDevelopers" should {
     "fetchDevelopers successfully" in new Setup {
       ThirdPartyDeveloperStub.FetchDevelopers.succeeds(GetUsersRequest(List(userId1, userId2)), response = List(user1, user2))
       val result = await(underTest.fetchDevelopers(List(userId1, userId2)))
@@ -67,6 +67,21 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
       ThirdPartyDeveloperStub.FetchDevelopers.fails(INTERNAL_SERVER_ERROR)
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchDevelopers(List(userId1, userId2)))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "fetchByEmails" should {
+    "fetchByEmails successfully" in new Setup {
+      ThirdPartyDeveloperStub.FetchByEmails.succeeds(Set(email1, email2), List(user1, user2))
+      val result = await(underTest.fetchByEmails(Set(email1, email2)))
+      result shouldBe List(user1, user2)
+    }
+
+    "fetchByEmails fails" in new Setup {
+      ThirdPartyDeveloperStub.FetchByEmails.fails(INTERNAL_SERVER_ERROR)
+      intercept[UpstreamErrorResponse] {
+        await(underTest.fetchByEmails(Set(email1, email2)))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }

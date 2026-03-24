@@ -42,6 +42,7 @@ object AllowListController {
       mapping(
         "email"        -> emailValidator(),
         "organisation" -> text
+          .verifying("organisation.error.required.field", !_.isBlank())
       )(AddAllowListForm.apply)(AddAllowListForm.unapply)
     )
   }
@@ -81,7 +82,7 @@ class AllowListController @Inject() (
         allowListService.createAllowList(LaxEmailAddress(allowListAddData.email), request.name.get, OrganisationName(allowListAddData.organisation))
           .map(_ match {
             case Right(org) => Redirect(routes.AllowListController.addAllowListConfirmView())
-            case Left(msg)  => BadRequest(addAllowListPage(AddAllowListForm.form.fill(allowListAddData).withError("email", "emailAddress.error.not.found", msg)))
+            case Left(msg)  => BadRequest(addAllowListPage(AddAllowListForm.form.fill(allowListAddData).withError("email", "emailAddress.error.creation", msg)))
           })
       }
     )

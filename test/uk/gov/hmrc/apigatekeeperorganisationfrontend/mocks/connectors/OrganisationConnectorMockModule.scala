@@ -20,7 +20,8 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
@@ -54,7 +55,6 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
       def willReturn(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(*)).thenReturn(Future.successful(organisations))
 
       def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(*)
-
     }
 
     object FetchByCompanyNumber {
@@ -63,6 +63,18 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
 
     object FetchAllOrganisationAllowLists {
       def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(*)).thenReturn(Future.successful(allowLists))
+    }
+
+    object CreateOrganisationAllowList {
+
+      def willReturn(allowList: OrganisationAllowList) =
+        when(aMock.createOrganisationAllowList(*[UserId], *, *[OrganisationName])(*)).thenReturn(Future.successful(Right(allowList)))
+
+      def verifyCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
+        verify(aMock).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
+
+      def verifyNotCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
+        verify(aMock, never).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
     }
   }
 }

@@ -28,14 +28,19 @@
 
 @(form: Form[AddAllowListForm])(implicit request: RequestHeader, messages: Messages)
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Add to the organisation allow list")) {
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Add to the organisation allow list"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+) {
 
-  <h1 class="govuk-heading-l">@{messages("addallowlist.title")}</h1>
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">@{messages("addallowlist.title")}</h1>
     
-  <p class="govuk-body">@{messages("addallowlist.subtitle")}</p>
+    <p class="govuk-body">@{messages("addallowlist.subtitle")}</p>
 
-  @helper.form(action = routes.AllowListController.addAllowListAction()) {
-    @helper.CSRF.formField
+    @helper.form(action = routes.AllowListController.addAllowListAction()) {
+      @helper.CSRF.formField
 
       <div class="govuk-form-group">
         <label class="govuk-label" for="email" id="email-label">
@@ -64,4 +69,5 @@
           content = Text("Add user to the allow list")))
        </div>
     }
+  </div>  
 }

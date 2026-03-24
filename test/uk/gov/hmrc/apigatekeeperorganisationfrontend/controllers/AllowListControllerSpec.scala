@@ -133,7 +133,7 @@ class AllowListControllerSpec extends HmrcSpec
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Enter the details of the user you want to add to the allow list")
-      contentAsString(result) should include("Developer Hub account not found")
+      contentAsString(result) should include("User not found")
     }
   }
 
