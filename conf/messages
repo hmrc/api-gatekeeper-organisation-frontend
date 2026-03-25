@@ -69,3 +69,13 @@ emailAddress.error.not.valid.field = Provide a valid email address
 emailAddress.error.maxLength.field = Provide an email address with fewer than 320 characters
 emailAddress.error.creation = {0}
 organisation.error.required.field = Enter an organisation
+
+removeallowlist.title = Are you sure that you want to remove this user from the allow list?
+removeallowlist.subtitle1 = The user
+removeallowlist.subtitle2 = from
+removeallowlist.subtitle3 = will no longer be able to access the organisation registration journey on the Developer Hub.
+removeallowlist.no.choice.field = Please select an option
+
+removeallowlistconfirm.title = User removed from the allow list
+removeallowlistconfirm.next = What happens next
+removeallowlistconfirm.back = Back to organisation allow list

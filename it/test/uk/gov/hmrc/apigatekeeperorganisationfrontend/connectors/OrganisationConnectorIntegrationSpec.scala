@@ -242,4 +242,22 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       result shouldBe Left("Failed to create organisation allow list - check user doesn't already exist in allow list")
     }
   }
+
+  "deleteOrganisationAllowList" should {
+    "successfully delete" in new Setup {
+      ApiPlatformOrganisationStub.DeleteOrganisationAllowList.succeeds(userId)
+
+      val result = await(underTest.deleteOrganisationAllowList(userId))
+
+      result shouldBe Right(true)
+    }
+
+    "fail when the call returns an error" in new Setup {
+      ApiPlatformOrganisationStub.DeleteOrganisationAllowList.fails(userId, INTERNAL_SERVER_ERROR)
+
+      val result = await(underTest.deleteOrganisationAllowList(userId))
+
+      result shouldBe Left("Failed to delete organisation allow list - check user exists in allow list")
+    }
+  }
 }

@@ -65,6 +65,12 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
       def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(*)).thenReturn(Future.successful(allowLists))
     }
 
+    object FetchOrganisationAllowList {
+      def willReturn(allowList: OrganisationAllowList) = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Some(allowList)))
+
+      def willReturnNone() = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(None))
+    }
+
     object CreateOrganisationAllowList {
 
       def willReturn(allowList: OrganisationAllowList) =
@@ -75,6 +81,12 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
 
       def verifyNotCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
         verify(aMock, never).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
+    }
+
+    object DeleteOrganisationAllowList {
+
+      def willReturn() =
+        when(aMock.deleteOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Right(true)))
     }
   }
 }

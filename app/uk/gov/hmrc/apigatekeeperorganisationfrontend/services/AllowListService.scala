@@ -22,7 +22,7 @@ import com.google.inject.{Inject, Singleton}
 
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
@@ -44,6 +44,16 @@ class AllowListService @Inject() (
     } yield orgAllowList.map(o => AllowList.applyFromMaybeUser(o, userList.find(u => u.userId == o.userId))).flatten
   }
 
+  def fetchAllowListForUserId(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, AllowList]] = {
+    (
+      for {
+        orgAllowList <- fromOptionF(orgConnector.fetchOrganisationAllowList(userId), "User not found in allow list")
+        userList     <- liftF(thirdPartyDeveloperConnector.fetchDevelopers(List(userId)))
+        user         <- fromOption(userList.find(u => u.userId == orgAllowList.userId), "User not found in Developer Hub")
+      } yield AllowList.applyFromUser(orgAllowList, user)
+    ).value
+  }
+
   def createAllowList(email: LaxEmailAddress, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier)
       : Future[Either[String, OrganisationAllowList]] = {
     (
@@ -57,5 +67,9 @@ class AllowListService @Inject() (
 
   private def getUserByEmail(email: LaxEmailAddress)(implicit hc: HeaderCarrier): Future[Option[User]] = {
     thirdPartyDeveloperConnector.fetchByEmails(Set(email)).map(users => users.headOption)
+  }
+
+  def deleteAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, Boolean]] = {
+    orgConnector.deleteOrganisationAllowList(userId)
   }
 }

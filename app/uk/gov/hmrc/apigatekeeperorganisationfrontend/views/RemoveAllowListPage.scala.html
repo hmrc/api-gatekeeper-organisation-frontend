@@ -1,0 +1,80 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.{RemoveAllowListForm, RemoveAllowListViewModel}
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+@import include._
+
+@import java.time.ZoneOffset
+@import java.time.format.DateTimeFormatter
+
+@this(layout: Layout, govukButton: GovukButton)
+
+@(form: Form[RemoveAllowListForm], viewModel: RemoveAllowListViewModel)(implicit request: RequestHeader, messages: Messages)
+
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - Remove from the organisation allow list"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+) {
+
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">@{messages("removeallowlist.title")}</h1>
+    
+    <p class="govuk-body">
+      @messages("removeallowlist.subtitle1")
+      <strong>@viewModel.email.text</strong>
+      @messages("removeallowlist.subtitle2")
+      <strong>@viewModel.organisationName.value</strong>
+      @messages("removeallowlist.subtitle3")
+    </p>
+
+    @helper.form(action = routes.AllowListController.removeAllowListAction(viewModel.userId)) {
+      @helper.CSRF.formField
+
+      <div class="govuk-form-group @if(form.errors("confirm").nonEmpty) {govuk-form-group--error}">
+        <fieldset id="confirm" class="govuk-fieldset" aria-describedby="remove-allow-list-error">
+          <input id="email" name="email" type="hidden" value="@viewModel.email.text"/>
+          <input id="organisationName" name="organisationName" type="hidden" value="@viewModel.organisationName.value"/>
+          <span id="remove-allow-list-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @fieldError(form.errors, "confirm")
+          </span>
+          <div class="govuk-radios govuk-radios--inline">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="yes" type="radio" name="confirm" value="Yes">
+              <label class="govuk-label govuk-radios__label" for="yes">Yes</label>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="no" type="radio" name="confirm" value="No">
+              <label class="govuk-label govuk-radios__label" for="no">No</label>
+            </div>
+          </div>
+        </fieldset>
+        <br>
+      </div>
+
+      <div class="govuk-button-group">
+        @govukButton(Button(
+          id = Some("removeAllowList"), 
+          isStartButton = false,
+          content = Text("Save and continue")))
+       </div>
+    }
+  </div>  
+}

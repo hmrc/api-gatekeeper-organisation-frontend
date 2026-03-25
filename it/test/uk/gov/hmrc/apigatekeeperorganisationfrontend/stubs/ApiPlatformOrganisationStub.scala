@@ -269,4 +269,29 @@ object ApiPlatformOrganisationStub {
       )
     }
   }
+
+  object DeleteOrganisationAllowList {
+
+    def succeeds(userId: UserId): StubMapping = {
+      stubFor(
+        delete(urlEqualTo(s"/allow-list/${userId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(true).toString())
+          )
+      )
+    }
+
+    def fails(userId: UserId, status: Int): StubMapping = {
+      stubFor(
+        delete(urlEqualTo(s"/allow-list/${userId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
 }

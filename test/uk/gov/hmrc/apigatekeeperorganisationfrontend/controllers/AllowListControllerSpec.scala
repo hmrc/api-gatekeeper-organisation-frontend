@@ -52,13 +52,25 @@ class AllowListControllerSpec extends HmrcSpec
       with LdapAuthorisationServiceMockModule
       with FixedClock {
 
-    val mainPage       = app.injector.instanceOf[AllowListPage]
-    val addPage        = app.injector.instanceOf[AddAllowListPage]
-    val addConfirmPage = app.injector.instanceOf[AddAllowListConfirmPage]
-    val mcc            = app.injector.instanceOf[MessagesControllerComponents]
+    val mainPage          = app.injector.instanceOf[AllowListPage]
+    val addPage           = app.injector.instanceOf[AddAllowListPage]
+    val addConfirmPage    = app.injector.instanceOf[AddAllowListConfirmPage]
+    val removePage        = app.injector.instanceOf[RemoveAllowListPage]
+    val removeConfirmPage = app.injector.instanceOf[RemoveAllowListConfirmPage]
+    val mcc               = app.injector.instanceOf[MessagesControllerComponents]
 
     val controller =
-      new AllowListController(mcc, mainPage, addPage, addConfirmPage, AllowListServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
+      new AllowListController(
+        mcc,
+        mainPage,
+        addPage,
+        addConfirmPage,
+        removePage,
+        removeConfirmPage,
+        AllowListServiceMock.aMock,
+        StrideAuthorisationServiceMock.aMock,
+        LdapAuthorisationServiceMock.aMock
+      )
 
     val userId                = UserId.random
     val allowList             = AllowList(userId, OrganisationName("My Org"), "Bob", "Fleming", LaxEmailAddress("bob@fleming.com"))
@@ -146,6 +158,69 @@ class AllowListControllerSpec extends HmrcSpec
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("User added to the allow list")
+      contentAsString(result) should include("Back to organisation allow list")
+    }
+  }
+
+  "GET remove allow list page" should {
+    "return 200 with Stride auth" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      AllowListServiceMock.FetchAllowListForUserId.succeed(allowList)
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("GET", s"/allow-list/remove/$userId"))
+
+      val result = controller.removeAllowListView(userId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Are you sure that you want to remove this user from the allow list?")
+      contentAsString(result) should include(allowList.email.text)
+      contentAsString(result) should include("will no longer be able to access the organisation registration journey on the Developer Hub.")
+    }
+  }
+
+  "POST remove allow list page" should {
+    "return 303 with Stride auth with valid data" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      AllowListServiceMock.DeleteAllowList.succeed()
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("POST", s"/allow-list/remove/$userId").withFormUrlEncodedBody("confirm" -> "Yes"))
+
+      val result = controller.removeAllowListAction(userId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some("/api-gatekeeper-organisation/allow-list/remove-confirm")
+    }
+
+    "return 400 with Stride auth with no confirmation" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      AllowListServiceMock.FetchAllowListForUserId.succeed(allowList)
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("POST", "/allow-list/remove/$userId"))
+
+      val result = controller.removeAllowListAction(userId)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) should include("Are you sure that you want to remove this user from the allow list?")
+      contentAsString(result) should include("Please select an option")
+    }
+
+    "return 303 and return to main allow list page if select No" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("POST", "/allow-list/remove/$userId").withFormUrlEncodedBody("confirm" -> "No"))
+
+      val result = controller.removeAllowListAction(userId)(fakeRequest)
+
+      status(result) shouldBe Status.SEE_OTHER
+      redirectLocation(result) shouldBe Some("/api-gatekeeper-organisation/allow-list")
+    }
+  }
+
+  "GET remove allow list confirm page" should {
+    "return 200 with Stride auth" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("GET", "/allow-list/remove-confirm"))
+
+      val result = controller.removeAllowListConfirmView(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("User removed from the allow list")
       contentAsString(result) should include("Back to organisation allow list")
     }
   }
