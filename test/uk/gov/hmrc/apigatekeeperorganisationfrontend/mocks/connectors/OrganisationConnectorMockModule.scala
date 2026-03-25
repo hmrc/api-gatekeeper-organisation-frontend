@@ -65,6 +65,12 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
       def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(*)).thenReturn(Future.successful(allowLists))
     }
 
+    object FetchOrganisationAllowList {
+      def willReturn(allowList: OrganisationAllowList) = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Some(allowList)))
+
+      def willReturnNone() = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(None))
+    }
+
     object CreateOrganisationAllowList {
 
       def willReturn(allowList: OrganisationAllowList) =

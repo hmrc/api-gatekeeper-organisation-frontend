@@ -61,6 +61,34 @@ class AllowListServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockM
     }
   }
 
+  "fetchAllowListForUserId" should {
+    "fetch allow list for a user id successfully" in new Setup {
+      OrganisationConnectorMock.FetchOrganisationAllowList.willReturn(orgAllowList1)
+      TpdConnectorMock.FetchDevelopers.willReturn(List(user1))
+
+      val result = await(underTest.fetchAllowListForUserId(userId1))
+
+      result shouldBe Right(allowList1)
+    }
+
+    "fetch allow list for a user id user not found in allow list" in new Setup {
+      OrganisationConnectorMock.FetchOrganisationAllowList.willReturnNone()
+
+      val result = await(underTest.fetchAllowListForUserId(userId1))
+
+      result shouldBe Left("User not found in allow list")
+    }
+
+    "fetch allow list for a user id user not found in TPD" in new Setup {
+      OrganisationConnectorMock.FetchOrganisationAllowList.willReturn(orgAllowList1)
+      TpdConnectorMock.FetchDevelopers.willReturn(List.empty)
+
+      val result = await(underTest.fetchAllowListForUserId(userId1))
+
+      result shouldBe Left("User not found in Developer Hub")
+    }
+  }
+
   "createAllowList" should {
     "create allow list successfully" in new Setup {
       TpdConnectorMock.FetchByEmails.willReturn(List(user1))
