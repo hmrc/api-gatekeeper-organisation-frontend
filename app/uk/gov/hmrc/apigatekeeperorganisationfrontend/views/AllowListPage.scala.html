@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import include._
 
 @import java.time.ZoneOffset
@@ -31,7 +32,7 @@
     <h1 class="govuk-heading-l">@{messages("allowlist.title")}</h1>
 
     <p class="govuk-body">
-        <a href="#" class="govuk-link govuk-link--no-visited-state">@{messages("allowlist.adduser")}</a>
+        <a href="@routes.AllowListController.addAllowListView()" class="govuk-link govuk-link--no-visited-state">@{messages("allowlist.adduser")}</a>
     </p>
     
     <h2 class="govuk-heading-m">@{messages("allowlist.subtitle")}</h2>

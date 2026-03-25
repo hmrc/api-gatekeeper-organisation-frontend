@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
@@ -211,6 +212,56 @@ object ApiPlatformOrganisationStub {
     def fails(status: Int): StubMapping = {
       stubFor(
         get(urlEqualTo("/allow-lists"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object FetchOrganisationAllowList {
+
+    def succeeds(userId: UserId, allowList: OrganisationAllowList): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/allow-list/${userId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(allowList).toString())
+          )
+      )
+    }
+
+    def fails(userId: UserId, status: Int): StubMapping = {
+      stubFor(
+        get(urlEqualTo(s"/allow-list/${userId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object CreateOrganisationAllowList {
+
+    def succeeds(userId: UserId, allowList: OrganisationAllowList): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/allow-list/${userId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(allowList).toString())
+          )
+      )
+    }
+
+    def fails(userId: UserId, status: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo(s"/allow-list/${userId}"))
           .willReturn(
             aResponse()
               .withStatus(status)

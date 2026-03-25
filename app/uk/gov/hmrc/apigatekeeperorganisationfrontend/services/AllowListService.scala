@@ -22,6 +22,11 @@ import com.google.inject.{Inject, Singleton}
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.services.EitherTHelper
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{OrganisationConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
 
@@ -30,12 +35,27 @@ class AllowListService @Inject() (
     orgConnector: OrganisationConnector,
     thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector
   )(implicit val ec: ExecutionContext
-  ) {
+  ) extends EitherTHelper[String] {
 
   def fetchAllowList()(implicit hc: HeaderCarrier): Future[List[AllowList]] = {
     for {
       orgAllowList <- orgConnector.fetchAllOrganisationAllowLists()
       userList     <- thirdPartyDeveloperConnector.fetchDevelopers(orgAllowList.map(a => a.userId))
     } yield orgAllowList.map(o => AllowList.applyFromMaybeUser(o, userList.find(u => u.userId == o.userId))).flatten
+  }
+
+  def createAllowList(email: LaxEmailAddress, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier)
+      : Future[Either[String, OrganisationAllowList]] = {
+    (
+      for {
+        user      <- fromOptionF(getUserByEmail(email), s"Developer Hub user not found with email address ${email.text}")
+        _         <- cond(user.verified, (), "Developer Hub user is not verified")
+        allowList <- fromEitherF(orgConnector.createOrganisationAllowList(user.userId, requestedBy, organisationName))
+      } yield allowList
+    ).value
+  }
+
+  private def getUserByEmail(email: LaxEmailAddress)(implicit hc: HeaderCarrier): Future[Option[User]] = {
+    thirdPartyDeveloperConnector.fetchByEmails(Set(email)).map(users => users.headOption)
   }
 }

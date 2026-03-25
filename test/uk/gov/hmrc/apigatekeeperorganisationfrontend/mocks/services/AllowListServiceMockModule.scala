@@ -20,6 +20,9 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.AllowListService
 
@@ -32,6 +35,12 @@ trait AllowListServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
       def succeed(allowLists: List[AllowList]) = when(aMock.fetchAllowList()(*)).thenReturn(Future.successful(allowLists))
 
       def verifyCalled() = verify(aMock).fetchAllowList()(*)
+    }
+
+    object CreateAllowList {
+      def succeed(allowList: OrganisationAllowList) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Right(allowList)))
+
+      def failed(msg: String) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Left(msg)))
     }
   }
 }

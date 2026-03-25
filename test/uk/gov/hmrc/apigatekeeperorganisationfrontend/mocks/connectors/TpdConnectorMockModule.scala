@@ -31,5 +31,9 @@ trait TpdConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
     object FetchDevelopers {
       def willReturn(users: List[User]) = when(aMock.fetchDevelopers(*)(*)).thenReturn(Future.successful(users))
     }
+
+    object FetchByEmails {
+      def willReturn(users: List[User]) = when(aMock.fetchByEmails(*)(*)).thenReturn(Future.successful(users))
+    }
   }
 }

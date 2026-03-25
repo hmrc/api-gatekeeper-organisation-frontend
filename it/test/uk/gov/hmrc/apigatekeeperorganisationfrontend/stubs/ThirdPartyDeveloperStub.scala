@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
 
@@ -45,6 +46,32 @@ object ThirdPartyDeveloperStub {
     def fails(status: Int): StubMapping = {
       stubFor(
         post(urlEqualTo("/developers/get-users"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object FetchByEmails {
+
+    def succeeds(emails: Set[LaxEmailAddress], response: List[User]): StubMapping = {
+      stubFor(
+        post(urlEqualTo("/developers/get-by-emails"))
+          .withRequestBody(equalToJson(Json.toJson(emails).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+    }
+
+    def fails(status: Int): StubMapping = {
+      stubFor(
+        post(urlEqualTo("/developers/get-by-emails"))
           .willReturn(
             aResponse()
               .withStatus(status)

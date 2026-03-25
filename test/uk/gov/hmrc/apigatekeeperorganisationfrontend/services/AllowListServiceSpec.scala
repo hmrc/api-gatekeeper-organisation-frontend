@@ -60,4 +60,35 @@ class AllowListServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockM
       result shouldBe List(allowList1, allowList2)
     }
   }
+
+  "createAllowList" should {
+    "create allow list successfully" in new Setup {
+      TpdConnectorMock.FetchByEmails.willReturn(List(user1))
+      OrganisationConnectorMock.CreateOrganisationAllowList.willReturn(orgAllowList1)
+
+      val result = await(underTest.createAllowList(email1, "requestedBy", OrganisationName("My Org 1")))
+
+      result shouldBe Right(orgAllowList1)
+      OrganisationConnectorMock.CreateOrganisationAllowList.verifyCalled(userId1, "requestedBy", OrganisationName("My Org 1"))
+    }
+
+    "create allow list user not found" in new Setup {
+      TpdConnectorMock.FetchByEmails.willReturn(List.empty)
+
+      val result = await(underTest.createAllowList(email2, "requestedBy", OrganisationName("My Org 1")))
+
+      result shouldBe Left(s"Developer Hub user not found with email address ${email2.text}")
+      OrganisationConnectorMock.CreateOrganisationAllowList.verifyNotCalled(userId2, "requestedBy", OrganisationName("My Org 1"))
+    }
+
+    "create allow list unverified user" in new Setup {
+      val unverifiedUser = user2.copy(verified = false)
+      TpdConnectorMock.FetchByEmails.willReturn(List(unverifiedUser))
+
+      val result = await(underTest.createAllowList(email2, "requestedBy", OrganisationName("My Org 1")))
+
+      result shouldBe Left("Developer Hub user is not verified")
+      OrganisationConnectorMock.CreateOrganisationAllowList.verifyNotCalled(userId2, "requestedBy", OrganisationName("My Org 1"))
+    }
+  }
 }
