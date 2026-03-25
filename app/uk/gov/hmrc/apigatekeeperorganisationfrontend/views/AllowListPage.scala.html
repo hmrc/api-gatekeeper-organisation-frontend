@@ -48,7 +48,7 @@
             TableRow(content = Text(s"${allow.firstName} ${allow.lastName}")),
             TableRow(content = Text(allow.email.text)),
             TableRow(content = Text(allow.organisationName.toString())),
-            TableRow(content = HtmlContent(s"<a href='#' class='govuk-link govuk-link--no-visited-state'>${messages("allowlist.removeuser")}</a>"))
+            TableRow(content = HtmlContent(s"<a href='${routes.AllowListController.removeAllowListView(allow.userId)}' class='govuk-link govuk-link--no-visited-state'>${messages("allowlist.removeuser")}</a>"))
         ))
     ))
 }

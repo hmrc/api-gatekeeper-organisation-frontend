@@ -34,5 +34,9 @@ object AllowList {
     }
   }
 
+  def applyFromUser(orgAllowList: OrganisationAllowList, user: User): AllowList = {
+    AllowList(user.userId, orgAllowList.organisationName, user.firstName, user.lastName, user.email)
+  }
+
   implicit val allowListFormat: OFormat[AllowList] = Json.format[AllowList]
 }

@@ -76,5 +76,11 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
       def verifyNotCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
         verify(aMock, never).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
     }
+
+    object DeleteOrganisationAllowList {
+
+      def willReturn() =
+        when(aMock.deleteOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Right(true)))
+    }
   }
 }

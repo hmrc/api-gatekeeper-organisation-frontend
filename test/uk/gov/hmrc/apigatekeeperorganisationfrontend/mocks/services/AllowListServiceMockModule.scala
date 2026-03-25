@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
@@ -37,10 +37,20 @@ trait AllowListServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
       def verifyCalled() = verify(aMock).fetchAllowList()(*)
     }
 
+    object FetchAllowListForUserId {
+      def succeed(allowList: AllowList) = when(aMock.fetchAllowListForUserId(*[UserId])(*)).thenReturn(Future.successful(Right(allowList)))
+    }
+
     object CreateAllowList {
       def succeed(allowList: OrganisationAllowList) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Right(allowList)))
 
       def failed(msg: String) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Left(msg)))
+    }
+
+    object DeleteAllowList {
+      def succeed() = when(aMock.deleteAllowList(*[UserId])(*)).thenReturn(Future.successful(Right(true)))
+
+      def failed(msg: String) = when(aMock.deleteAllowList(*[UserId])(*)).thenReturn(Future.successful(Left(msg)))
     }
   }
 }

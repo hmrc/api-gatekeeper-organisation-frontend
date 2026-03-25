@@ -91,4 +91,14 @@ class AllowListServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockM
       OrganisationConnectorMock.CreateOrganisationAllowList.verifyNotCalled(userId2, "requestedBy", OrganisationName("My Org 1"))
     }
   }
+
+  "deleteAllowList" should {
+    "delete allow list successfully" in new Setup {
+      OrganisationConnectorMock.DeleteOrganisationAllowList.willReturn()
+
+      val result = await(underTest.deleteAllowList(userId1))
+
+      result shouldBe Right(true)
+    }
+  }
 }

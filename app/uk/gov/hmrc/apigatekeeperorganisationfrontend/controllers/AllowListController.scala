@@ -20,19 +20,21 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.FormUtils.emailValidator
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.AllowListService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.{AddAllowListConfirmPage, AddAllowListPage, AllowListPage}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 object AllowListController {
+
+  case class RemoveAllowListViewModel(userId: UserId, email: LaxEmailAddress, organisationName: OrganisationName)
 
   case class AddAllowListForm(email: String, organisation: String)
 
@@ -46,6 +48,18 @@ object AllowListController {
       )(AddAllowListForm.apply)(AddAllowListForm.unapply)
     )
   }
+
+  case class RemoveAllowListForm(confirm: Option[String] = Some(""))
+
+  object RemoveAllowListForm {
+
+    def form: Form[RemoveAllowListForm] = Form(
+      mapping(
+        "confirm" -> optional(text)
+          .verifying("removeallowlist.no.choice.field", _.isDefined)
+      )(RemoveAllowListForm.apply)(RemoveAllowListForm.unapply)
+    )
+  }
 }
 
 @Singleton
@@ -54,6 +68,8 @@ class AllowListController @Inject() (
     allowListPage: AllowListPage,
     addAllowListPage: AddAllowListPage,
     addAllowListConfirmPage: AddAllowListConfirmPage,
+    removeAllowListPage: RemoveAllowListPage,
+    removeAllowListConfirmPage: RemoveAllowListConfirmPage,
     allowListService: AllowListService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
@@ -62,7 +78,8 @@ class AllowListController @Inject() (
 
   import AllowListController._
 
-  val addAllowListForm: Form[AddAllowListForm] = AddAllowListForm.form
+  val addAllowListForm: Form[AddAllowListForm]       = AddAllowListForm.form
+  val removeAllowListForm: Form[RemoveAllowListForm] = RemoveAllowListForm.form
 
   def allowListView: Action[AnyContent] = loggedInOnly() { implicit request =>
     allowListService.fetchAllowList()
@@ -90,6 +107,42 @@ class AllowListController @Inject() (
 
   def addAllowListConfirmView: Action[AnyContent] = loggedInOnly() { implicit request =>
     Future.successful(Ok(addAllowListConfirmPage()))
+  }
+
+  def removeAllowListView(userId: UserId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    allowListService.fetchAllowListForUserId(userId)
+      .map(_ match {
+        case Right(allowList) => Ok(removeAllowListPage(removeAllowListForm, RemoveAllowListViewModel(userId, allowList.email, allowList.organisationName)))
+        case Left(msg)        => BadRequest(msg)
+      })
+  }
+
+  def removeAllowListAction(userId: UserId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    removeAllowListForm.bindFromRequest().fold(
+      formWithErrors => {
+        allowListService.fetchAllowListForUserId(userId)
+          .map(_ match {
+            case Right(allowList) => BadRequest(removeAllowListPage(formWithErrors, RemoveAllowListViewModel(userId, allowList.email, allowList.organisationName)))
+            case Left(msg)        => BadRequest(msg)
+          })
+      },
+      allowListRemoveData => {
+        allowListRemoveData.confirm match {
+          case Some("Yes") => {
+            allowListService.deleteAllowList(userId)
+              .map(_ match {
+                case Right(res) => Redirect(routes.AllowListController.removeAllowListConfirmView())
+                case Left(msg)  => BadRequest(msg)
+              })
+          }
+          case _           => Future.successful(Redirect(routes.AllowListController.allowListView()))
+        }
+      }
+    )
+  }
+
+  def removeAllowListConfirmView: Action[AnyContent] = loggedInOnly() { implicit request =>
+    Future.successful(Ok(removeAllowListConfirmPage()))
   }
 
 }

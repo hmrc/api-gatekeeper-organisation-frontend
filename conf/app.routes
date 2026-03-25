@@ -31,4 +31,7 @@ GET         /allow-list                                  uk.gov.hmrc.apigatekeep
 GET         /allow-list/add                              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListView()
 POST        /allow-list/add                              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListAction()
 GET         /allow-list/add-confirm                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListConfirmView()
+GET         /allow-list/remove/:uid                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.removeAllowListView(uid: UserId)
+POST        /allow-list/remove/:uid                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.removeAllowListAction(uid: UserId)
+GET         /allow-list/remove-confirm                   uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.removeAllowListConfirmView()
 

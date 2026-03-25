@@ -100,6 +100,14 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .execute[Either[UpstreamErrorResponse, OrganisationAllowList]]
       .map(_.leftMap(failed))
   }
+
+  def deleteOrganisationAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, Boolean]] = {
+    import cats.implicits._
+    val failed = (err: UpstreamErrorResponse) => "Failed to delete organisation allow list - check user exists in allow list"
+    http.delete(url"${config.serviceBaseUrl}/allow-list/$userId")
+      .execute[Either[UpstreamErrorResponse, Boolean]]
+      .map(_.leftMap(failed))
+  }
 }
 
 object OrganisationConnector {
