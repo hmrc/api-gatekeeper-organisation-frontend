@@ -28,7 +28,8 @@
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Business check approved"),
-  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url))),
+  currentCheck = true,
 ) {
 
   @govukPanel(Panel(

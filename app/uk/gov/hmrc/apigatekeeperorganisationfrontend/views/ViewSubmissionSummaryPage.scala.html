@@ -30,7 +30,8 @@
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Business checks"),
-  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url)))
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url))),
+  currentCheck = true
 ) {
 
     <span class="govuk-caption-l">@messages("viewsubmission.title")</span>
