@@ -43,6 +43,10 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
       def willReturn(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
     }
 
+    object DeclineSubmission {
+      def willReturn(submission: Submission) = when(aMock.declineSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+    }
+
     object UpdateSubmissionReview {
       def willReturn(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
     }

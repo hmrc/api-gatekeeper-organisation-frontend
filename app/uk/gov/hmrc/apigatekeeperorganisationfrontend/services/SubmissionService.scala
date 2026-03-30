@@ -44,6 +44,10 @@ class SubmissionService @Inject() (orgConnector: OrganisationConnector) {
     orgConnector.approveSubmission(submissionId, approvedBy, comment)
   }
 
+  def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+    orgConnector.declineSubmission(submissionId, declinedBy, comment)
+  }
+
   def updateSubmissionReview(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String)(implicit hc: HeaderCarrier)
       : Future[Either[String, SubmissionReview]] = {
     orgConnector.updateSubmissionReview(submissionId, instanceIndex, approvedBy, comment)

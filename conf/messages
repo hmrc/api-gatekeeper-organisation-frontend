@@ -44,6 +44,19 @@ approvesubmissionconfirm.subtitle = What happens next
 approvesubmissionconfirm.hinttext = {0} can now request access to tax data in our production environment.
 approvesubmissionconfirm.back = Back to business checks
 
+declinesubmission.title = Are you sure that you want to fail {0}?
+declinesubmission.subtitle = Organisation checks
+declinesubmission.hinttext = {0} will need to correct their organisation registration and submit it again, before they can request credentials to use live tax data in our production environment.
+declinesubmission.error.confirmation.no.choice.field = Please select an option
+declinesubmission.confirm = Confirm and send
+declinesubmission.cancel = Cancel
+
+declinesubmissionconfirm.title = The organisation check for {0} has been failed
+declinesubmissionconfirm.subtitle = What happens next
+declinesubmissionconfirm.hinttext1 = You need to contact {0} and tell them why their organisation registration failed and has been re-opened.
+declinesubmissionconfirm.hinttext2 = They will need to amend their organisation registration and submit it again.
+declinesubmissionconfirm.back = Back to business checks
+
 organisationslist.title = Organisations
 
 allowlist.title = Organisation allow list
