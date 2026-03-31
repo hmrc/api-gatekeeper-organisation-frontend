@@ -48,6 +48,7 @@ declinesubmission.title = Are you sure that you want to fail {0}?
 declinesubmission.subtitle = Organisation checks
 declinesubmission.hinttext = {0} will need to correct their organisation registration and submit it again, before they can request credentials to use live tax data in our production environment.
 declinesubmission.error.confirmation.no.choice.field = Please select an option
+declinesubmission.error.comment.empty.field = Please provide a reason
 declinesubmission.confirm = Confirm and send
 declinesubmission.cancel = Cancel
 
