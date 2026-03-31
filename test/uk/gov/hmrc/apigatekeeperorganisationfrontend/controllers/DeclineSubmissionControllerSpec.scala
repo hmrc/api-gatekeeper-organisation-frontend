@@ -154,21 +154,6 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.DeclineSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", "decline comment")
     }
 
-    // "return 303 for form validation successful and submission approval successful with no comment" in new Setup {
-    //   StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-    //   SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
-
-    //   val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
-    //   val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
-
-    //   status(result) shouldBe Status.SEE_OTHER
-    //   redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.DeclineSubmissionController.confirmPage(
-    //     submissionReviewSubmitted.submissionId,
-    //     submissionReviewSubmitted.instanceIndex
-    //   ).url)
-    //   SubmissionServiceMock.DeclineSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", None)
-    // }
-
     "return 303 for user selected No" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
@@ -184,7 +169,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.DeclineSubmission.verifyNeverCalled()
     }
 
-    "return 400 for form validation failed" in new Setup {
+    "return 400 for form validation failed because no option selected" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
@@ -192,6 +177,18 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Please select an option")
+      SubmissionServiceMock.DeclineSubmission.verifyNeverCalled()
+    }
+
+    "return 400 for form validation failed because Yes selected, but no comment entered" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
+
+      val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
+      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) should include("Please provide a reason")
       SubmissionServiceMock.DeclineSubmission.verifyNeverCalled()
     }
 

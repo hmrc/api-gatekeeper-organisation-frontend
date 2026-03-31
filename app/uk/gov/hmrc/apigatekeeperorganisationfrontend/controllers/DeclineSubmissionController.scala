@@ -83,15 +83,24 @@ class DeclineSubmissionController @Inject() (
           })
       },
       confirmData => {
-        confirmData.confirm match {
-          case Some("Yes") => {
-            service.declineSubmission(submissionId, request.name.get, confirmData.comment.get)
+        (confirmData.confirm, confirmData.comment) match {
+          case (Some("Yes"), Some(comment)) => {
+            service.declineSubmission(submissionId, request.name.get, comment)
               .map(_ match {
                 case Right(sub) => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId, instanceIndex))
                 case Left(msg)  => BadRequest(msg)
               })
           }
-          case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId, instanceIndex)))
+          case (Some("Yes"), None)          => {
+            service.fetchSubmissionReview(submissionId, instanceIndex)
+              .map(_ match {
+                case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+                  val form = DeclineSubmissionForm.form.fill(confirmData).withError("confirm", "declinesubmission.error.comment.empty.field")
+                  BadRequest(declineSubmissionPage(DeclineSubmissionViewModel(submissionId, instanceIndex, sr.organisationName, sr.requestedBy), form))
+                case _                                                           => BadRequest("Submission review not found or not submitted")
+              })
+          }
+          case (_, _)                       => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId, instanceIndex)))
         }
       }
     )
