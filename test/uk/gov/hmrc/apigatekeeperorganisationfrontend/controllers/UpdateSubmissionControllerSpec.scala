@@ -79,8 +79,8 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
         List(submissionReviewEvent)
       )
 
-    val submissionReviewFailed =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
+    val submissionReviewDeclined =
+      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
   }
 
   "get update page" should {
@@ -125,9 +125,9 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 400 if submission review found but not submitted or in progress" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewFailed))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
-      val result = controller.page(submissionReviewFailed.submissionId, submissionReviewFailed.instanceIndex)(fakeRequest)
+      val result = controller.page(submissionReviewDeclined.submissionId, submissionReviewDeclined.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")

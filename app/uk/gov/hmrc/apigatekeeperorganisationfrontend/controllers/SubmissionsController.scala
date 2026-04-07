@@ -87,7 +87,7 @@ class SubmissionsController @Inject() (
     getQueryParamFromStatusVar("SUBMITTED", form.submittedStatus) ++
       getQueryParamFromStatusVar("IN_PROGRESS", form.inProgressStatus) ++
       getQueryParamFromStatusVar("APPROVED", form.approvedStatus) ++
-      getQueryParamFromStatusVar("FAILED", form.failedStatus)
+      getQueryParamFromStatusVar("DECLINED", form.failedStatus)
   }
 
   private def getQueryParamFromStatusVar(key: String, value: Option[String]): Seq[(String, String)] = {

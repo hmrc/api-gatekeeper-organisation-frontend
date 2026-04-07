@@ -48,7 +48,8 @@
             id = Some("failed"), 
             isStartButton = false,
             classes = "govuk-button--secondary",
-            content = Text(messages("viewsubmittedanswers.fail"))))
+            content = Text(messages("viewsubmittedanswers.fail")),
+            href=Some(routes.DeclineSubmissionController.page(model.submissionId, model.instanceIndex).url)))
         } else {
           <a href="@routes.ViewSubmissionController.summaryPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmittedanswers.backtosummary")</a>
         }

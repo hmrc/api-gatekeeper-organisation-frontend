@@ -86,8 +86,8 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
     val submissionReviewApproved =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
 
-    val submissionReviewFailed =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
+    val submissionReviewDeclined =
+      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
 
     val extendedSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
       .hasCompletelyAnsweredWith(answersToQuestions)
@@ -148,19 +148,19 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
     "return 200 for submission review found and isFailed" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewFailed))
+      SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
-      val result = controller.summaryPage(submissionReviewFailed.submissionId, submissionReviewFailed.instanceIndex)(fakeRequest)
+      val result = controller.summaryPage(submissionReviewDeclined.submissionId, submissionReviewDeclined.instanceIndex)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Business checks")
-      contentAsString(result) should include(submissionReviewFailed.organisationName.value)
+      contentAsString(result) should include(submissionReviewDeclined.organisationName.value)
       contentAsString(result) should include("Failed")
       contentAsString(result) should include("View check answers")
       contentAsString(result) shouldNot include("Review this check")
       contentAsString(result) shouldNot include("Add a comment on this check")
       contentAsString(result) should include("Check history")
-      contentAsString(result) should include(submissionReviewFailed.events.head.description)
+      contentAsString(result) should include(submissionReviewDeclined.events.head.description)
     }
 
     "return 400 if submission review not found" in new Setup {

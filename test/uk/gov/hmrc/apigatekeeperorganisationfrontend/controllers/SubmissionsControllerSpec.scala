@@ -83,8 +83,8 @@ class SubmissionsControllerSpec extends HmrcSpec
     val submissionReviewApproved =
       SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
 
-    val submissionReviewFailed =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Failed, List(submissionReviewEvent))
+    val submissionReviewDeclined =
+      SubmissionReview(SubmissionId.random, 0, OrganisationName("Declined org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
   }
 
   "GET /" should {
@@ -98,7 +98,7 @@ class SubmissionsControllerSpec extends HmrcSpec
       contentAsString(result) should include("Submitted org")
       contentAsString(result) should include("InProgress org")
       contentAsString(result) shouldNot include("Approved org")
-      contentAsString(result) shouldNot include("Failed org")
+      contentAsString(result) shouldNot include("Declined org")
 
       SubmissionServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS"))
     }
@@ -113,14 +113,14 @@ class SubmissionsControllerSpec extends HmrcSpec
       contentAsString(result) should include("Submitted org")
       contentAsString(result) shouldNot include("InProgress org")
       contentAsString(result) shouldNot include("Approved org")
-      contentAsString(result) shouldNot include("Failed org")
+      contentAsString(result) shouldNot include("Declined org")
 
       SubmissionServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED"))
     }
 
     "filter with no statuses selected" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
+      SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewDeclined))
 
       val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true"))
 
@@ -128,14 +128,14 @@ class SubmissionsControllerSpec extends HmrcSpec
       contentAsString(result) should include("Submitted org")
       contentAsString(result) should include("InProgress org")
       contentAsString(result) should include("Approved org")
-      contentAsString(result) should include("Failed org")
+      contentAsString(result) should include("Declined org")
 
       SubmissionServiceMock.SearchSubmissionReviews.verifyCalled(Seq.empty)
     }
 
     "filter with all statuses selected" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewFailed))
+      SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted, submissionReviewInProgress, submissionReviewApproved, submissionReviewDeclined))
 
       val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody(
         "control"          -> "true",
@@ -149,9 +149,9 @@ class SubmissionsControllerSpec extends HmrcSpec
       contentAsString(result) should include("Submitted org")
       contentAsString(result) should include("InProgress org")
       contentAsString(result) should include("Approved org")
-      contentAsString(result) should include("Failed org")
+      contentAsString(result) should include("Declined org")
 
-      SubmissionServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS", "status" -> "APPROVED", "status" -> "FAILED"))
+      SubmissionServiceMock.SearchSubmissionReviews.verifyCalled(Seq("status" -> "SUBMITTED", "status" -> "IN_PROGRESS", "status" -> "APPROVED", "status" -> "DECLINED"))
     }
 
     "return 200 for Ldap auth" in new Setup {
