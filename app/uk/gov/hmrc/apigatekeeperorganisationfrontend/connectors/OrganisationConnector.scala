@@ -41,8 +41,8 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .execute[List[SubmissionReview]]
   }
 
-  def fetchSubmissionReview(submissionId: SubmissionId, instanceIndex: Int)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
-    http.get(url"${config.serviceBaseUrl}/submission-review/$submissionId/$instanceIndex")
+  def fetchSubmissionReview(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
+    http.get(url"${config.serviceBaseUrl}/submission-review/$submissionId")
       .execute[Option[SubmissionReview]]
   }
 
@@ -76,11 +76,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .map(_.leftMap(failed))
   }
 
-  def updateSubmissionReview(submissionId: SubmissionId, instanceIndex: Int, updatedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
+  def updateSubmissionReview(submissionId: SubmissionId, updatedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to update submission review $submissionId, index $instanceIndex"
+    val failed = (err: UpstreamErrorResponse) => s"Failed to update submission review $submissionId"
 
-    http.put(url"${config.serviceBaseUrl}/submission-review/$submissionId/$instanceIndex")
+    http.put(url"${config.serviceBaseUrl}/submission-review/$submissionId")
       .withBody(Json.toJson(UpdateSubmissionRequest(updatedBy, comment)))
       .execute[Either[UpstreamErrorResponse, SubmissionReview]]
       .map(_.leftMap(failed))

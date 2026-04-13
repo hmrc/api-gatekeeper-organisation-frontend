@@ -43,7 +43,7 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
     val submissionReview =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
 
     val allowList = OrganisationAllowList(userId, OrganisationName("My Org 1"), "requestedBy", instant)
   }
@@ -75,26 +75,26 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
   "fetchSubmissionReview" should {
     "successfully get one" in new Setup {
-      ApiPlatformOrganisationStub.FetchSubmissionReview.succeeds(submissionReview.submissionId, submissionReview.instanceIndex, submissionReview)
+      ApiPlatformOrganisationStub.FetchSubmissionReview.succeeds(submissionReview.submissionId, submissionReview)
 
-      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
+      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId))
 
       result shouldBe Some(submissionReview)
     }
 
     "return None when not found" in new Setup {
-      ApiPlatformOrganisationStub.FetchSubmissionReview.fails(submissionReview.submissionId, submissionReview.instanceIndex, NOT_FOUND)
+      ApiPlatformOrganisationStub.FetchSubmissionReview.fails(submissionReview.submissionId, NOT_FOUND)
 
-      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
+      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId))
 
       result shouldBe None
     }
 
     "fail when the call returns an error" in new Setup {
-      ApiPlatformOrganisationStub.FetchSubmissionReview.fails(submissionReview.submissionId, submissionReview.instanceIndex, INTERNAL_SERVER_ERROR)
+      ApiPlatformOrganisationStub.FetchSubmissionReview.fails(submissionReview.submissionId, INTERNAL_SERVER_ERROR)
 
       intercept[UpstreamErrorResponse] {
-        await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
+        await(underTest.fetchSubmissionReview(submissionReview.submissionId))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
@@ -119,19 +119,19 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
 
   "updateSubmissionReview" should {
     "successfully update" in new Setup {
-      ApiPlatformOrganisationStub.UpdateSubmissionReview.succeeds(submissionReview.submissionId, submissionReview.instanceIndex, submissionReview)
+      ApiPlatformOrganisationStub.UpdateSubmissionReview.succeeds(submissionReview.submissionId, submissionReview)
 
-      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "some comment"))
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, "updatedBy", "some comment"))
 
       result shouldBe Right(submissionReview)
     }
 
     "fail when the call returns an error" in new Setup {
-      ApiPlatformOrganisationStub.UpdateSubmissionReview.fails(submissionReview.submissionId, submissionReview.instanceIndex, INTERNAL_SERVER_ERROR)
+      ApiPlatformOrganisationStub.UpdateSubmissionReview.fails(submissionReview.submissionId, INTERNAL_SERVER_ERROR)
 
-      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "some comment"))
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, "updatedBy", "some comment"))
 
-      result shouldBe Left(s"Failed to update submission review ${submissionReview.submissionId}, index ${submissionReview.instanceIndex}")
+      result shouldBe Left(s"Failed to update submission review ${submissionReview.submissionId}")
     }
   }
 

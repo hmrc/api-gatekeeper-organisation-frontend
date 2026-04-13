@@ -32,7 +32,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 object UpdateSubmissionController {
-  case class UpdateSubmissionViewModel(submissionId: SubmissionId, instanceIndex: Int, organisationName: OrganisationName)
+  case class UpdateSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName)
 
   case class UpdateSubmissionForm(comment: String)
 
@@ -62,37 +62,37 @@ class UpdateSubmissionController @Inject() (
 
   val updateSubmissionForm: Form[UpdateSubmissionForm] = UpdateSubmissionForm.form
 
-  def page(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    service.fetchSubmissionReview(submissionId, instanceIndex) map {
+  def page(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchSubmissionReview(submissionId) map {
       case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-        Ok(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), updateSubmissionForm))
+        Ok(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, sr.organisationName), updateSubmissionForm))
       case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
-  def action(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def action(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
     updateSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
-        service.fetchSubmissionReview(submissionId, instanceIndex)
+        service.fetchSubmissionReview(submissionId)
           .map(_ match {
             case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-              BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
+              BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, sr.organisationName), formWithErrors))
             case _                                                           => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {
-        service.updateSubmissionReview(submissionId, instanceIndex, request.name.get, confirmData.comment)
+        service.updateSubmissionReview(submissionId, request.name.get, confirmData.comment)
           .map(_ match {
-            case Right(sub) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId, instanceIndex))
+            case Right(sub) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId))
             case Left(msg)  => BadRequest(msg)
           })
       }
     )
   }
 
-  def confirmPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    service.fetchSubmissionReview(submissionId, instanceIndex) map {
-      case Some(sr) => Ok(updateSubmissionConfirmPage(UpdateSubmissionViewModel(submissionId, instanceIndex, sr.organisationName)))
+  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchSubmissionReview(submissionId) map {
+      case Some(sr) => Ok(updateSubmissionConfirmPage(UpdateSubmissionViewModel(submissionId, sr.organisationName)))
       case _        => BadRequest("Submission review not found")
     }
   }

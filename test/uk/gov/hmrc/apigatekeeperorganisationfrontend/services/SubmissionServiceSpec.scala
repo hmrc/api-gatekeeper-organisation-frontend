@@ -34,7 +34,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMock
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 
     val submissionReview =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("My org"), instant, "bob@example.com", instant, SubmissionReview.State.Submitted, List(submissionReviewEvent))
   }
 
   "searchSubmissionReviews" should {
@@ -48,7 +48,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMock
   "fetchSubmissionReview" should {
     "fetch a submission review" in new Setup {
       OrganisationConnectorMock.FetchSubmissionReview.willReturn(Some(submissionReview))
-      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex))
+      val result = await(underTest.fetchSubmissionReview(submissionReview.submissionId))
       result shouldBe Some(submissionReview)
     }
   }
@@ -72,7 +72,7 @@ class SubmissionServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMock
   "updateSubmissionReview" should {
     "update a submission review" in new Setup {
       OrganisationConnectorMock.UpdateSubmissionReview.willReturn(submissionReview)
-      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, submissionReview.instanceIndex, "updatedBy", "comment"))
+      val result = await(underTest.updateSubmissionReview(submissionReview.submissionId, "updatedBy", "comment"))
       result shouldBe Right(submissionReview)
     }
   }

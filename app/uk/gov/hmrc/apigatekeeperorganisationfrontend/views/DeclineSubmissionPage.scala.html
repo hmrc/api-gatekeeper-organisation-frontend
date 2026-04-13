@@ -40,7 +40,7 @@
     <span class="govuk-caption-l">@{messages("declinesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("declinesubmission.title", model.organisationName.toString())}</h1>
 
-    @helper.form(action = routes.DeclineSubmissionController.action(model.submissionId, model.instanceIndex)) {
+    @helper.form(action = routes.DeclineSubmissionController.action(model.submissionId)) {
       @helper.CSRF.formField
 
         @govukRadios(Radios(
@@ -69,7 +69,7 @@
             isStartButton = false,
             content = Text(messages("declinesubmission.confirm"))))
 
-          <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("declinesubmission.cancel")</a>
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("declinesubmission.cancel")</a>
         </div>
 
       }

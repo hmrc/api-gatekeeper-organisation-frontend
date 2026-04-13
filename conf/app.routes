@@ -3,20 +3,20 @@
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 GET         /                                            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.SubmissionsController.submissionsView()
 
-GET         /submission/:sid/:idx                        uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.summaryPage(sid: SubmissionId, idx: Int)
-GET         /submission/:sid/:idx/answers                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.checkAnswersPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid                             uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.summaryPage(sid: SubmissionId)
+GET         /submission/:sid/answers                     uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ViewSubmissionController.checkAnswersPage(sid: SubmissionId)
 
-GET         /submission/:sid/:idx/approve                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.page(sid: SubmissionId, idx: Int)
-POST        /submission/:sid/:idx/approve                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId, idx: Int)
-GET         /submission/:sid/:idx/approve-confirm        uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/approve                     uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.page(sid: SubmissionId)
+POST        /submission/:sid/approve                     uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.action(sid: SubmissionId)
+GET         /submission/:sid/approve-confirm             uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.ApproveSubmissionController.confirmPage(sid: SubmissionId)
 
-GET         /submission/:sid/:idx/decline                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.page(sid: SubmissionId, idx: Int)
-POST        /submission/:sid/:idx/decline                uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.action(sid: SubmissionId, idx: Int)
-GET         /submission/:sid/:idx/decline-confirm        uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/decline                     uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.page(sid: SubmissionId)
+POST        /submission/:sid/decline                     uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.action(sid: SubmissionId)
+GET         /submission/:sid/decline-confirm             uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.DeclineSubmissionController.confirmPage(sid: SubmissionId)
 
-GET         /submission/:sid/:idx/update                 uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.page(sid: SubmissionId, idx: Int)
-POST        /submission/:sid/:idx/update                 uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId, idx: Int)
-GET         /submission/:sid/:idx/update-confirm         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId, idx: Int)
+GET         /submission/:sid/update                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.page(sid: SubmissionId)
+POST        /submission/:sid/update                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.action(sid: SubmissionId)
+GET         /submission/:sid/update-confirm              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.UpdateSubmissionController.confirmPage(sid: SubmissionId)
 
 GET         /organisations                               uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.OrganisationsController.organisationsView()
 

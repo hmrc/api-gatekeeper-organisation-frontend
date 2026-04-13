@@ -56,9 +56,9 @@ object ApiPlatformOrganisationStub {
 
   object FetchSubmissionReview {
 
-    def succeeds(submissionId: SubmissionId, instanceIndex: Int, submissionReview: SubmissionReview): StubMapping = {
+    def succeeds(submissionId: SubmissionId, submissionReview: SubmissionReview): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/submission-review/$submissionId/$instanceIndex"))
+        get(urlEqualTo(s"/submission-review/$submissionId"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -68,9 +68,9 @@ object ApiPlatformOrganisationStub {
       )
     }
 
-    def fails(submissionId: SubmissionId, instanceIndex: Int, status: Int): StubMapping = {
+    def fails(submissionId: SubmissionId, status: Int): StubMapping = {
       stubFor(
-        get(urlEqualTo(s"/submission-review/$submissionId/$instanceIndex"))
+        get(urlEqualTo(s"/submission-review/$submissionId"))
           .willReturn(
             aResponse()
               .withStatus(status)
@@ -106,9 +106,9 @@ object ApiPlatformOrganisationStub {
 
   object UpdateSubmissionReview {
 
-    def succeeds(submissionId: SubmissionId, instanceIndex: Int, submissionReview: SubmissionReview): StubMapping = {
+    def succeeds(submissionId: SubmissionId, submissionReview: SubmissionReview): StubMapping = {
       stubFor(
-        put(urlEqualTo(s"/submission-review/$submissionId/$instanceIndex"))
+        put(urlEqualTo(s"/submission-review/$submissionId"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -118,9 +118,9 @@ object ApiPlatformOrganisationStub {
       )
     }
 
-    def fails(submissionId: SubmissionId, instanceIndex: Int, status: Int): StubMapping = {
+    def fails(submissionId: SubmissionId, status: Int): StubMapping = {
       stubFor(
-        put(urlEqualTo(s"/submission-review/$submissionId/$instanceIndex"))
+        put(urlEqualTo(s"/submission-review/$submissionId"))
           .willReturn(
             aResponse()
               .withStatus(status)

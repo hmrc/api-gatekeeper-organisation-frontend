@@ -59,7 +59,6 @@ class SubmissionsControllerSpec extends HmrcSpec
     val submissionReviewSubmitted =
       SubmissionReview(
         SubmissionId.random,
-        0,
         OrganisationName("Submitted org"),
         instant,
         "bob@example.com",
@@ -71,7 +70,6 @@ class SubmissionsControllerSpec extends HmrcSpec
     val submissionReviewInProgress =
       SubmissionReview(
         SubmissionId.random,
-        0,
         OrganisationName("InProgress org"),
         instant,
         "bob@example.com",
@@ -81,10 +79,10 @@ class SubmissionsControllerSpec extends HmrcSpec
       )
 
     val submissionReviewApproved =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
 
     val submissionReviewDeclined =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Declined org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("Declined org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
   }
 
   "GET /" should {

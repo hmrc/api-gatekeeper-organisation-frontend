@@ -32,8 +32,8 @@ class SubmissionService @Inject() (orgConnector: OrganisationConnector) {
     orgConnector.searchSubmissionReviews(params)
   }
 
-  def fetchSubmissionReview(submissionId: SubmissionId, instanceIndex: Int)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
-    orgConnector.fetchSubmissionReview(submissionId, instanceIndex)
+  def fetchSubmissionReview(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
+    orgConnector.fetchSubmissionReview(submissionId)
   }
 
   def fetchSubmission(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
@@ -48,8 +48,7 @@ class SubmissionService @Inject() (orgConnector: OrganisationConnector) {
     orgConnector.declineSubmission(submissionId, declinedBy, comment)
   }
 
-  def updateSubmissionReview(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String)(implicit hc: HeaderCarrier)
-      : Future[Either[String, SubmissionReview]] = {
-    orgConnector.updateSubmissionReview(submissionId, instanceIndex, approvedBy, comment)
+  def updateSubmissionReview(submissionId: SubmissionId, approvedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
+    orgConnector.updateSubmissionReview(submissionId, approvedBy, comment)
   }
 }

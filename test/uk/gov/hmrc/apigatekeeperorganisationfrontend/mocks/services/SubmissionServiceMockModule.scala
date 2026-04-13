@@ -36,7 +36,7 @@ trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar 
     }
 
     object FetchSubmissionReview {
-      def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId], *)(*)).thenReturn(Future.successful(submissionReview))
+      def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(*)).thenReturn(Future.successful(submissionReview))
     }
 
     object FetchSubmission {
@@ -66,14 +66,14 @@ trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar 
     }
 
     object UpdateSubmissionReview {
-      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
 
-      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Left(msg)))
+      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Left(msg)))
 
-      def verifyCalled(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: String) =
-        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(instanceIndex), eqTo(approvedBy), eqTo(comment))(*)
+      def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: String) =
+        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
 
-      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *, *)(*)
+      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *)(*)
     }
   }
 }

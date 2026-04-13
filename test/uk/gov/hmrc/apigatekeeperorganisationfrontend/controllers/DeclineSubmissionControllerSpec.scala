@@ -58,7 +58,6 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     val submissionReviewSubmitted =
       SubmissionReview(
         SubmissionId.random,
-        0,
         OrganisationName("Submitted org"),
         instant,
         "bob@example.com",
@@ -70,7 +69,6 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     val submissionReviewInProgress =
       SubmissionReview(
         SubmissionId.random,
-        0,
         OrganisationName("InProgress org"),
         instant,
         "bob@example.com",
@@ -80,10 +78,10 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       )
 
     val submissionReviewApproved =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("Approved org"), instant, "bob@example.com", instant, SubmissionReview.State.Approved, List(submissionReviewEvent))
 
     val submissionReviewDeclined =
-      SubmissionReview(SubmissionId.random, 0, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
+      SubmissionReview(SubmissionId.random, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
   }
 
   "get decline page" should {
@@ -92,7 +90,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
-      val result = controller.page(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
+      val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include(s"Are you sure that you want to fail ${submissionReviewSubmitted.organisationName.value}?")
@@ -106,7 +104,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewInProgress))
 
-      val result = controller.page(submissionReviewInProgress.submissionId, submissionReviewInProgress.instanceIndex)(fakeRequest)
+      val result = controller.page(submissionReviewInProgress.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include(s"Are you sure that you want to fail ${submissionReviewInProgress.organisationName.value}?")
@@ -120,7 +118,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
-      val result = controller.page(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
+      val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")
@@ -130,7 +128,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
-      val result = controller.page(submissionReviewDeclined.submissionId, submissionReviewDeclined.instanceIndex)(fakeRequest)
+      val result = controller.page(submissionReviewDeclined.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")
@@ -144,12 +142,11 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "decline comment")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+      val result  = controller.action(submissionReviewSubmitted.submissionId)(request)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.DeclineSubmissionController.confirmPage(
-        submissionReviewSubmitted.submissionId,
-        submissionReviewSubmitted.instanceIndex
+        submissionReviewSubmitted.submissionId
       ).url)
       SubmissionServiceMock.DeclineSubmission.verifyCalled(submissionReviewSubmitted.submissionId, "Bobby Example", "decline comment")
     }
@@ -159,12 +156,11 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "No")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+      val result  = controller.action(submissionReviewSubmitted.submissionId)(request)
 
       status(result) shouldBe Status.SEE_OTHER
       redirectLocation(result) shouldBe Some(uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.checkAnswersPage(
-        submissionReviewSubmitted.submissionId,
-        submissionReviewSubmitted.instanceIndex
+        submissionReviewSubmitted.submissionId
       ).url)
       SubmissionServiceMock.DeclineSubmission.verifyNeverCalled()
     }
@@ -173,7 +169,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
-      val result = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
+      val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Please select an option")
@@ -185,7 +181,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+      val result  = controller.action(submissionReviewSubmitted.submissionId)(request)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Please provide a reason")
@@ -197,7 +193,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       SubmissionServiceMock.DeclineSubmission.failed("Decline failed")
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "decline comment")
-      val result  = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(request)
+      val result  = controller.action(submissionReviewSubmitted.submissionId)(request)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Decline failed")
@@ -207,7 +203,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
-      val result = controller.action(submissionReviewSubmitted.submissionId, submissionReviewSubmitted.instanceIndex)(fakeRequest)
+      val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")
@@ -221,7 +217,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
-      val result = controller.confirmPage(submissionReviewApproved.submissionId, submissionReviewDeclined.instanceIndex)(fakeRequest)
+      val result = controller.confirmPage(submissionReviewApproved.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include(s"The organisation check for ${submissionReviewDeclined.organisationName.value} has been failed")
@@ -236,7 +232,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
-      val result = controller.confirmPage(submissionReviewDeclined.submissionId, submissionReviewDeclined.instanceIndex)(fakeRequest)
+      val result = controller.confirmPage(submissionReviewDeclined.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found")
