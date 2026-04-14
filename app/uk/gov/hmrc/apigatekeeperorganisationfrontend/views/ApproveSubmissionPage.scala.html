@@ -54,11 +54,13 @@
             RadioItem(
               content = Text("Yes"),
               value = Some("Yes"),
+              id = Some("yes"),
               conditionalHtml = Some(buildConditionalHtml())
             ),
             RadioItem(
               content = Text("No"),
-              value = Some("No")
+              value = Some("No"),
+              id = Some("no"),
             )
           )
         ).withFormField(form("confirm")))
