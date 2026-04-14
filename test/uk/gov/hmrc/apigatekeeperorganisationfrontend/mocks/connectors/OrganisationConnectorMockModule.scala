@@ -36,7 +36,7 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     }
 
     object FetchSubmissionReview {
-      def willReturn(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId], *)(*)).thenReturn(Future.successful(submissionReview))
+      def willReturn(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(*)).thenReturn(Future.successful(submissionReview))
     }
 
     object ApproveSubmission {
@@ -48,7 +48,7 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     }
 
     object UpdateSubmissionReview {
-      def willReturn(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+      def willReturn(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
     }
 
     object FetchSubmission {

@@ -33,7 +33,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
 
 object ApproveSubmissionController {
-  case class ApproveSubmissionViewModel(submissionId: SubmissionId, instanceIndex: Int, organisationName: OrganisationName)
+  case class ApproveSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName)
 
   case class ApproveSubmissionForm(comment: Option[String], confirm: Option[String] = Some(""))
 
@@ -64,21 +64,21 @@ class ApproveSubmissionController @Inject() (
 
   val approveSubmissionForm: Form[ApproveSubmissionForm] = ApproveSubmissionForm.form
 
-  def page(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    service.fetchSubmissionReview(submissionId, instanceIndex) map {
+  def page(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchSubmissionReview(submissionId) map {
       case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-        Ok(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), approveSubmissionForm))
+        Ok(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, sr.organisationName), approveSubmissionForm))
       case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
-  def action(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def action(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
     approveSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
-        service.fetchSubmissionReview(submissionId, instanceIndex)
+        service.fetchSubmissionReview(submissionId)
           .map(_ match {
             case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
-              BadRequest(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName), formWithErrors))
+              BadRequest(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, sr.organisationName), formWithErrors))
             case _                                                           => BadRequest("Submission review not found or not submitted")
           })
       },
@@ -87,19 +87,19 @@ class ApproveSubmissionController @Inject() (
           case Some("Yes") => {
             service.approveSubmission(submissionId, request.name.get, confirmData.comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId, instanceIndex))
+                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId))
                 case Left(msg)  => BadRequest(msg)
               })
           }
-          case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId, instanceIndex)))
+          case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId)))
         }
       }
     )
   }
 
-  def confirmPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    service.fetchSubmissionReview(submissionId, instanceIndex) map {
-      case Some(sr) => Ok(approveSubmissionConfirmPage(ApproveSubmissionViewModel(submissionId, instanceIndex, sr.organisationName)))
+  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchSubmissionReview(submissionId) map {
+      case Some(sr) => Ok(approveSubmissionConfirmPage(ApproveSubmissionViewModel(submissionId, sr.organisationName)))
       case _        => BadRequest("Submission review not found")
     }
   }

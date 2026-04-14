@@ -55,11 +55,11 @@
             id = Some("reviewCheck"), 
             isStartButton = false,
             content = Text(messages("viewsubmission.review")),
-            href=Some(routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex).url)))
+            href=Some(routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId).url)))
 
-          <a href="@routes.UpdateSubmissionController.page(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
+          <a href="@routes.UpdateSubmissionController.page(submissionReview.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.comment")</a>
         } else {
-          <a href="@routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId, submissionReview.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(submissionReview.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("viewsubmission.viewanswers")</a>
         }
         </div>
 

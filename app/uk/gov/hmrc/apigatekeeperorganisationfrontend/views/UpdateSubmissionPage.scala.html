@@ -35,7 +35,7 @@
     <span class="govuk-caption-l">@{messages("updatesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("updatesubmission.title", model.organisationName.toString())}</h1>
 
-    @helper.form(action = routes.UpdateSubmissionController.action(model.submissionId, model.instanceIndex)) {
+    @helper.form(action = routes.UpdateSubmissionController.action(model.submissionId)) {
       @helper.CSRF.formField
 
         @govukCharacterCount(CharacterCount(
@@ -51,7 +51,7 @@
             isStartButton = false,
             content = Text(messages("updatesubmission.confirm"))))
 
-          <a href="@routes.ViewSubmissionController.summaryPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("updatesubmission.cancel")</a>
+          <a href="@routes.ViewSubmissionController.summaryPage(model.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("updatesubmission.cancel")</a>
         </div>
 
       }

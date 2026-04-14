@@ -40,7 +40,7 @@
     <span class="govuk-caption-l">@{messages("approvesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("approvesubmission.title", model.organisationName.toString())}</h1>
 
-    @helper.form(action = routes.ApproveSubmissionController.action(model.submissionId, model.instanceIndex)) {
+    @helper.form(action = routes.ApproveSubmissionController.action(model.submissionId)) {
       @helper.CSRF.formField
 
         @govukRadios(Radios(
@@ -54,11 +54,13 @@
             RadioItem(
               content = Text("Yes"),
               value = Some("Yes"),
+              id = Some("yes"),
               conditionalHtml = Some(buildConditionalHtml())
             ),
             RadioItem(
               content = Text("No"),
-              value = Some("No")
+              value = Some("No"),
+              id = Some("no"),
             )
           )
         ).withFormField(form("confirm")))
@@ -69,7 +71,7 @@
             isStartButton = false,
             content = Text(messages("approvesubmission.confirm"))))
 
-          <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId, model.instanceIndex)" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
+          <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
         </div>
 
       }

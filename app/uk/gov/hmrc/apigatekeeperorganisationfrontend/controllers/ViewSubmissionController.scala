@@ -40,17 +40,17 @@ class ViewSubmissionController @Inject() (
   )(implicit ec: ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
-  def summaryPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
-    service.fetchSubmissionReview(submissionId, instanceIndex) map {
+  def summaryPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchSubmissionReview(submissionId) map {
       case Some(sr) => Ok(viewSubmissionSummaryPage(sr))
       case _        => BadRequest("Submission review not found")
     }
   }
 
-  def checkAnswersPage(submissionId: SubmissionId, instanceIndex: Int): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def checkAnswersPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
     service.fetchSubmission(submissionId).map {
       case Some(extSubmission) =>
-        val viewModel = convertSubmissionToViewModel(extSubmission, instanceIndex)
+        val viewModel = convertSubmissionToViewModel(extSubmission, extSubmission.submission.latestInstance.index)
         Ok(viewSubmittedAnswersPage(viewModel))
       case None                => BadRequest("Submission not found")
     }
