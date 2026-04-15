@@ -94,7 +94,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"Leave a comment if you have an update about this business check, it will be added to the business check history."
       )
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
     }
 
     "return 200 for submission review found and isInProgress" in new Setup {
@@ -108,7 +108,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"Leave a comment if you have an update about this business check, it will be added to the business check history."
       )
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
     }
 
     "return 400 if submission review not found" in new Setup {
@@ -196,7 +196,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"Your comment is visible on the business check history of ${submissionReviewSubmitted.organisationName.value}."
       )
-      contentAsString(result) should include("Back to business checks")
+      contentAsString(result) should include("Back to organisation checks")
     }
 
     "return 400 when submission review not found" in new Setup {
