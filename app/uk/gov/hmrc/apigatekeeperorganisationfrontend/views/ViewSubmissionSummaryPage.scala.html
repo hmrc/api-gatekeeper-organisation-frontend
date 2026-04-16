@@ -21,7 +21,8 @@
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import include._
 
-@import java.time.ZoneOffset
+@import java.util.Locale
+@import java.time.ZoneId
 @import java.time.format.DateTimeFormatter
 
 @this(layout: Layout, govukTable: GovukTable, hmrcTimeline: HmrcTimeline, govukButton: GovukButton)
@@ -37,15 +38,15 @@
     <span class="govuk-caption-l">@messages("viewsubmission.title")</span>
     <h1 class="govuk-heading-l">@{submissionReview.organisationName.toString()}</h1>
 
-    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
+    @defining(DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mm a").withZone(ZoneId.of("Europe/London")).withLocale(Locale.UK)) { dateFormatter =>
     
       @govukTable(Table(
         firstCellIsHeader = true,
         rows = Seq(
             Seq(TableRow(content = Text("Status")), TableRow(content = HtmlContent(buildStatusHtml(submissionReview.state)))),
             Seq(TableRow(content = Text("Submitted by")), TableRow(content = Text(submissionReview.requestedBy))),
-            Seq(TableRow(content = Text("Last update")), TableRow(content = Text(dateFormatter.format(submissionReview.lastUpdate.atOffset(ZoneOffset.UTC).toLocalDateTime)))),
-            Seq(TableRow(content = Text("Submission date")), TableRow(content = Text(dateFormatter.format(submissionReview.requestedOn.atOffset(ZoneOffset.UTC).toLocalDateTime))))
+            Seq(TableRow(content = Text("Last update")), TableRow(content = Text(dateFormatter.format(submissionReview.lastUpdate)))),
+            Seq(TableRow(content = Text("Submission date")), TableRow(content = Text(dateFormatter.format(submissionReview.requestedOn))))
         )
       ))
 
@@ -70,7 +71,7 @@
           Event(
             title = event.description + " by " + event.name , 
             content = "<h2 class='govuk-heading-s'>Comment</h2><p class='govuk-body'>" + event.comment.getOrElse("No comment") + "</p>", 
-            time = dateFormatter.format(event.timestamp.atOffset(ZoneOffset.UTC).toLocalDateTime)
+            time = dateFormatter.format(event.timestamp)
           )
         )
       ))
