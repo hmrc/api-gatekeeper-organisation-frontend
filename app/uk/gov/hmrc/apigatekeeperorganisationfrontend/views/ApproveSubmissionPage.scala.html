@@ -37,6 +37,8 @@
   currentCheck = true,
 ) {
 
+  <div class="govuk-grid-column-two-thirds">
+
     <span class="govuk-caption-l">@{messages("approvesubmission.subtitle")}</span>
     <h1 class="govuk-heading-l">@{messages("approvesubmission.title", model.organisationName.toString())}</h1>
 
@@ -75,4 +77,6 @@
         </div>
 
       }
+      
+  </div>    
 }

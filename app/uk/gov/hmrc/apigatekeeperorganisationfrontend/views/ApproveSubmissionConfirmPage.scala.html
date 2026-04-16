@@ -32,15 +32,19 @@
   currentCheck = true,
 ) {
 
-  @govukPanel(Panel(
-    title = Text(messages("approvesubmissionconfirm.title", model.organisationName.toString()))
-  ))
+  <div class="govuk-grid-column-two-thirds">
 
-  <h2 class="govuk-heading-m">@messages("approvesubmissionconfirm.subtitle")</h2>
+    @govukPanel(Panel(
+      title = Text(messages("approvesubmissionconfirm.title", model.organisationName.toString()))
+    ))
 
-  <p class="govuk-body">@messages("approvesubmissionconfirm.hinttext", model.organisationName.toString())</p>
+    <h2 class="govuk-heading-m">@messages("approvesubmissionconfirm.subtitle")</h2>
 
-  <div class="govuk-button-group">
-    <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
-  </div>
+    <p class="govuk-body">@messages("approvesubmissionconfirm.hinttext", model.organisationName.toString())</p>
+
+    <div class="govuk-button-group">
+      <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
+    </div>
+
+  </div>  
 }
