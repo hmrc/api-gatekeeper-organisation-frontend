@@ -97,7 +97,7 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"This will allow ${submissionReviewSubmitted.organisationName.value} to request credentials to use live tax data in our production environment."
       )
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
     }
 
     "return 200 for submission review found and isInProgress" in new Setup {
@@ -111,7 +111,7 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"This will allow ${submissionReviewInProgress.organisationName.value} to request credentials to use live tax data in our production environment."
       )
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
     }
 
     "return 400 if submission review not found" in new Setup {
@@ -226,7 +226,7 @@ class ApproveSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include(
         s"${submissionReviewApproved.organisationName.value} can now request access to tax data in our production environment."
       )
-      contentAsString(result) should include("Back to business checks")
+      contentAsString(result) should include("Back to organisation checks")
     }
 
     "return 400 when submission review not found" in new Setup {

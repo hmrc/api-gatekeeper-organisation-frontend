@@ -225,7 +225,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
         s"You need to contact ${submissionReviewDeclined.requestedBy} and tell them why their organisation registration failed and has been re-opened."
       )
       contentAsString(result) should include("They will need to amend their organisation registration and submit it again.")
-      contentAsString(result) should include("Back to business checks")
+      contentAsString(result) should include("Back to organisation checks")
     }
 
     "return 400 when submission review not found" in new Setup {

@@ -1,7 +1,7 @@
 service.name = HMRC API Gatekeeper
 service.text = This is your new service
 
-submissionreview.title = Business checks
+submissionreview.title = Organisation checks
 submissionreview.filterbystatus = Filter by status
 submissionreview.filter = Filter
 submissionreview.submitted = New
@@ -9,19 +9,19 @@ submissionreview.inprogress = In progress
 submissionreview.approved = Approved
 submissionreview.failed = Failed
 
-viewsubmission.title = Business checks
+viewsubmission.title = Organisation checks
 viewsubmission.review = Review this check
 viewsubmission.comment = Add a comment on this check
 viewsubmission.viewanswers = View check answers
 viewsubmission.history = Check history
 
-viewsubmittedanswers.title = Business checks
+viewsubmittedanswers.title = Organisation checks
 viewsubmittedanswers.approve = Approve this check
 viewsubmittedanswers.fail = Fail this check
-viewsubmittedanswers.backtosummary = Back to business checks
+viewsubmittedanswers.backtosummary = Back to organisation checks
 
 updatesubmission.title = Add a comment for the {0} business check
-updatesubmission.subtitle = Business checks
+updatesubmission.subtitle = Organisation checks
 updatesubmission.hinttext = Leave a comment if you have an update about this business check, it will be added to the business check history.
 updatesubmission.error.comment.blank = Please add a comment
 updatesubmission.confirm = Send comment
@@ -30,10 +30,10 @@ updatesubmission.cancel = Cancel
 updatesubmissionconfirm.title = Your comment has been added for the {0} business check
 updatesubmissionconfirm.subtitle = What happens next
 updatesubmissionconfirm.hinttext = Your comment is visible on the business check history of {0}.
-updatesubmissionconfirm.back = Back to business checks
+updatesubmissionconfirm.back = Back to organisation checks
 
 approvesubmission.title = Are you sure that you want to approve {0}?
-approvesubmission.subtitle = Business checks
+approvesubmission.subtitle = Organisation checks
 approvesubmission.hinttext = This will allow {0} to request credentials to use live tax data in our production environment.
 approvesubmission.error.confirmation.no.choice.field = Please select an option
 approvesubmission.confirm = Confirm and send
@@ -42,7 +42,7 @@ approvesubmission.cancel = Cancel
 approvesubmissionconfirm.title = The business check for {0} has been approved
 approvesubmissionconfirm.subtitle = What happens next
 approvesubmissionconfirm.hinttext = {0} can now request access to tax data in our production environment.
-approvesubmissionconfirm.back = Back to business checks
+approvesubmissionconfirm.back = Back to organisation checks
 
 declinesubmission.title = Are you sure that you want to fail {0}?
 declinesubmission.subtitle = Organisation checks
@@ -56,7 +56,7 @@ declinesubmissionconfirm.title = The organisation check for {0} has been failed
 declinesubmissionconfirm.subtitle = What happens next
 declinesubmissionconfirm.hinttext1 = You need to contact {0} and tell them why their organisation registration failed and has been re-opened.
 declinesubmissionconfirm.hinttext2 = They will need to amend their organisation registration and submit it again.
-declinesubmissionconfirm.back = Back to business checks
+declinesubmissionconfirm.back = Back to organisation checks
 
 organisationslist.title = Organisations
 

@@ -102,7 +102,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.summaryPage(submissionReviewSubmitted.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
       contentAsString(result) should include(submissionReviewSubmitted.organisationName.value)
       contentAsString(result) should include("New")
       contentAsString(result) should include("Review this check")
@@ -118,7 +118,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.summaryPage(submissionReviewInProgress.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
       contentAsString(result) should include(submissionReviewInProgress.organisationName.value)
       contentAsString(result) should include("In progress")
       contentAsString(result) should include("Review this check")
@@ -134,7 +134,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.summaryPage(submissionReviewApproved.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
       contentAsString(result) should include(submissionReviewApproved.organisationName.value)
       contentAsString(result) should include("Approved")
       contentAsString(result) should include("View check answers")
@@ -151,7 +151,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.summaryPage(submissionReviewDeclined.submissionId)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
       contentAsString(result) should include(submissionReviewDeclined.organisationName.value)
       contentAsString(result) should include("Failed")
       contentAsString(result) should include("View check answers")
@@ -182,7 +182,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
       val result = controller.checkAnswersPage(extendedSubmittedSubmission.submission.id)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Business checks")
+      contentAsString(result) should include("Organisation checks")
       contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName)
       contentAsString(result) should include("Approve this check")
       contentAsString(result) should include("Fail this check")

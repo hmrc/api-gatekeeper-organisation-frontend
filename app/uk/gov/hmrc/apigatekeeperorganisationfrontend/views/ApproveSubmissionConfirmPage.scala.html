@@ -19,28 +19,29 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
-@import java.time.ZoneOffset
-@import java.time.format.DateTimeFormatter
-
 @this(layout: Layout, govukPanel: GovukPanel)
 
 @(model: ApproveSubmissionViewModel)(implicit request: RequestHeader, messages: Messages)
 
 @layout(
-  pageTitle = Some("HMRC API Gatekeeper - Business check approved"),
-  breadcrumbs = Seq(BreadcrumbsItem(Text("Business checks"), Some(routes.SubmissionsController.submissionsView().url))),
+  pageTitle = Some("HMRC API Gatekeeper - Organisation check approved"),
+  breadcrumbs = Seq(BreadcrumbsItem(Text("Organisation checks"), Some(routes.SubmissionsController.submissionsView().url))),
   currentCheck = true,
 ) {
 
-  @govukPanel(Panel(
-    title = Text(messages("approvesubmissionconfirm.title", model.organisationName.toString()))
-  ))
+  <div class="govuk-grid-column-two-thirds">
 
-  <h2 class="govuk-heading-m">@messages("approvesubmissionconfirm.subtitle")</h2>
+    @govukPanel(Panel(
+      title = Text(messages("approvesubmissionconfirm.title", model.organisationName.toString()))
+    ))
 
-  <p class="govuk-body">@messages("approvesubmissionconfirm.hinttext", model.organisationName.toString())</p>
+    <h2 class="govuk-heading-m">@messages("approvesubmissionconfirm.subtitle")</h2>
 
-  <div class="govuk-button-group">
-    <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
-  </div>
+    <p class="govuk-body">@messages("approvesubmissionconfirm.hinttext", model.organisationName.toString())</p>
+
+    <div class="govuk-button-group">
+      <a href="@routes.SubmissionsController.submissionsView()" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmissionconfirm.back")</a>
+    </div>
+
+  </div>  
 }

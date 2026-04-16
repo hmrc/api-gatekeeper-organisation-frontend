@@ -31,7 +31,7 @@
   <a href='@uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.ViewSubmissionController.summaryPage(sr.submissionId)' class='govuk-link govuk-link--no-visited-state'>@{sr.organisationName.toString()}</a>
 }
 
-@layout(pageTitle = Some("HMRC API Gatekeeper - Business checks"), currentCheck = true) {
+@layout(pageTitle = Some("HMRC API Gatekeeper - Organisation checks"), currentCheck = true) {
 
     <h1 class="govuk-heading-l">@{messages("submissionreview.title")}</h1>
 
@@ -104,7 +104,7 @@
     @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
         @govukTable(Table(
             head = Some(Seq(
-                HeadCell(content = Text("Business name")),
+                HeadCell(content = Text("Organisation name")),
                 HeadCell(content = Text("Last update")),
                 HeadCell(content = Text("Status"))
             )),
