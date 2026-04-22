@@ -6,6 +6,7 @@ submissionreview.filterbystatus = Filter by status
 submissionreview.filter = Filter
 submissionreview.submitted = New
 submissionreview.inprogress = In progress
+submissionreview.resubmitted = Re-submitted
 submissionreview.approved = Approved
 submissionreview.failed = Failed
 

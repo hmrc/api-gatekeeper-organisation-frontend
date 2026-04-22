@@ -35,17 +35,19 @@ object SubmissionsController {
       control: String = "true",
       submittedStatus: Option[String] = Some("true"),
       inProgressStatus: Option[String] = Some("true"),
+      reSubmittedStatus: Option[String] = Some("true"),
       approvedStatus: Option[String] = None,
       failedStatus: Option[String] = None
     )
 
   val filterForm: Form[FilterForm] = Form(
     mapping(
-      "control"          -> text,
-      "submittedStatus"  -> optional(text),
-      "inProgressStatus" -> optional(text),
-      "approvedStatus"   -> optional(text),
-      "failedStatus"     -> optional(text)
+      "control"           -> text,
+      "submittedStatus"   -> optional(text),
+      "inProgressStatus"  -> optional(text),
+      "reSubmittedStatus" -> optional(text),
+      "approvedStatus"    -> optional(text),
+      "failedStatus"      -> optional(text)
     )(FilterForm.apply)(FilterForm.unapply)
   )
 }
@@ -86,6 +88,7 @@ class SubmissionsController @Inject() (
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {
     getQueryParamFromStatusVar("SUBMITTED", form.submittedStatus) ++
       getQueryParamFromStatusVar("IN_PROGRESS", form.inProgressStatus) ++
+      getQueryParamFromStatusVar("RE_SUBMITTED", form.reSubmittedStatus) ++
       getQueryParamFromStatusVar("APPROVED", form.approvedStatus) ++
       getQueryParamFromStatusVar("DECLINED", form.failedStatus)
   }
