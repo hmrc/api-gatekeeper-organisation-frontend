@@ -67,13 +67,13 @@
                   </div>
                 </div>
               }
-              @defining(if(form("approvedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+              @defining(if(form("reSubmittedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
                 <div class="govuk-grid-column-one-third">
                   <div class="govuk-checkboxes__item">
-                    <input class="govuk-checkboxes__input" type="checkbox" id="approvedStatusFilter" 
-                      name="approvedStatus" value="true" @{checked}>
-                    <label class="govuk-body-s govuk-checkboxes__label" for="approvedStatusFilter">
-                      @{messages("submissionreview.approved")}
+                    <input class="govuk-checkboxes__input" type="checkbox" id="reSubmittedStatusFilter" 
+                      name="reSubmittedStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="reSubmittedStatusFilter">
+                      @{messages("submissionreview.resubmitted")}
                     </label>
                   </div>
                 </div>
@@ -87,6 +87,17 @@
                       name="failedStatus" value="true" @{checked}>
                     <label class="govuk-body-s govuk-checkboxes__label" for="failedStatusFilter">
                       @{messages("submissionreview.failed")}
+                    </label>
+                  </div>
+                </div>
+              }
+              @defining(if(form("approvedStatus").value == Some("true")) """checked="checked"""" else "") { checked =>
+                <div class="govuk-grid-column-one-third">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" type="checkbox" id="approvedStatusFilter" 
+                      name="approvedStatus" value="true" @{checked}>
+                    <label class="govuk-body-s govuk-checkboxes__label" for="approvedStatusFilter">
+                      @{messages("submissionreview.approved")}
                     </label>
                   </div>
                 </div>
