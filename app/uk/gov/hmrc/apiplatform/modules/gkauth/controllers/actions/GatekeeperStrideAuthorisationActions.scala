@@ -19,10 +19,10 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-import play.api.mvc.{ActionRefiner, MessagesRequest, Result}
+import play.api.mvc.{Action, ActionRefiner, AnyContent, MessagesRequest, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
+import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, GatekeeperStrideRole, LoggedInRequest}
 import uk.gov.hmrc.apiplatform.modules.gkauth.services._
 
 trait ForbiddenHandler {
@@ -36,6 +36,31 @@ trait GatekeeperStrideAuthorisationActions {
 
   implicit def ec: ExecutionContext
 
+  def gatekeeperRoleActionRefiner(minimumRoleRequired: GatekeeperStrideRole): ActionRefiner[MessagesRequest, LoggedInRequest] =
+    new ActionRefiner[MessagesRequest, LoggedInRequest] {
+      def executionContext = ec
+
+      def refine[A](msgRequest: MessagesRequest[A]): Future[Either[Result, LoggedInRequest[A]]] = {
+        strideAuthorisationService.refineStride(minimumRoleRequired)(msgRequest)
+      }
+    }
+
+  private def gatekeeperRoleAction(minimumRoleRequired: GatekeeperStrideRole)(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    Action.async { implicit request =>
+      gatekeeperRoleActionRefiner(minimumRoleRequired).invokeBlock(request, block)
+    }
+
+  def anyStrideUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.USER)(block)
+
+  def atLeastAdvancedUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADVANCEDUSER)(block)
+
+  def atLeastSuperUserAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.SUPERUSER)(block)
+
+  def adminOnlyAction(block: LoggedInRequest[_] => Future[Result]): Action[AnyContent] =
+    gatekeeperRoleAction(GatekeeperRoles.ADMIN)(block)
 }
 
 trait GatekeeperAuthorisationActions {

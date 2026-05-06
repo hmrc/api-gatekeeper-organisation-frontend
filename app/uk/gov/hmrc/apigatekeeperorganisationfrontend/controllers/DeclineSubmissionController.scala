@@ -64,7 +64,7 @@ class DeclineSubmissionController @Inject() (
 
   val declineSubmissionForm: Form[DeclineSubmissionForm] = DeclineSubmissionForm.form
 
-  def page(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def page(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
       case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
         Ok(declineSubmissionPage(DeclineSubmissionViewModel(submissionId, sr.organisationName, sr.requestedBy), declineSubmissionForm))
@@ -72,7 +72,7 @@ class DeclineSubmissionController @Inject() (
     }
   }
 
-  def action(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def action(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     declineSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
         service.fetchSubmissionReview(submissionId)
@@ -106,7 +106,7 @@ class DeclineSubmissionController @Inject() (
     )
   }
 
-  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
       case Some(sr) => Ok(declineSubmissionConfirmPage(DeclineSubmissionViewModel(submissionId, sr.organisationName, sr.requestedBy)))
       case _        => BadRequest("Submission review not found")

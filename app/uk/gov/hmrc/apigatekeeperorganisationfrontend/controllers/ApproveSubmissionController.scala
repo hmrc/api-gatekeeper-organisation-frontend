@@ -64,7 +64,7 @@ class ApproveSubmissionController @Inject() (
 
   val approveSubmissionForm: Form[ApproveSubmissionForm] = ApproveSubmissionForm.form
 
-  def page(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def page(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
       case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
         Ok(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, sr.organisationName), approveSubmissionForm))
@@ -72,7 +72,7 @@ class ApproveSubmissionController @Inject() (
     }
   }
 
-  def action(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def action(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     approveSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
         service.fetchSubmissionReview(submissionId)
@@ -97,7 +97,7 @@ class ApproveSubmissionController @Inject() (
     )
   }
 
-  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
       case Some(sr) => Ok(approveSubmissionConfirmPage(ApproveSubmissionViewModel(submissionId, sr.organisationName)))
       case _        => BadRequest("Submission review not found")

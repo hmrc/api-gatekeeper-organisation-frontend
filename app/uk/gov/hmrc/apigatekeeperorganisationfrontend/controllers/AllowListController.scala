@@ -86,11 +86,11 @@ class AllowListController @Inject() (
       .map(allowList => Ok(allowListPage(allowList)))
   }
 
-  def addAllowListView: Action[AnyContent] = loggedInOnly() { implicit request =>
+  def addAllowListView: Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     Future.successful(Ok(addAllowListPage(addAllowListForm)))
   }
 
-  def addAllowListAction(): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def addAllowListAction(): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     addAllowListForm.bindFromRequest().fold(
       formWithErrors => {
         Future.successful(BadRequest(addAllowListPage(formWithErrors)))
@@ -105,11 +105,11 @@ class AllowListController @Inject() (
     )
   }
 
-  def addAllowListConfirmView: Action[AnyContent] = loggedInOnly() { implicit request =>
+  def addAllowListConfirmView: Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     Future.successful(Ok(addAllowListConfirmPage()))
   }
 
-  def removeAllowListView(userId: UserId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def removeAllowListView(userId: UserId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     allowListService.fetchAllowListForUserId(userId)
       .map(_ match {
         case Right(allowList) => Ok(removeAllowListPage(removeAllowListForm, RemoveAllowListViewModel(userId, allowList.email, allowList.organisationName)))
@@ -117,7 +117,7 @@ class AllowListController @Inject() (
       })
   }
 
-  def removeAllowListAction(userId: UserId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def removeAllowListAction(userId: UserId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     removeAllowListForm.bindFromRequest().fold(
       formWithErrors => {
         allowListService.fetchAllowListForUserId(userId)
@@ -141,7 +141,7 @@ class AllowListController @Inject() (
     )
   }
 
-  def removeAllowListConfirmView: Action[AnyContent] = loggedInOnly() { implicit request =>
+  def removeAllowListConfirmView: Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     Future.successful(Ok(removeAllowListConfirmPage()))
   }
 

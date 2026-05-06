@@ -62,20 +62,20 @@ class UpdateSubmissionController @Inject() (
 
   val updateSubmissionForm: Form[UpdateSubmissionForm] = UpdateSubmissionForm.form
 
-  def page(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def page(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
-      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
         Ok(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, sr.organisationName), updateSubmissionForm))
-      case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
+      case _                                                                                     => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
-  def action(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def action(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     updateSubmissionForm.bindFromRequest().fold(
       formWithErrors => {
         service.fetchSubmissionReview(submissionId)
           .map(_ match {
-            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
               BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, sr.organisationName), formWithErrors))
             case _                                                           => BadRequest("Submission review not found or not submitted")
           })
@@ -90,7 +90,7 @@ class UpdateSubmissionController @Inject() (
     )
   }
 
-  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>
+  def confirmPage(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
       case Some(sr) => Ok(updateSubmissionConfirmPage(UpdateSubmissionViewModel(submissionId, sr.organisationName)))
       case _        => BadRequest("Submission review not found")

@@ -78,8 +78,8 @@ class AllowListControllerSpec extends HmrcSpec
   }
 
   "GET allow list page" should {
-    "return 200 with all organisations for no filter and Stride auth" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+    "return 200 with all organisations for no filter and Stride auth - super user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       AllowListServiceMock.FetchAllowList.succeed(List(allowList))
       val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("GET", "/allow-list"))
 
@@ -91,6 +91,25 @@ class AllowListControllerSpec extends HmrcSpec
       contentAsString(result) should include("Users on the allow list")
       contentAsString(result) should include(allowList.organisationName.value)
       contentAsString(result) should include(allowList.email.text)
+      contentAsString(result) should include("Remove")
+
+      AllowListServiceMock.FetchAllowList.verifyCalled()
+    }
+
+    "return 200 with all organisations for no filter and Stride auth - user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      AllowListServiceMock.FetchAllowList.succeed(List(allowList))
+      val fakeRequest = CSRFTokenHelper.addCSRFToken(FakeRequest("GET", "/allow-list"))
+
+      val result = controller.allowListView(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Organisation allow list")
+      contentAsString(result) shouldNot include("Add a user to the allow list")
+      contentAsString(result) should include("Users on the allow list")
+      contentAsString(result) should include(allowList.organisationName.value)
+      contentAsString(result) should include(allowList.email.text)
+      contentAsString(result) shouldNot include("Remove")
 
       AllowListServiceMock.FetchAllowList.verifyCalled()
     }
