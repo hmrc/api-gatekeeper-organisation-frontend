@@ -87,7 +87,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
   "get decline page" should {
     val fakeRequest = FakeRequest("GET", "/submission/decline").withCSRFToken
     "return 200 for submission review found and isSubmitted" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -101,7 +101,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 200 for submission review found and isInProgress" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewInProgress))
 
       val result = controller.page(submissionReviewInProgress.submissionId)(fakeRequest)
@@ -115,7 +115,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 if submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -125,7 +125,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 if submission review found but not submitted or in progress" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
       val result = controller.page(submissionReviewDeclined.submissionId)(fakeRequest)
@@ -138,7 +138,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
   "post decline action" should {
     val fakeRequest = FakeRequest("POST", "/submission/decline").withCSRFToken
     "return 303 for form validation successful and submission approval successful with comment" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "decline comment")
@@ -152,7 +152,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 303 for user selected No" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.DeclineSubmission.succeed(aSubmission)
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "No")
@@ -166,7 +166,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for form validation failed because no option selected" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -177,7 +177,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for form validation failed because Yes selected, but no comment entered" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "")
@@ -189,7 +189,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for submission approval failed" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.DeclineSubmission.failed("Decline failed")
 
       val request = fakeRequest.withFormUrlEncodedBody("confirm" -> "Yes", "comment" -> "decline comment")
@@ -200,7 +200,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for form validation failed and submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -209,12 +209,21 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include("Submission review not found or not submitted")
       SubmissionServiceMock.DeclineSubmission.verifyNeverCalled()
     }
+
+    "return 401 for normal user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+
+      val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
+      contentAsString(result) should include("You do not have permission")
+    }
   }
 
   "get decline confirmation page" should {
     val fakeRequest = FakeRequest("GET", "/submission/decline-confirm").withCSRFToken
     "return 200 for submission review found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
       val result = controller.confirmPage(submissionReviewApproved.submissionId)(fakeRequest)
@@ -229,7 +238,7 @@ class DeclineSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 when submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.confirmPage(submissionReviewDeclined.submissionId)(fakeRequest)
