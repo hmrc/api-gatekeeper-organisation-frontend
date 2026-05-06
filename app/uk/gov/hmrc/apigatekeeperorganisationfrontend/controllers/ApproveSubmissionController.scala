@@ -66,9 +66,9 @@ class ApproveSubmissionController @Inject() (
 
   def page(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
-      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
         Ok(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, sr.organisationName), approveSubmissionForm))
-      case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
+      case _                                                                                     => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
@@ -77,9 +77,9 @@ class ApproveSubmissionController @Inject() (
       formWithErrors => {
         service.fetchSubmissionReview(submissionId)
           .map(_ match {
-            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
               BadRequest(approveSubmissionPage(ApproveSubmissionViewModel(submissionId, sr.organisationName), formWithErrors))
-            case _                                                           => BadRequest("Submission review not found or not submitted")
+            case _                                                                                     => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {

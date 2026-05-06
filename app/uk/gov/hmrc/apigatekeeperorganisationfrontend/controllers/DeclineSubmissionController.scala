@@ -66,9 +66,9 @@ class DeclineSubmissionController @Inject() (
 
   def page(submissionId: SubmissionId): Action[AnyContent] = atLeastSuperUserAction { implicit request =>
     service.fetchSubmissionReview(submissionId) map {
-      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+      case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
         Ok(declineSubmissionPage(DeclineSubmissionViewModel(submissionId, sr.organisationName, sr.requestedBy), declineSubmissionForm))
-      case _                                                           => BadRequest("Submission review not found or not submitted/in progress")
+      case _                                                                                     => BadRequest("Submission review not found or not submitted/in progress")
     }
   }
 
@@ -77,9 +77,9 @@ class DeclineSubmissionController @Inject() (
       formWithErrors => {
         service.fetchSubmissionReview(submissionId)
           .map(_ match {
-            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+            case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
               BadRequest(declineSubmissionPage(DeclineSubmissionViewModel(submissionId, sr.organisationName, sr.requestedBy), formWithErrors))
-            case _                                                           => BadRequest("Submission review not found or not submitted")
+            case _                                                                                     => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {
@@ -94,10 +94,10 @@ class DeclineSubmissionController @Inject() (
           case (Some("Yes"), None)          => {
             service.fetchSubmissionReview(submissionId)
               .map(_ match {
-                case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress) =>
+                case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
                   val form = DeclineSubmissionForm.form.fill(confirmData).withError("confirm", "declinesubmission.error.comment.empty.field")
                   BadRequest(declineSubmissionPage(DeclineSubmissionViewModel(submissionId, sr.organisationName, sr.requestedBy), form))
-                case _                                                           => BadRequest("Submission review not found or not submitted")
+                case _                                                                                     => BadRequest("Submission review not found or not submitted")
               })
           }
           case (_, _)                       => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId)))

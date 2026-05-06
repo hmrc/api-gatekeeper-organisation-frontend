@@ -77,7 +77,7 @@ class UpdateSubmissionController @Inject() (
           .map(_ match {
             case Some(sr) if (sr.state.isSubmitted || sr.state.isInProgress || sr.state.isReSubmitted) =>
               BadRequest(updateSubmissionPage(UpdateSubmissionViewModel(submissionId, sr.organisationName), formWithErrors))
-            case _                                                           => BadRequest("Submission review not found or not submitted")
+            case _                                                                                     => BadRequest("Submission review not found or not submitted")
           })
       },
       confirmData => {

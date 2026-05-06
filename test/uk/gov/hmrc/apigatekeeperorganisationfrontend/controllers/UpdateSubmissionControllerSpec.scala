@@ -84,7 +84,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
   "get update page" should {
     val fakeRequest = FakeRequest("GET", "/submission/update").withCSRFToken
     "return 200 for submission review found and isSubmitted" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -98,7 +98,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 200 for submission review found and isInProgress" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewInProgress))
 
       val result = controller.page(submissionReviewInProgress.submissionId)(fakeRequest)
@@ -112,7 +112,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 if submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -122,7 +122,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 if submission review found but not submitted or in progress" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewDeclined))
 
       val result = controller.page(submissionReviewDeclined.submissionId)(fakeRequest)
@@ -130,12 +130,21 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) should include("Submission review not found or not submitted")
     }
+
+    "return 401 for normal user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+
+      val result = controller.page(submissionReviewSubmitted.submissionId)(fakeRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
+      contentAsString(result) should include("You do not have permission")
+    }
   }
 
   "post update action" should {
     val fakeRequest = FakeRequest("POST", "/submission/update").withCSRFToken
     "return 303 for form validation successful and submission update successful with comment" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.UpdateSubmissionReview.succeed(submissionReviewSubmitted)
 
       val request = fakeRequest.withFormUrlEncodedBody("comment" -> "update comment")
@@ -149,7 +158,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for form validation failed" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val request = fakeRequest.withFormUrlEncodedBody("comment" -> "")
@@ -161,7 +170,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for submission update failed" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.UpdateSubmissionReview.failed("Update failed")
 
       val request = fakeRequest.withFormUrlEncodedBody("comment" -> "update comment")
@@ -172,7 +181,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 for form validation failed and submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -181,12 +190,21 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
       contentAsString(result) should include("Submission review not found or not submitted")
       SubmissionServiceMock.UpdateSubmissionReview.verifyNeverCalled()
     }
+
+    "return 401 for normal user" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+
+      val result = controller.action(submissionReviewSubmitted.submissionId)(fakeRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
+      contentAsString(result) should include("You do not have permission")
+    }
   }
 
   "get update confirmation page" should {
     val fakeRequest = FakeRequest("GET", "/submission/update-confirm").withCSRFToken
     "return 200 for submission review found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(Some(submissionReviewSubmitted))
 
       val result = controller.confirmPage(submissionReviewSubmitted.submissionId)(fakeRequest)
@@ -200,7 +218,7 @@ class UpdateSubmissionControllerSpec extends AsyncHmrcSpec
     }
 
     "return 400 when submission review not found" in new Setup {
-      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.SUPERUSER)
       SubmissionServiceMock.FetchSubmissionReview.succeed(None)
 
       val result = controller.confirmPage(submissionReviewSubmitted.submissionId)(fakeRequest)
