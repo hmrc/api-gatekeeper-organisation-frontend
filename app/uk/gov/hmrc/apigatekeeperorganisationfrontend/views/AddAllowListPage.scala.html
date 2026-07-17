@@ -61,9 +61,10 @@
 
       <div class="govuk-button-group">
         @govukButton(Button(
-          id = Some("addAllowList"), 
+          id = Some("addAllowList"),
           isStartButton = false,
-          content = Text("Add user to the allow list")))
+          content = Text("Add user to the allow list"),
+          preventDoubleClick = Some(true)))
        </div>
     }
   </div>  

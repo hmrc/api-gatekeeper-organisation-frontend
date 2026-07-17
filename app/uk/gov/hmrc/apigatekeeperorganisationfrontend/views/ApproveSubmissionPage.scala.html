@@ -66,9 +66,10 @@
 
         <div class="govuk-button-group">
           @govukButton(Button(
-            id = Some("confirm"), 
+            id = Some("confirm"),
             isStartButton = false,
-            content = Text(messages("approvesubmission.confirm"))))
+            content = Text(messages("approvesubmission.confirm")),
+            preventDoubleClick = Some(true)))
 
           <a href="@routes.ViewSubmissionController.checkAnswersPage(model.submissionId)" class="govuk-link govuk-link--no-visited-state">@messages("approvesubmission.cancel")</a>
         </div>
