@@ -1,7 +1,7 @@
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.7.4"
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
@@ -13,8 +13,14 @@ lazy val microservice = Project("api-gatekeeper-organisation-frontend", file("."
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
+    scalacOptions ++= Seq(
+      "-Wconf:src=routes/.*:s",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s", // TODO - remove once Play is really Scala 3
+      "-Wconf:msg=unused import&src=html/.*:s"
+    ),
+    Test / scalacOptions ++= Seq(
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
+    ),
     pipelineStages := Seq(gzip),
     routesImport ++= Seq(
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
