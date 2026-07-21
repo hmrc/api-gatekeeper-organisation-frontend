@@ -94,7 +94,7 @@ class SubmissionsControllerSpec extends HmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true", "submittedStatus" -> "true"))
+      val result = controller.submissionsView(FakeRequest("GET", "/?control=true&submittedStatus=true"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
@@ -116,7 +116,7 @@ class SubmissionsControllerSpec extends HmrcSpec
         submissionReviewReSubmitted
       ))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true"))
+      val result = controller.submissionsView(FakeRequest("GET", "/?control=true"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
@@ -138,13 +138,9 @@ class SubmissionsControllerSpec extends HmrcSpec
         submissionReviewReSubmitted
       ))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody(
-        "control"           -> "true",
-        "submittedStatus"   -> "true",
-        "inProgressStatus"  -> "true",
-        "approvedStatus"    -> "true",
-        "failedStatus"      -> "true",
-        "reSubmittedStatus" -> "true"
+      val result = controller.submissionsView(FakeRequest(
+        "GET",
+        "/?control=true&submittedStatus=true&inProgressStatus=true&approvedStatus=true&failedStatus=true&reSubmittedStatus=true"
       ))
 
       status(result) shouldBe Status.OK

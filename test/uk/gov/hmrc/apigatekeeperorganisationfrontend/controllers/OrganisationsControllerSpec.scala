@@ -77,7 +77,7 @@ class OrganisationsControllerSpec extends HmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       OrganisationServiceMock.SearchOrganisations.succeed(List(standardOrg))
 
-      val result = controller.organisationsView(fakeRequest.withFormUrlEncodedBody("organisationName" -> standardOrg.organisationName.value))
+      val result = controller.organisationsView(FakeRequest("GET", s"/?organisationName=${standardOrg.organisationName.value}"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include(standardOrg.organisationName.value)
@@ -89,7 +89,7 @@ class OrganisationsControllerSpec extends HmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       OrganisationServiceMock.SearchOrganisations.succeed(List.empty)
 
-      val result = controller.organisationsView(fakeRequest.withFormUrlEncodedBody("organisationName" -> "test"))
+      val result = controller.organisationsView(FakeRequest("GET", "/?organisationName=test"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Organisation name")
