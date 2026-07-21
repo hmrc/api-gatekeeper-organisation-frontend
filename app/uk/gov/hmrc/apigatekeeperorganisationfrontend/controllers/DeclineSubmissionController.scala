@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object DeclineSubmissionController {
   case class DeclineSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName, requestedBy: String)
@@ -87,8 +87,8 @@ class DeclineSubmissionController @Inject() (
           case (Some("Yes"), Some(comment)) => {
             service.declineSubmission(submissionId, request.name.get, comment)
               .map(_ match {
-                case Right(_) => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
-                case Left(msg)  => BadRequest(msg)
+                case Right(_)  => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
+                case Left(msg) => BadRequest(msg)
               })
           }
           case (Some("Yes"), None)          => {

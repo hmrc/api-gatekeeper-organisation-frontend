@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.repositories
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{IndexModel, IndexOptions, InsertManyOptions}
 

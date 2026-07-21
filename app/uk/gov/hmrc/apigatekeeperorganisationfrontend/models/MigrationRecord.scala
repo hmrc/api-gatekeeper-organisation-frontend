@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonForm
 case class MigrationRecord(answer: String, applicationIds: List[ApplicationId], status: MigrationStatus, questionType: String, details: Option[String])
 
 object MigrationRecord {
-  implicit val migrationRecordFormat: OFormat[MigrationRecord] = Json.format[MigrationRecord]
+  given migrationRecordFormat: OFormat[MigrationRecord] = Json.format[MigrationRecord]
 
   def from(applicationsByAnswer: ApplicationsByAnswer, questionType: String) =
     MigrationRecord(applicationsByAnswer.answer.replaceAll("/\\s+/", ""), applicationsByAnswer.applicationIds, MigrationStatus.Unchecked, questionType, None)
@@ -40,6 +40,6 @@ object MigrationStatus {
 
   def unsafeApply(text: String): MigrationStatus = apply(text).getOrElse(throw new RuntimeException(s"$text is not a valid MigrationStatus"))
 
-  implicit val format: Format[MigrationStatus] = SimpleEnumJsonFormatting.createStringFormatFor[MigrationStatus]("MigrationStatus", apply)
+  given Format[MigrationStatus] = SimpleEnumJsonFormatting.createStringFormatFor[MigrationStatus]("MigrationStatus", apply)
 
 }

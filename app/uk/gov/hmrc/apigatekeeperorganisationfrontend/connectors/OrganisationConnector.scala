@@ -22,8 +22,8 @@ import com.google.inject.{Inject, Singleton}
 
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.writeableOf_JsValue
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
@@ -125,17 +125,17 @@ object OrganisationConnector {
   case class Config(serviceBaseUrl: String)
 
   case class ApproveSubmissionRequest(approvedBy: String, comment: Option[String])
-  implicit val writesApproveSubmissionRequest: Writes[ApproveSubmissionRequest] = Json.writes[ApproveSubmissionRequest]
+  given Writes[ApproveSubmissionRequest] = Json.writes[ApproveSubmissionRequest]
 
   case class DeclineSubmissionRequest(declinedBy: String, comment: String)
-  implicit val writesDeclineSubmissionRequest: Writes[DeclineSubmissionRequest] = Json.writes[DeclineSubmissionRequest]
+  given Writes[DeclineSubmissionRequest] = Json.writes[DeclineSubmissionRequest]
 
   case class UpdateSubmissionRequest(updatedBy: String, comment: String)
-  implicit val writesUpdateSubmissionRequest: Writes[UpdateSubmissionRequest] = Json.writes[UpdateSubmissionRequest]
+  given Writes[UpdateSubmissionRequest] = Json.writes[UpdateSubmissionRequest]
 
   case class SearchOrganisationRequest(params: Seq[(String, String)])
-  implicit val writeSearchOrganisationRequest: Writes[SearchOrganisationRequest] = Json.writes[SearchOrganisationRequest]
+  given Writes[SearchOrganisationRequest] = Json.writes[SearchOrganisationRequest]
 
   case class AddOrganisationAllowListRequest(requestedBy: String, organisationName: OrganisationName)
-  implicit val writeAddOrganisationAllowListRequest: Writes[AddOrganisationAllowListRequest] = Json.writes[AddOrganisationAllowListRequest]
+  given Writes[AddOrganisationAllowListRequest] = Json.writes[AddOrganisationAllowListRequest]
 }

@@ -22,8 +22,8 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 import play.api.http.HeaderNames.LOCATION
-import play.api.http.Status._
-import play.api.mvc.Results._
+import play.api.http.Status.*
+import play.api.mvc.Results.*
 import play.api.mvc.{MessagesRequest, Result}
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, StubMessagesFactory}
 

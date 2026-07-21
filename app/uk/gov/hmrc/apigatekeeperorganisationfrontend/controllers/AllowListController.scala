@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.FormUtils.emailValidator
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.AllowListService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object AllowListController {
 
@@ -98,8 +98,8 @@ class AllowListController @Inject() (
       allowListAddData => {
         allowListService.createAllowList(LaxEmailAddress(allowListAddData.email), request.name.get, OrganisationName(allowListAddData.organisation))
           .map(_ match {
-            case Right(_) => Redirect(routes.AllowListController.addAllowListConfirmView())
-            case Left(msg)  => BadRequest(addAllowListPage(AddAllowListForm.form.fill(allowListAddData).withError("email", "emailAddress.error.creation", msg)))
+            case Right(_)  => Redirect(routes.AllowListController.addAllowListConfirmView())
+            case Left(msg) => BadRequest(addAllowListPage(AddAllowListForm.form.fill(allowListAddData).withError("email", "emailAddress.error.creation", msg)))
           })
       }
     )
@@ -131,8 +131,8 @@ class AllowListController @Inject() (
           case Some("Yes") => {
             allowListService.deleteAllowList(userId)
               .map(_ match {
-                case Right(_) => Redirect(routes.AllowListController.removeAllowListConfirmView())
-                case Left(msg)  => BadRequest(msg)
+                case Right(_)  => Redirect(routes.AllowListController.removeAllowListConfirmView())
+                case Left(msg) => BadRequest(msg)
               })
           }
           case _           => Future.successful(Redirect(routes.AllowListController.allowListView()))

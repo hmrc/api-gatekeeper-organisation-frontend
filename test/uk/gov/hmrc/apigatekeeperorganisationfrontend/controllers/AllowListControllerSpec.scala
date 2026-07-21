@@ -24,7 +24,7 @@ import play.api.Application
 import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{CSRFTokenHelper, FakeRequest}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
@@ -36,7 +36,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.O
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.AllowListServiceMockModule
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 class AllowListControllerSpec extends HmrcSpec
     with GuiceOneAppPerSuite
