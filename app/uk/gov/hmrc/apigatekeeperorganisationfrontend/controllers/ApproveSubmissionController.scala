@@ -87,7 +87,7 @@ class ApproveSubmissionController @Inject() (
           case Some("Yes") => {
             service.approveSubmission(submissionId, request.name.get, confirmData.comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId))
+                case Right(_) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId))
                 case Left(msg)  => BadRequest(msg)
               })
           }

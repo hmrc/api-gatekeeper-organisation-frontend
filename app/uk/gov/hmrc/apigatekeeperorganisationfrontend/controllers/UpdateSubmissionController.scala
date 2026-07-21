@@ -83,7 +83,7 @@ class UpdateSubmissionController @Inject() (
       confirmData => {
         service.updateSubmissionReview(submissionId, request.name.get, confirmData.comment)
           .map(_ match {
-            case Right(sub) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId))
+            case Right(_) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId))
             case Left(msg)  => BadRequest(msg)
           })
       }

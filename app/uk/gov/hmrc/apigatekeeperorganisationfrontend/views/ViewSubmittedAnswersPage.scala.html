@@ -23,7 +23,7 @@
 @this(layout: Layout,
         govukButton: GovukButton)
 
-@(model: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+@(model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Organisation verification request details"),

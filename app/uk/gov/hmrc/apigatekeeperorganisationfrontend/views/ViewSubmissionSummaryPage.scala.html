@@ -28,7 +28,7 @@
 
 @this(layout: Layout, govukTable: GovukTable, hmrcTimeline: HmrcTimeline, govukButton: GovukButton)
 
-@(submissionReview: SubmissionReview)(implicit request: LoggedInRequest[_], messages: Messages)
+@(submissionReview: SubmissionReview)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Organisation checks"),

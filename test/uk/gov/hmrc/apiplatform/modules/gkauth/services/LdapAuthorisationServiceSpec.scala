@@ -56,13 +56,13 @@ class LdapAuthorisationServiceSpec extends HmrcSpec with MockitoSugar with Argum
   }
 
   trait Authorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(true)
   }
 
   trait Unauthorised {
-    self: Setup with SessionPresent =>
+    self: Setup & SessionPresent =>
 
     stub(false)
   }

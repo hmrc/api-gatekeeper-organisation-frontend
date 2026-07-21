@@ -87,7 +87,7 @@ class DeclineSubmissionController @Inject() (
           case (Some("Yes"), Some(comment)) => {
             service.declineSubmission(submissionId, request.name.get, comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
+                case Right(_) => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
                 case Left(msg)  => BadRequest(msg)
               })
           }

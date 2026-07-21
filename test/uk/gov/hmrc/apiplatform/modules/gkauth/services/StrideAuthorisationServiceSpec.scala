@@ -46,7 +46,7 @@ class StrideAuthorisationServiceSpec extends HmrcSpec with MockitoSugar with Arg
     val underTest = new StrideAuthorisationService(
       strideAuthConnector = StrideAuthConnectorMock.aMock,
       forbiddenHandler = new ForbiddenHandler {
-        def handle(msgResult: MessagesRequest[_]): Result = Forbidden("No thanks")
+        def handle(msgResult: MessagesRequest[?]): Result = Forbidden("No thanks")
       },
       strideAuthConfig = strideAuthConfig
     )
@@ -73,9 +73,9 @@ class StrideAuthorisationServiceSpec extends HmrcSpec with MockitoSugar with Arg
       forAll(cases) { case (requiredRole, userIsOfRole, expected) =>
         StrideAuthConnectorMock.Authorise.returnsFor(userIsOfRole)
 
-        val result: Either[Result, LoggedInRequest[_]] = await(underTest.refineStride(requiredRole)(msgRequest))
+        val result: Either[Result, LoggedInRequest[?]] = await(underTest.refineStride(requiredRole)(msgRequest))
         (result, expected) match {
-          case (Right(request: LoggedInRequest[_]), Right(expectedRole: GatekeeperRole)) => request.role shouldBe expectedRole
+          case (Right(request: LoggedInRequest[?]), Right(expectedRole: GatekeeperRole)) => request.role shouldBe expectedRole
           case (Left(result: Result), Left(expectedCode: Int))                           => result.header.status shouldBe expectedCode
           case _                                                                         => fail()
         }
@@ -85,7 +85,7 @@ class StrideAuthorisationServiceSpec extends HmrcSpec with MockitoSugar with Arg
     "return a redirect when there is no active session" in new Setup {
       StrideAuthConnectorMock.Authorise.failsWithNoActiveSession
 
-      val result: Either[Result, LoggedInRequest[_]] = await(underTest.refineStride(GatekeeperRoles.USER)(msgRequest))
+      val result: Either[Result, LoggedInRequest[?]] = await(underTest.refineStride(GatekeeperRoles.USER)(msgRequest))
 
       result.left.value.header.status shouldBe SEE_OTHER
       result.left.value.header.headers(LOCATION) should startWith(strideAuthConfig.strideLoginUrl)

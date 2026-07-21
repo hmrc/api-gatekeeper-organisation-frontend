@@ -29,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperStrideRole
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.StrideAuthorisationPredicateForGatekeeperRole
 
 trait StrideAuthConnectorMockModule {
-  self: MockitoSugar with ArgumentMatchersSugar =>
+  self: MockitoSugar & ArgumentMatchersSugar =>
 
   val strideAuthRoles: StrideAuthRoles
 
@@ -45,9 +45,10 @@ trait StrideAuthConnectorMockModule {
       private lazy val predicateAdminRole     = StrideAuthorisationPredicateForGatekeeperRole(strideAuthRoles)(ADMIN)
 
       def returnsFor(userRole: GatekeeperStrideRole, name: Name = defaultName) = userRole match {
-        case ADMIN     => returnsAdminEnrolledUserWhenSufficient(name)
-        case SUPERUSER => returnsSuperuserEnrolledUserWhenSufficient(name)
-        case USER      => returnsUserEnrolledUserWhenSufficient(name)
+        case ADMIN        => returnsAdminEnrolledUserWhenSufficient(name)
+        case SUPERUSER    => returnsSuperuserEnrolledUserWhenSufficient(name)
+        case ADVANCEDUSER => returnsUserEnrolledUserWhenSufficient(name)
+        case USER         => returnsUserEnrolledUserWhenSufficient(name)
       }
 
       def returnsAdminEnrolledUserWhenSufficient(name: Name = defaultName) = {

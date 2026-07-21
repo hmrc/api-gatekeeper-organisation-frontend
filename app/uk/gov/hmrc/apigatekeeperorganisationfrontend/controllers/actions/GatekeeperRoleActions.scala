@@ -32,6 +32,5 @@ trait GatekeeperRoleActions extends GatekeeperAuthorisationActions {
       refiner.invokeBlock(request, block)
     }
 
-  def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] =
-    role(anyAuthenticatedUserRefiner) _
+  def loggedInOnly: () => (LoggedInRequest[AnyContent] => Future[Result]) => Action[AnyContent] = () => role(anyAuthenticatedUserRefiner)()
 }

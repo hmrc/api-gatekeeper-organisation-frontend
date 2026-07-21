@@ -98,7 +98,7 @@ class AllowListController @Inject() (
       allowListAddData => {
         allowListService.createAllowList(LaxEmailAddress(allowListAddData.email), request.name.get, OrganisationName(allowListAddData.organisation))
           .map(_ match {
-            case Right(org) => Redirect(routes.AllowListController.addAllowListConfirmView())
+            case Right(_) => Redirect(routes.AllowListController.addAllowListConfirmView())
             case Left(msg)  => BadRequest(addAllowListPage(AddAllowListForm.form.fill(allowListAddData).withError("email", "emailAddress.error.creation", msg)))
           })
       }
@@ -131,7 +131,7 @@ class AllowListController @Inject() (
           case Some("Yes") => {
             allowListService.deleteAllowList(userId)
               .map(_ match {
-                case Right(res) => Redirect(routes.AllowListController.removeAllowListConfirmView())
+                case Right(_) => Redirect(routes.AllowListController.removeAllowListConfirmView())
                 case Left(msg)  => BadRequest(msg)
               })
           }

@@ -59,7 +59,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
+    val failed = (_: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
 
     http.post(url"${config.serviceBaseUrl}/submission/$submissionId/approve")
       .withBody(Json.toJson(ApproveSubmissionRequest(approvedBy, comment)))
@@ -69,7 +69,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to decline submission $submissionId"
+    val failed = (_: UpstreamErrorResponse) => s"Failed to decline submission $submissionId"
 
     http.post(url"${config.serviceBaseUrl}/submission/$submissionId/decline")
       .withBody(Json.toJson(DeclineSubmissionRequest(declinedBy, comment)))
@@ -79,7 +79,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def updateSubmissionReview(submissionId: SubmissionId, updatedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => s"Failed to update submission review $submissionId"
+    val failed = (_: UpstreamErrorResponse) => s"Failed to update submission review $submissionId"
 
     http.put(url"${config.serviceBaseUrl}/submission-review/$submissionId")
       .withBody(Json.toJson(UpdateSubmissionRequest(updatedBy, comment)))
@@ -105,7 +105,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => "Failed to create organisation allow list - check user doesn't already exist in allow list"
+    val failed = (_: UpstreamErrorResponse) => "Failed to create organisation allow list - check user doesn't already exist in allow list"
     http.post(url"${config.serviceBaseUrl}/allow-list/$userId")
       .withBody(Json.toJson(AddOrganisationAllowListRequest(requestedBy, organisationName)))
       .execute[Either[UpstreamErrorResponse, OrganisationAllowList]]
@@ -114,7 +114,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
 
   def deleteOrganisationAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, Boolean]] = {
     import cats.implicits._
-    val failed = (err: UpstreamErrorResponse) => "Failed to delete organisation allow list - check user exists in allow list"
+    val failed = (_: UpstreamErrorResponse) => "Failed to delete organisation allow list - check user exists in allow list"
     http.delete(url"${config.serviceBaseUrl}/allow-list/$userId")
       .execute[Either[UpstreamErrorResponse, Boolean]]
       .map(_.leftMap(failed))
