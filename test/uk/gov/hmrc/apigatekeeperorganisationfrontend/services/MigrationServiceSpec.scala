@@ -32,8 +32,8 @@ class MigrationServiceSpec extends AsyncHmrcSpec with TpoConnectorMockModule wit
     with MigrationRepositoryMockModule with ApplicationIdFixtures {
 
   trait Setup extends MigrationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = new MigrationService(TpoConnectorMock.aMock, MigrationRepositoryMock.aMock, VatRegisteredCompaniesConnectorMock.aMock, OrganisationConnectorMock.aMock)
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = new MigrationService(TpoConnectorMock.aMock, MigrationRepositoryMock.aMock, VatRegisteredCompaniesConnectorMock.aMock, OrganisationConnectorMock.aMock)
 
     val questionType = "vat-registration-number"
     val answer       = "123456789"

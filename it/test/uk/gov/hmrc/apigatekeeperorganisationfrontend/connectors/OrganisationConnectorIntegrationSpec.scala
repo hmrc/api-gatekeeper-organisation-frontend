@@ -37,8 +37,8 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
   )
 
   trait Setup extends SubmissionsTestData with OrganisationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[OrganisationConnector]
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[OrganisationConnector]
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 

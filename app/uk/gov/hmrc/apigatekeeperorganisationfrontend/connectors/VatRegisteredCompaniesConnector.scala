@@ -48,10 +48,10 @@ object LookupResponse {
 class VatRegisteredCompaniesConnector @Inject() (
     http: HttpClientV2,
     config: VatRegisteredCompaniesConnector.Config
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends Logging {
 
-  def lookupVatNumber(vatNumber: String)(implicit hc: HeaderCarrier): Future[LookupResponse] = {
+  def lookupVatNumber(vatNumber: String)(using HeaderCarrier): Future[LookupResponse] = {
     http.get(url"${config.serviceBaseUrl}/vat-registered-companies/lookup/${vatNumber}")
       .execute[LookupResponse]
   }

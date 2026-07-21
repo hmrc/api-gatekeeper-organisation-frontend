@@ -32,25 +32,27 @@ trait AllowListServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
     val aMock = mock[AllowListService]
 
     object FetchAllowList {
-      def succeed(allowLists: List[AllowList]) = when(aMock.fetchAllowList()(*)).thenReturn(Future.successful(allowLists))
+      def succeed(allowLists: List[AllowList]) = when(aMock.fetchAllowList()(using *)).thenReturn(Future.successful(allowLists))
 
-      def verifyCalled() = verify(aMock).fetchAllowList()(*)
+      def verifyCalled() = verify(aMock).fetchAllowList()(using *)
     }
 
     object FetchAllowListForUserId {
-      def succeed(allowList: AllowList) = when(aMock.fetchAllowListForUserId(*[UserId])(*)).thenReturn(Future.successful(Right(allowList)))
+      def succeed(allowList: AllowList) = when(aMock.fetchAllowListForUserId(*[UserId])(using *)).thenReturn(Future.successful(Right(allowList)))
     }
 
     object CreateAllowList {
-      def succeed(allowList: OrganisationAllowList) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Right(allowList)))
 
-      def failed(msg: String) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(*)).thenReturn(Future.successful(Left(msg)))
+      def succeed(allowList: OrganisationAllowList) =
+        when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(using *)).thenReturn(Future.successful(Right(allowList)))
+
+      def failed(msg: String) = when(aMock.createAllowList(*[LaxEmailAddress], *, *[OrganisationName])(using *)).thenReturn(Future.successful(Left(msg)))
     }
 
     object DeleteAllowList {
-      def succeed() = when(aMock.deleteAllowList(*[UserId])(*)).thenReturn(Future.successful(Right(true)))
+      def succeed() = when(aMock.deleteAllowList(*[UserId])(using *)).thenReturn(Future.successful(Right(true)))
 
-      def failed(msg: String) = when(aMock.deleteAllowList(*[UserId])(*)).thenReturn(Future.successful(Left(msg)))
+      def failed(msg: String) = when(aMock.deleteAllowList(*[UserId])(using *)).thenReturn(Future.successful(Left(msg)))
     }
   }
 }

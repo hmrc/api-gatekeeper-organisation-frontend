@@ -73,7 +73,7 @@ class AllowListController @Inject() (
     allowListService: AllowListService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   import AllowListController._

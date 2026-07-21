@@ -59,7 +59,7 @@ class SubmissionsController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
   import SubmissionsController._
 

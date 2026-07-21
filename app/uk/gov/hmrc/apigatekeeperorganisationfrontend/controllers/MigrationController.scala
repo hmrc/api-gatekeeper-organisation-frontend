@@ -37,7 +37,7 @@ class MigrationController @Inject() (
     processedListPage: ProcessedListPage,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   def controlPage(): Action[AnyContent] = loggedInOnly() { implicit request =>

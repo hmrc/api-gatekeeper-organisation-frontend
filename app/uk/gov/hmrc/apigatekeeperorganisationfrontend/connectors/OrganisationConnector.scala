@@ -33,31 +33,31 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
 @Singleton
-class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
+class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(using ExecutionContext) {
 
   import OrganisationConnector._
 
-  def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
+  def searchSubmissionReviews(params: Seq[(String, String)])(using HeaderCarrier): Future[List[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")
       .execute[List[SubmissionReview]]
   }
 
-  def fetchSubmissionReview(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
+  def fetchSubmissionReview(submissionId: SubmissionId)(using HeaderCarrier): Future[Option[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-review/$submissionId")
       .execute[Option[SubmissionReview]]
   }
 
-  def fetchSubmission(id: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+  def fetchSubmission(id: SubmissionId)(using HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     http.get(url"${config.serviceBaseUrl}/submission/${id.value}")
       .execute[Option[ExtendedSubmission]]
   }
 
-  def fetchByCompanyNumber(companyNumber: String)(implicit hc: HeaderCarrier): Future[Option[CompaniesHouseCompanyProfile]] = {
+  def fetchByCompanyNumber(companyNumber: String)(using HeaderCarrier): Future[Option[CompaniesHouseCompanyProfile]] = {
     http.get(url"${config.serviceBaseUrl}/company/${companyNumber}")
       .execute[Option[CompaniesHouseCompanyProfile]]
   }
 
-  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(using HeaderCarrier): Future[Either[String, Submission]] = {
     import cats.implicits._
     val failed = (_: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
 
@@ -67,7 +67,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .map(_.leftMap(failed))
   }
 
-  def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+  def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, Submission]] = {
     import cats.implicits._
     val failed = (_: UpstreamErrorResponse) => s"Failed to decline submission $submissionId"
 
@@ -77,7 +77,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .map(_.leftMap(failed))
   }
 
-  def updateSubmissionReview(submissionId: SubmissionId, updatedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
+  def updateSubmissionReview(submissionId: SubmissionId, updatedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, SubmissionReview]] = {
     import cats.implicits._
     val failed = (_: UpstreamErrorResponse) => s"Failed to update submission review $submissionId"
 
@@ -87,23 +87,23 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .map(_.leftMap(failed))
   }
 
-  def searchOrganisations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[Organisation]] = {
+  def searchOrganisations(params: Seq[(String, String)])(using HeaderCarrier): Future[List[Organisation]] = {
     http.post(url"${config.serviceBaseUrl}/organisations?$params")
       .withBody(Json.toJson(SearchOrganisationRequest(params)))
       .execute[List[Organisation]]
   }
 
-  def fetchAllOrganisationAllowLists()(implicit hc: HeaderCarrier): Future[List[OrganisationAllowList]] = {
+  def fetchAllOrganisationAllowLists()(using HeaderCarrier): Future[List[OrganisationAllowList]] = {
     http.get(url"${config.serviceBaseUrl}/allow-lists")
       .execute[List[OrganisationAllowList]]
   }
 
-  def fetchOrganisationAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Option[OrganisationAllowList]] = {
+  def fetchOrganisationAllowList(userId: UserId)(using HeaderCarrier): Future[Option[OrganisationAllowList]] = {
     http.get(url"${config.serviceBaseUrl}/allow-list/$userId")
       .execute[Option[OrganisationAllowList]]
   }
 
-  def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
+  def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(using HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
     import cats.implicits._
     val failed = (_: UpstreamErrorResponse) => "Failed to create organisation allow list - check user doesn't already exist in allow list"
     http.post(url"${config.serviceBaseUrl}/allow-list/$userId")
@@ -112,7 +112,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .map(_.leftMap(failed))
   }
 
-  def deleteOrganisationAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, Boolean]] = {
+  def deleteOrganisationAllowList(userId: UserId)(using HeaderCarrier): Future[Either[String, Boolean]] = {
     import cats.implicits._
     val failed = (_: UpstreamErrorResponse) => "Failed to delete organisation allow list - check user exists in allow list"
     http.delete(url"${config.serviceBaseUrl}/allow-list/$userId")

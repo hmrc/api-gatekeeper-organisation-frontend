@@ -33,11 +33,11 @@ class VatRegisteredCompaniesConnectorIntegrationSpec extends BaseConnectorIntegr
   )
 
   trait Setup extends AppsByAnswerFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[VatRegisteredCompaniesConnector]
-    val vatNumber                  = "123456789"
-    val companyName                = "Example Corp"
-    val lookupResponse             = LookupResponse(Some(VatRegisteredCompany(companyName, vatNumber)))
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[VatRegisteredCompaniesConnector]
+    val vatNumber       = "123456789"
+    val companyName     = "Example Corp"
+    val lookupResponse  = LookupResponse(Some(VatRegisteredCompany(companyName, vatNumber)))
 
   }
 

@@ -30,10 +30,10 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.ApplicationsByAnswer
 class ThirdPartyOrchestratorConnector @Inject() (
     http: HttpClientV2,
     config: ThirdPartyOrchestratorConnector.Config
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends Logging {
 
-  def fetchApplicationsByAnswer(questionType: String)(implicit hc: HeaderCarrier): Future[List[ApplicationsByAnswer]] = {
+  def fetchApplicationsByAnswer(questionType: String)(using HeaderCarrier): Future[List[ApplicationsByAnswer]] = {
     http.get(url"${config.serviceBaseUrl}/submissions/answers/${questionType}")
       .execute[List[ApplicationsByAnswer]]
   }

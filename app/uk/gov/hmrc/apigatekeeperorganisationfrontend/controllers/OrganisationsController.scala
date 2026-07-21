@@ -49,7 +49,7 @@ class OrganisationsController @Inject() (
     service: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
   import OrganisationsController._
 

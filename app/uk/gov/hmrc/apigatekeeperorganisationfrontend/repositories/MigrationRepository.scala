@@ -29,7 +29,7 @@ import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.{MigrationRecord, MigrationStatus}
 
 @Singleton
-class MigrationRepository @Inject() (mongo: MongoComponent)(implicit val ec: ExecutionContext)
+class MigrationRepository @Inject() (mongo: MongoComponent)(using ExecutionContext)
     extends PlayMongoRepository[MigrationRecord](
       collectionName = "migration",
       mongoComponent = mongo,

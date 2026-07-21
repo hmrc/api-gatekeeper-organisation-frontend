@@ -37,7 +37,7 @@ class ViewSubmissionController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   def summaryPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>

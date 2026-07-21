@@ -32,14 +32,14 @@ class MigrationService @Inject() (
     migrationRepository: MigrationRepository,
     vatRegisteredCompaniesConnector: VatRegisteredCompaniesConnector,
     organisationConnector: OrganisationConnector
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) {
 
   def fetchAll(): Future[List[MigrationRecord]] = {
     migrationRepository.fetchAll()
   }
 
-  def loadData(questionType: String)(implicit hc: HeaderCarrier): Future[List[MigrationRecord]] = {
+  def loadData(questionType: String)(using HeaderCarrier): Future[List[MigrationRecord]] = {
     tpoConnector.fetchApplicationsByAnswer(questionType).map(appsByAnswers => appsByAnswers.map(MigrationRecord.from(_, questionType)))
       .flatMap(records => migrationRepository.save(records))
   }
@@ -48,25 +48,25 @@ class MigrationService @Inject() (
     migrationRepository.fetch(questionType, answer)
   }
 
-  def processVat(count: Int)(implicit hc: HeaderCarrier): Future[List[MigrationRecord]] = {
+  def processVat(count: Int)(using HeaderCarrier): Future[List[MigrationRecord]] = {
     migrationRepository.fetchUnchecked("vat-registration-number", count).map(records => records.map(rec => processVatRecord(rec))).flatMap(futureRecords =>
       Future.sequence(futureRecords)
     )
   }
 
-  def processCompaniesHouse(count: Int)(implicit hc: HeaderCarrier): Future[List[MigrationRecord]] = {
+  def processCompaniesHouse(count: Int)(using HeaderCarrier): Future[List[MigrationRecord]] = {
     migrationRepository.fetchUnchecked("company-registration-number", count).map(records => records.map(rec => processCompaniesHouseRecord(rec))).flatMap(futureRecords =>
       Future.sequence(futureRecords)
     )
   }
 
-  private def processVatRecord(record: MigrationRecord)(implicit hc: HeaderCarrier): Future[MigrationRecord] = {
+  private def processVatRecord(record: MigrationRecord)(using HeaderCarrier): Future[MigrationRecord] = {
     vatRegisteredCompaniesConnector.lookupVatNumber(record.answer).map(_.target).map(_.fold(record.copy(status = Unverified))(company =>
       record.copy(status = Verified, details = Some(company.name))
     )).flatMap(newRecord => migrationRepository.update(newRecord))
   }
 
-  private def processCompaniesHouseRecord(record: MigrationRecord)(implicit hc: HeaderCarrier): Future[MigrationRecord] = {
+  private def processCompaniesHouseRecord(record: MigrationRecord)(using HeaderCarrier): Future[MigrationRecord] = {
     organisationConnector.fetchByCompanyNumber(record.answer).map(_.fold(record.copy(status = Unverified))(company =>
       record.copy(status = Verified, details = Some(company.companyName))
     )).flatMap(newRecord => migrationRepository.update(newRecord))

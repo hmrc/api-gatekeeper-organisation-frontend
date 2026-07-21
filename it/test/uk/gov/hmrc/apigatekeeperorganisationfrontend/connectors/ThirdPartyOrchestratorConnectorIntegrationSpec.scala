@@ -33,9 +33,9 @@ class ThirdPartyOrchestratorConnectorIntegrationSpec extends BaseConnectorIntegr
   )
 
   trait Setup extends AppsByAnswerFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[ThirdPartyOrchestratorConnector]
-    val questionType               = "vat-registration-number"
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[ThirdPartyOrchestratorConnector]
+    val questionType    = "vat-registration-number"
   }
 
   override def fakeApplication(): PlayApplication =

@@ -34,16 +34,16 @@ import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
 class ThirdPartyDeveloperConnector @Inject() (
     http: HttpClientV2,
     config: ThirdPartyDeveloperConnector.Config
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends Logging {
 
-  def fetchDevelopers(users: List[UserId])(implicit hc: HeaderCarrier): Future[List[User]] = {
+  def fetchDevelopers(users: List[UserId])(using HeaderCarrier): Future[List[User]] = {
     http.post(url"${config.serviceBaseUrl}/developers/get-users")
       .withBody(Json.toJson(GetUsersRequest(users)))
       .execute[List[User]]
   }
 
-  def fetchByEmails(emails: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[Seq[User]] = {
+  def fetchByEmails(emails: Set[LaxEmailAddress])(using HeaderCarrier): Future[Seq[User]] = {
     http
       .post(url"${config.serviceBaseUrl}/developers/get-by-emails")
       .withBody(Json.toJson(emails))

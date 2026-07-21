@@ -30,50 +30,50 @@ trait SubmissionServiceMockModule extends SubmissionsTestData with MockitoSugar 
     val aMock = mock[SubmissionService]
 
     object SearchSubmissionReviews {
-      def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(*)).thenReturn(Future.successful(submissionReviews))
+      def succeed(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(using *)).thenReturn(Future.successful(submissionReviews))
 
-      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchSubmissionReviews(eqTo(params))(*)
+      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchSubmissionReviews(eqTo(params))(using *)
     }
 
     object FetchSubmissionReview {
-      def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(*)).thenReturn(Future.successful(submissionReview))
+      def succeed(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(using *)).thenReturn(Future.successful(submissionReview))
     }
 
     object FetchSubmission {
-      def succeed(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(*)).thenReturn(Future.successful(submission))
+      def succeed(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(using *)).thenReturn(Future.successful(submission))
     }
 
     object ApproveSubmission {
-      def succeed(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+      def succeed(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submission)))
 
-      def failed(msg: String) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Left(msg)))
+      def failed(msg: String) = when(aMock.approveSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Left(msg)))
 
       def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: Option[String]) =
-        verify(aMock).approveSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
+        verify(aMock).approveSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(using *)
 
-      def verifyNeverCalled() = verify(aMock, never).approveSubmission(*[SubmissionId], *, *)(*)
+      def verifyNeverCalled() = verify(aMock, never).approveSubmission(*[SubmissionId], *, *)(using *)
     }
 
     object DeclineSubmission {
-      def succeed(submission: Submission) = when(aMock.declineSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+      def succeed(submission: Submission) = when(aMock.declineSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submission)))
 
-      def failed(msg: String) = when(aMock.declineSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Left(msg)))
+      def failed(msg: String) = when(aMock.declineSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Left(msg)))
 
       def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: String) =
-        verify(aMock).declineSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
+        verify(aMock).declineSubmission(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(using *)
 
-      def verifyNeverCalled() = verify(aMock, never).declineSubmission(*[SubmissionId], *, *)(*)
+      def verifyNeverCalled() = verify(aMock, never).declineSubmission(*[SubmissionId], *, *)(using *)
     }
 
     object UpdateSubmissionReview {
-      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+      def succeed(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submissionReview)))
 
-      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Left(msg)))
+      def failed(msg: String) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Left(msg)))
 
       def verifyCalled(submissionId: SubmissionId, approvedBy: String, comment: String) =
-        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(*)
+        verify(aMock).updateSubmissionReview(eqTo(submissionId), eqTo(approvedBy), eqTo(comment))(using *)
 
-      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *)(*)
+      def verifyNeverCalled() = verify(aMock, never).updateSubmissionReview(*[SubmissionId], *, *)(using *)
     }
   }
 }

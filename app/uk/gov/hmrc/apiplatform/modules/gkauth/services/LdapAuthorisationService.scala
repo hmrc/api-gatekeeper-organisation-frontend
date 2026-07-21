@@ -29,11 +29,11 @@ import uk.gov.hmrc.apiplatform.modules.common.services.ApplicationLogger
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRoles, LoggedInRequest}
 
 @Singleton
-class LdapAuthorisationService @Inject() (auth: FrontendAuthComponents)(implicit ec: ExecutionContext) extends ApplicationLogger {
+class LdapAuthorisationService @Inject() (auth: FrontendAuthComponents)(using ExecutionContext) extends ApplicationLogger {
 
   def refineLdap[A]: (MessagesRequest[A]) => Future[Either[MessagesRequest[A], LoggedInRequest[A]]] = (msgRequest) => {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(msgRequest, msgRequest.session)
+    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(msgRequest, msgRequest.session)
 
     lazy val notAuthenticatedOrAuthorized: Either[MessagesRequest[A], LoggedInRequest[A]] = Left(msgRequest)
 

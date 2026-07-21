@@ -38,8 +38,8 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
   )
 
   trait Setup extends AppsByAnswerFixtures with FixedClock {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[ThirdPartyDeveloperConnector]
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[ThirdPartyDeveloperConnector]
 
     val userId1 = UserId.random
     val userId2 = UserId.random

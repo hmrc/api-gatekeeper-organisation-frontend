@@ -28,8 +28,8 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.Organisati
 class SubmissionServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule {
 
   trait Setup extends FixedClock with SubmissionsTestData {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = new SubmissionService(OrganisationConnectorMock.aMock)
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = new SubmissionService(OrganisationConnectorMock.aMock)
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 

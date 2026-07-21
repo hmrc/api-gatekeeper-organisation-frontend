@@ -29,9 +29,9 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     val aMock = mock[OrganisationService]
 
     object SearchOrganisations {
-      def succeed(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(*)).thenReturn(Future.successful(organisations))
+      def succeed(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(using *)).thenReturn(Future.successful(organisations))
 
-      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(*)
+      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(using *)
     }
   }
 }

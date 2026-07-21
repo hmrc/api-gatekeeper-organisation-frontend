@@ -28,27 +28,27 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConn
 @Singleton
 class SubmissionService @Inject() (orgConnector: OrganisationConnector) {
 
-  def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
+  def searchSubmissionReviews(params: Seq[(String, String)])(using HeaderCarrier): Future[List[SubmissionReview]] = {
     orgConnector.searchSubmissionReviews(params)
   }
 
-  def fetchSubmissionReview(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[SubmissionReview]] = {
+  def fetchSubmissionReview(submissionId: SubmissionId)(using HeaderCarrier): Future[Option[SubmissionReview]] = {
     orgConnector.fetchSubmissionReview(submissionId)
   }
 
-  def fetchSubmission(submissionId: SubmissionId)(implicit hc: HeaderCarrier): Future[Option[ExtendedSubmission]] = {
+  def fetchSubmission(submissionId: SubmissionId)(using HeaderCarrier): Future[Option[ExtendedSubmission]] = {
     orgConnector.fetchSubmission(submissionId)
   }
 
-  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+  def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(using HeaderCarrier): Future[Either[String, Submission]] = {
     orgConnector.approveSubmission(submissionId, approvedBy, comment)
   }
 
-  def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
+  def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, Submission]] = {
     orgConnector.declineSubmission(submissionId, declinedBy, comment)
   }
 
-  def updateSubmissionReview(submissionId: SubmissionId, approvedBy: String, comment: String)(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReview]] = {
+  def updateSubmissionReview(submissionId: SubmissionId, approvedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, SubmissionReview]] = {
     orgConnector.updateSubmissionReview(submissionId, approvedBy, comment)
   }
 }
