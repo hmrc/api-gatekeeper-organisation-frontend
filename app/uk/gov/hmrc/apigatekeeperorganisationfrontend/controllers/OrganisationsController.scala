@@ -67,12 +67,12 @@ class OrganisationsController @Inject() (
       doSearch(form)
     }
 
-    def handleInvalidForm(form: Form[FilterForm]) = {
+    def handleInvalidForm() = {
       val defaultForm = FilterForm()
       doSearch(defaultForm)
     }
 
-    OrganisationsController.filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+    OrganisationsController.filterForm.bindFromRequest().fold(_ => handleInvalidForm(), handleValidForm)
   }
 
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {
