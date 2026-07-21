@@ -1,5 +1,7 @@
 import uk.gov.hmrc.DefaultBuildSettings
 
+Global / bloopAggregateSourceDependencies := true
+Global / bloopExportJarClassifiers := Some(Set("sources"))
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.7.4"
 ThisBuild / semanticdbEnabled := true
