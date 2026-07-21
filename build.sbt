@@ -23,6 +23,8 @@ lazy val microservice = Project("api-gatekeeper-organisation-frontend", file("."
     ),
     pipelineStages := Seq(gzip),
     routesImport ++= Seq(
+      "uk.gov.hmrc.apigatekeeperorganisationfrontend.models.RouteModels._",
+      "uk.gov.hmrc.apigatekeeperorganisationfrontend.models.RouteModels.given",
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.organisations.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._"

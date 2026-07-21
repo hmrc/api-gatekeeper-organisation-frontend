@@ -45,7 +45,7 @@ object AllowListController {
         "email"        -> emailValidator(),
         "organisation" -> text
           .verifying("organisation.error.required.field", !_.isBlank())
-      )(AddAllowListForm.apply)(AddAllowListForm.unapply)
+      )(AddAllowListForm.apply)(a => Some((a.email, a.organisation)))
     )
   }
 
@@ -57,7 +57,7 @@ object AllowListController {
       mapping(
         "confirm" -> optional(text)
           .verifying("removeallowlist.no.choice.field", _.isDefined)
-      )(RemoveAllowListForm.apply)(RemoveAllowListForm.unapply)
+      )(RemoveAllowListForm.apply)(r => Some(r.confirm))
     )
   }
 }

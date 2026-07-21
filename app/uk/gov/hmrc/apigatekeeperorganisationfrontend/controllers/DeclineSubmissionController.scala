@@ -44,7 +44,7 @@ object DeclineSubmissionController {
         "comment" -> optional(text(maxLength = 500)),
         "confirm" -> optional(text)
           .verifying("declinesubmission.error.confirmation.no.choice.field", _.isDefined)
-      )(DeclineSubmissionForm.apply)(DeclineSubmissionForm.unapply)
+      )(DeclineSubmissionForm.apply)(d => Some((d.comment, d.confirm)))
     )
   }
 }

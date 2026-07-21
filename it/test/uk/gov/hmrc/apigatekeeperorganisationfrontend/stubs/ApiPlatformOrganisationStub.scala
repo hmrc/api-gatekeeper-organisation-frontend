@@ -24,6 +24,7 @@ import play.api.libs.json.Json
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
 
@@ -130,8 +131,6 @@ object ApiPlatformOrganisationStub {
   }
 
   object FetchSubmission {
-
-    import Submission._
 
     def succeeds(submissionId: SubmissionId, submission: ExtendedSubmission): StubMapping = {
       stubFor(

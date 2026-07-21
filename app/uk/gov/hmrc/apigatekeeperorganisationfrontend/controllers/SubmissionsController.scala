@@ -48,7 +48,7 @@ object SubmissionsController {
       "reSubmittedStatus" -> optional(text),
       "approvedStatus"    -> optional(text),
       "failedStatus"      -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some((f.control, f.submittedStatus, f.inProgressStatus, f.reSubmittedStatus, f.approvedStatus, f.failedStatus)))
   )
 }
 

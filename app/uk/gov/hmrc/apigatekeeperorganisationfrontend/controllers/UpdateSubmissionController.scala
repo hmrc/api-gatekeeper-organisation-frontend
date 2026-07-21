@@ -42,7 +42,7 @@ object UpdateSubmissionController {
       mapping(
         "comment" -> text(maxLength = 500)
           .verifying("updatesubmission.error.comment.blank", !_.isBlank())
-      )(UpdateSubmissionForm.apply)(UpdateSubmissionForm.unapply)
+      )(UpdateSubmissionForm.apply)(u => Some(u.comment))
     )
   }
 }

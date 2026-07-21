@@ -21,12 +21,14 @@ import scala.concurrent.{ExecutionContext, Future}
 import com.google.inject.{Inject, Singleton}
 
 import play.api.libs.json.{Json, Writes}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
@@ -34,7 +36,6 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompan
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(implicit ec: ExecutionContext) {
 
   import OrganisationConnector._
-  import Submission._
 
   def searchSubmissionReviews(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")

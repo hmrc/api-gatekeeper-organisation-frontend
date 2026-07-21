@@ -38,7 +38,7 @@ object OrganisationsController {
   val filterForm: Form[FilterForm] = Form(
     mapping(
       "organisationName" -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some(f.organisationName))
   )
 }
 

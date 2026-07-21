@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatform.modules.gkauth.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 import play.api.http.HeaderNames.LOCATION
@@ -32,7 +33,8 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.connectors.StrideAuthConnectorMock
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.{GatekeeperRole, GatekeeperRoles, LoggedInRequest}
 
-class StrideAuthorisationServiceSpec extends HmrcSpec with DefaultAwaitTimeout with FutureAwaits with StrideAuthConnectorMockModule with StubMessagesFactory
+class StrideAuthorisationServiceSpec extends HmrcSpec with MockitoSugar with ArgumentMatchersSugar with DefaultAwaitTimeout with FutureAwaits
+    with StrideAuthConnectorMockModule with StubMessagesFactory
     with TableDrivenPropertyChecks {
   val strideAuthRoles = StrideAuthRoles(adminRole = "test-admin", superUserRole = "test-superUser", advancedUserRole = "test-advancedUser", userRole = "test-user")
   val fakeRequest     = FakeRequest()
