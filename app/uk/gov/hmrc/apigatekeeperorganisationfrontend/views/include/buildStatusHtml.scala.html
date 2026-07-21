@@ -24,6 +24,5 @@
       case SubmissionReview.State.ReSubmitted => <strong class='govuk-tag govuk-tag--light-blue'>Re-submitted</strong>
       case SubmissionReview.State.Approved    => <strong class='govuk-tag govuk-tag--purple'>Approved</strong>
       case SubmissionReview.State.Declined    => <strong class='govuk-tag govuk-tag--red'>Failed</strong>
-      case _                                  => <strong class='govuk-tag'> + @{state.toString} + </strong>
     }
   }

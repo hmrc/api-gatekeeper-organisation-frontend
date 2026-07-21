@@ -22,6 +22,5 @@
       case MigrationStatus.Unchecked  => <strong class='govuk-tag govuk-tag--blue'>Unchecked</strong>
       case MigrationStatus.Verified   => <strong class='govuk-tag govuk-tag--green'>Verified</strong>
       case MigrationStatus.Unverified => <strong class='govuk-tag govuk-tag--red'>Unverified</strong>
-      case _                          => <strong class='govuk-tag'> + @{state.toString} + </strong>
     }
   }
