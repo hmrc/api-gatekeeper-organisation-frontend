@@ -26,10 +26,12 @@ GET         /migrations/overview                         uk.gov.hmrc.apigatekeep
 GET         /migrations/:questionType/:answer            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.detailsPage(questionType:String, answer: String)
 GET         /migrations/controls                         uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.controlPage()
 GET         /migrations/admin                            uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.adminPage()
+GET         /migrations/utr-checker                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.utrChecker()
 
 POST        /migrations/load/:questionType               uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.load(questionType: String)
 POST        /migrations/process-vat                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processVat(count: Int ?= 10)
 POST        /migrations/process-companies-house          uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.processCompaniesHouse(count: Int ?= 10)
+POST        /migrations/utr-checker                      uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.utrCheckerAction()
 
 GET         /allow-list                                  uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.allowListView()
 GET         /allow-list/add                              uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.AllowListController.addAllowListView()

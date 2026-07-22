@@ -19,8 +19,10 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.services
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SaMatchingRequest
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{OrganisationConnector, ThirdPartyOrchestratorConnector, VatRegisteredCompaniesConnector}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationRecord
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationStatus.{Unverified, Verified}
@@ -70,5 +72,9 @@ class MigrationService @Inject() (
     organisationConnector.fetchByCompanyNumber(record.answer).map(_.fold(record.copy(status = Unverified))(company =>
       record.copy(status = Verified, details = Some(company.companyName))
     )).flatMap(newRecord => migrationRepository.update(newRecord))
+  }
+
+  def matchBySa(request: SaMatchingRequest)(using HeaderCarrier): Future[JsValue] = {
+    organisationConnector.matchBySa(request)
   }
 }

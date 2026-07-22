@@ -20,6 +20,8 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import play.api.libs.json.JsValue
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
@@ -91,6 +93,10 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
 
       def willReturn() =
         when(aMock.deleteOrganisationAllowList(*[UserId])(using *)).thenReturn(Future.successful(Right(true)))
+    }
+
+    object MatchBySa {
+      def willReturn(json: JsValue) = when(aMock.matchBySa(*)(using *)).thenReturn(Future.successful(json))
     }
   }
 }

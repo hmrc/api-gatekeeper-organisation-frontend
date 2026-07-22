@@ -16,21 +16,27 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors
 
+import org.mockito.scalatest.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.http.Status.*
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.{Application as PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{OrganisationAllowList, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.OrganisationFixtures
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaMatchingAddress, SaMatchingRequest}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.repositories.MigrationRepository
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ApiPlatformOrganisationStub
 
-class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite {
+class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite with MockitoSugar {
 
   private val stubConfig = Configuration(
     "microservice.services.api-platform-organisation.port" -> stubPort
@@ -52,6 +58,8 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
     GuiceApplicationBuilder()
       .configure(stubConfig)
       .in(Mode.Test)
+      .disable[PlayMongoModule]
+      .overrides(bind[MigrationRepository].toInstance(mock[MigrationRepository]))
       .build()
 
   "searchSubmissionReviews" should {
@@ -258,6 +266,19 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
       val result = await(underTest.deleteOrganisationAllowList(userId))
 
       result shouldBe Left("Failed to delete organisation allow list - check user exists in allow list")
+    }
+  }
+
+  "matchBySa" should {
+    val request = SaMatchingRequest("1234567890", "Individual", "Bob Smith", SaMatchingAddress("1 Test Street", "AB1 2CD"))
+
+    "successfully get a match" in new Setup {
+      val matchJson = Json.obj("matched" -> true)
+      ApiPlatformOrganisationStub.MatchBySa.succeeds(request, matchJson)
+
+      val result = await(underTest.matchBySa(request))
+
+      result shouldBe matchJson
     }
   }
 }
