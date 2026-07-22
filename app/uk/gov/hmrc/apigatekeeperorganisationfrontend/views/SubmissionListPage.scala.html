@@ -35,7 +35,7 @@
 
     <h1 class="govuk-heading-l">@{messages("submissionreview.title")}</h1>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView, Symbol("class") -> "form") {
+    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.SubmissionsController.submissionsView(), Symbol("class") -> "form") {
       <input id="control" name="control" type="hidden" value="true"/>
 
       <div class="govuk-form-group">
