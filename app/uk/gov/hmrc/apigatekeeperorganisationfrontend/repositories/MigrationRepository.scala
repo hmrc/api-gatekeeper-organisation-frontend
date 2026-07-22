@@ -62,7 +62,7 @@ class MigrationRepository @Inject() (mongo: MongoComponent)(using ExecutionConte
   }
 
   def fetchAll(): Future[List[MigrationRecord]] = {
-    collection.find.toFuture().map(_.toList)
+    collection.find().toFuture().map(_.toList)
   }
 
   def update(record: MigrationRecord): Future[MigrationRecord] = {
