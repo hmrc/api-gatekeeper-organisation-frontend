@@ -15,15 +15,15 @@
  *@
 
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel._
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel.*
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
-@import uk.gov.hmrc.govukfrontend.views.html.components._
-@import include._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import include.*
 
 @this(layout: Layout,
         govukButton: GovukButton)
 
-@(model: ViewModel)(implicit request: LoggedInRequest[_], messages: Messages)
+@(model: ViewModel)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Organisation verification request details"),

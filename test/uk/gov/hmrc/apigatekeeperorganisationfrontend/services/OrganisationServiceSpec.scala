@@ -25,8 +25,8 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, Organisatio
 class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule {
 
   trait Setup extends FixedClock with OrganisationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = new OrganisationService(OrganisationConnectorMock.aMock)
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = new OrganisationService(OrganisationConnectorMock.aMock)
   }
 
   "searchOrganisations" should {

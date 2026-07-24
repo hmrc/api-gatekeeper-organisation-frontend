@@ -29,7 +29,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object UpdateSubmissionController {
   case class UpdateSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName)
@@ -42,7 +42,7 @@ object UpdateSubmissionController {
       mapping(
         "comment" -> text(maxLength = 500)
           .verifying("updatesubmission.error.comment.blank", !_.isBlank())
-      )(UpdateSubmissionForm.apply)(UpdateSubmissionForm.unapply)
+      )(UpdateSubmissionForm.apply)(u => Some(u.comment))
     )
   }
 }
@@ -55,7 +55,7 @@ class UpdateSubmissionController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   import UpdateSubmissionController._
@@ -83,8 +83,8 @@ class UpdateSubmissionController @Inject() (
       confirmData => {
         service.updateSubmissionReview(submissionId, request.name.get, confirmData.comment)
           .map(_ match {
-            case Right(sub) => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId))
-            case Left(msg)  => BadRequest(msg)
+            case Right(_)  => Redirect(routes.UpdateSubmissionController.confirmPage(submissionId))
+            case Left(msg) => BadRequest(msg)
           })
       }
     )

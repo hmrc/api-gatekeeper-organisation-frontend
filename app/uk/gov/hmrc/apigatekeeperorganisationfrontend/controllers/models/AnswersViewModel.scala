@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 import cats.data.NonEmptyList
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 
 object AnswersViewModel {
   case class ViewQuestion(id: Question.Id, text: String, answer: String)
@@ -42,7 +42,7 @@ object AnswersViewModel {
     case ActualAnswer.AcknowledgedAnswer           => None
   }
 
-  private def convertQuestion(instance: Submission.Instance, instanceIndex: Int)(item: QuestionItem): Option[ViewQuestion] = {
+  private def convertQuestion(instance: Submission.Instance)(item: QuestionItem): Option[ViewQuestion] = {
     val id = item.question.id
 
     instance.answersToQuestions.get(id).flatMap(convertAnswer).map(answer =>
@@ -56,7 +56,7 @@ object AnswersViewModel {
     val instance = extSubmission.submission.instances.find(_.index == instanceIndex).getOrElse(extSubmission.submission.latestInstance)
 
     val questions = questionnaire.questions
-      .map(convertQuestion(instance, instanceIndex))
+      .map(convertQuestion(instance))
       .collect { case Some(x) => x }
     NonEmptyList.fromList(questions)
       .map(ViewQuestionnaire(questionnaire.label.value, state, questionnaire.id, _))

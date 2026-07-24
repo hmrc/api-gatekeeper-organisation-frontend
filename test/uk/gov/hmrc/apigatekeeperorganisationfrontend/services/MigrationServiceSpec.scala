@@ -24,16 +24,16 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationIdFixture
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{LookupResponse, VatRegisteredCompany}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.{OrganisationConnectorMockModule, TpoConnectorMockModule, VatRegisteredCompaniesConnectorMockModule}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.repository.MigrationRepositoryMockModule
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationStatus._
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.models._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.*
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationStatus.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, MigrationFixtures}
 
 class MigrationServiceSpec extends AsyncHmrcSpec with TpoConnectorMockModule with VatRegisteredCompaniesConnectorMockModule with OrganisationConnectorMockModule
     with MigrationRepositoryMockModule with ApplicationIdFixtures {
 
   trait Setup extends MigrationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = new MigrationService(TpoConnectorMock.aMock, MigrationRepositoryMock.aMock, VatRegisteredCompaniesConnectorMock.aMock, OrganisationConnectorMock.aMock)
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = new MigrationService(TpoConnectorMock.aMock, MigrationRepositoryMock.aMock, VatRegisteredCompaniesConnectorMock.aMock, OrganisationConnectorMock.aMock)
 
     val questionType = "vat-registration-number"
     val answer       = "123456789"

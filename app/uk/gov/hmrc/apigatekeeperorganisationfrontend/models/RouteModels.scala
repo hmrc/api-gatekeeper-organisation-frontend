@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,15 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationStatus
+package uk.gov.hmrc.apigatekeeperorganisationfrontend.models
 
-@(state: MigrationStatus)
-  @{
-    state match {
-      case MigrationStatus.Unchecked  => <strong class='govuk-tag govuk-tag--blue'>Unchecked</strong>
-      case MigrationStatus.Verified   => <strong class='govuk-tag govuk-tag--green'>Verified</strong>
-      case MigrationStatus.Unverified => <strong class='govuk-tag govuk-tag--red'>Unverified</strong>
-    }
+import java.util.UUID
+
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+
+object RouteModels {
+
+  case class SimpleUserId(value: UUID) extends AnyVal {
+    override def toString: String = value.toString
   }
+
+  given Conversion[SimpleUserId, UserId] = sUid => UserId(sUid.value)
+  given Conversion[UserId, SimpleUserId] = uId => SimpleUserId(uId.value)
+}

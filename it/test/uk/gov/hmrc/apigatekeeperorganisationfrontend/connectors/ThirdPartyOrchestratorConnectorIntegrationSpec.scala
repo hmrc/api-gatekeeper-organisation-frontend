@@ -20,7 +20,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application => PlayApplication, Configuration, Mode}
+import play.api.{Application as PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.AppsByAnswerFixtures
@@ -33,9 +33,9 @@ class ThirdPartyOrchestratorConnectorIntegrationSpec extends BaseConnectorIntegr
   )
 
   trait Setup extends AppsByAnswerFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[ThirdPartyOrchestratorConnector]
-    val questionType               = "vat-registration-number"
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[ThirdPartyOrchestratorConnector]
+    val questionType    = "vat-registration-number"
   }
 
   override def fakeApplication(): PlayApplication =

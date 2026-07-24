@@ -33,8 +33,8 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, Organisatio
 class AllowListServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule with TpdConnectorMockModule {
 
   trait Setup extends FixedClock with OrganisationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = new AllowListService(OrganisationConnectorMock.aMock, TpdConnectorMock.aMock)
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = new AllowListService(OrganisationConnectorMock.aMock, TpdConnectorMock.aMock)
 
     val userId1       = UserId.random
     val userId2       = UserId.random

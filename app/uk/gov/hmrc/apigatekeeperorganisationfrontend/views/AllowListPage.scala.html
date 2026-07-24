@@ -20,11 +20,11 @@
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-@import include._
+@import include.*
 
 @this(layout: Layout, govukTable: GovukTable)
 
-@(allowList: List[AllowList])(implicit request: LoggedInRequest[_], messages: Messages)
+@(allowList: List[AllowList])(implicit request: LoggedInRequest[?], messages: Messages)
 
 @buildRemoveLink(userId: UserId) = @{
   if(request.role.isSuperUser) {

@@ -25,9 +25,9 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseControll
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models.AnswersViewModel.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 @Singleton
 class ViewSubmissionController @Inject() (
@@ -37,7 +37,7 @@ class ViewSubmissionController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   def summaryPage(submissionId: SubmissionId): Action[AnyContent] = loggedInOnly() { implicit request =>

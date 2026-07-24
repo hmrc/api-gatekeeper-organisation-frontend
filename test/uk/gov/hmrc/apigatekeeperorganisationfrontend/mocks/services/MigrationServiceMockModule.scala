@@ -34,7 +34,7 @@ trait MigrationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
     }
 
     object LoadData {
-      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.loadData(*)(*)).thenReturn(Future.successful(results))
+      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.loadData(*)(using *)).thenReturn(Future.successful(results))
     }
 
     object Fetch {
@@ -42,11 +42,11 @@ trait MigrationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
     }
 
     object ProcessVat {
-      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.processVat(*)(*)).thenReturn(Future.successful(results))
+      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.processVat(*)(using *)).thenReturn(Future.successful(results))
     }
 
     object ProcessCompaniesHouse {
-      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.processCompaniesHouse(*)(*)).thenReturn(Future.successful(results))
+      def willReturn(results: List[MigrationRecord]): Unit = when(aMock.processCompaniesHouse(*)(using *)).thenReturn(Future.successful(results))
     }
   }
 }

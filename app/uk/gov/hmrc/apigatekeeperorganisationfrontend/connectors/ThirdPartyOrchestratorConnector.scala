@@ -20,9 +20,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
+import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.ApplicationsByAnswer
 
@@ -30,10 +30,10 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.ApplicationsByAnswer
 class ThirdPartyOrchestratorConnector @Inject() (
     http: HttpClientV2,
     config: ThirdPartyOrchestratorConnector.Config
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends Logging {
 
-  def fetchApplicationsByAnswer(questionType: String)(implicit hc: HeaderCarrier): Future[List[ApplicationsByAnswer]] = {
+  def fetchApplicationsByAnswer(questionType: String)(using HeaderCarrier): Future[List[ApplicationsByAnswer]] = {
     http.get(url"${config.serviceBaseUrl}/submissions/answers/${questionType}")
       .execute[List[ApplicationsByAnswer]]
   }

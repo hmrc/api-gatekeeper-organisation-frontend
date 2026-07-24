@@ -16,36 +16,30 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.models
 
-import scala.collection.immutable.ListSet
-
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.SimpleEnumJsonFormatting
 
 case class MigrationRecord(answer: String, applicationIds: List[ApplicationId], status: MigrationStatus, questionType: String, details: Option[String])
 
 object MigrationRecord {
-  implicit val migrationRecordFormat: OFormat[MigrationRecord] = Json.format[MigrationRecord]
+  given migrationRecordFormat: OFormat[MigrationRecord] = Json.format[MigrationRecord]
 
   def from(applicationsByAnswer: ApplicationsByAnswer, questionType: String) =
     MigrationRecord(applicationsByAnswer.answer.replaceAll("/\\s+/", ""), applicationsByAnswer.applicationIds, MigrationStatus.Unchecked, questionType, None)
 }
 
-sealed trait MigrationStatus
+enum MigrationStatus {
+  case Unchecked, Verified, Unverified
+}
 
 object MigrationStatus {
 
-  case object Unchecked  extends MigrationStatus
-  case object Verified   extends MigrationStatus
-  case object Unverified extends MigrationStatus
-
-  val values                                       = ListSet(Unchecked, Verified, Unverified)
   def apply(text: String): Option[MigrationStatus] = MigrationStatus.values.find(_.toString.toUpperCase == text.toUpperCase())
 
   def unsafeApply(text: String): MigrationStatus = apply(text).getOrElse(throw new RuntimeException(s"$text is not a valid MigrationStatus"))
 
-  import play.api.libs.json.Format
-  import uk.gov.hmrc.apiplatform.modules.common.domain.services.SealedTraitJsonFormatting
-  implicit val format: Format[MigrationStatus] = SealedTraitJsonFormatting.createFormatFor[MigrationStatus]("MigrationStatus", apply)
+  given Format[MigrationStatus] = SimpleEnumJsonFormatting.createStringFormatFor[MigrationStatus]("MigrationStatus", apply)
 
 }

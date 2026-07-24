@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
@@ -38,7 +38,7 @@ object OrganisationsController {
   val filterForm: Form[FilterForm] = Form(
     mapping(
       "organisationName" -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some(f.organisationName))
   )
 }
 
@@ -49,7 +49,7 @@ class OrganisationsController @Inject() (
     service: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
   import OrganisationsController._
 
@@ -67,12 +67,12 @@ class OrganisationsController @Inject() (
       doSearch(form)
     }
 
-    def handleInvalidForm(form: Form[FilterForm]) = {
+    def handleInvalidForm() = {
       val defaultForm = FilterForm()
       doSearch(defaultForm)
     }
 
-    OrganisationsController.filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+    OrganisationsController.filterForm.bindFromRequest().fold(_ => handleInvalidForm(), handleValidForm)
   }
 
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {

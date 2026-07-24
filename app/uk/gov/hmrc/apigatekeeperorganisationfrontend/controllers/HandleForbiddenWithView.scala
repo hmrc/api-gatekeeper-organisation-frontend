@@ -27,6 +27,6 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.ForbiddenView
 // $COVERAGE-OFF$
 @Singleton
 class HandleForbiddenWithView @Inject() (forbiddenView: ForbiddenView) extends ForbiddenHandler {
-  def handle(m: MessagesRequest[_]) = Forbidden(forbiddenView()(m, m.messages))
+  def handle(m: MessagesRequest[?]) = Forbidden(forbiddenView()(m, m.messages))
 }
 // $COVERAGE-ON$

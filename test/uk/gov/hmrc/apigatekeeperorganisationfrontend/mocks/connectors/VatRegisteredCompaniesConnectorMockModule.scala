@@ -28,7 +28,7 @@ trait VatRegisteredCompaniesConnectorMockModule extends MockitoSugar with Argume
     val aMock = mock[VatRegisteredCompaniesConnector]
 
     object LookupVatNumber {
-      def willReturn(result: LookupResponse) = when(aMock.lookupVatNumber(*)(*)).thenReturn(Future.successful(result))
+      def willReturn(result: LookupResponse) = when(aMock.lookupVatNumber(*)(using *)).thenReturn(Future.successful(result))
     }
 
   }

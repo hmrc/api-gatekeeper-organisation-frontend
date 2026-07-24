@@ -34,17 +34,17 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
 class AllowListService @Inject() (
     orgConnector: OrganisationConnector,
     thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends EitherTHelper[String] {
 
-  def fetchAllowList()(implicit hc: HeaderCarrier): Future[List[AllowList]] = {
+  def fetchAllowList()(using HeaderCarrier): Future[List[AllowList]] = {
     for {
       orgAllowList <- orgConnector.fetchAllOrganisationAllowLists()
       userList     <- thirdPartyDeveloperConnector.fetchDevelopers(orgAllowList.map(a => a.userId))
     } yield orgAllowList.map(o => AllowList.applyFromMaybeUser(o, userList.find(u => u.userId == o.userId))).flatten
   }
 
-  def fetchAllowListForUserId(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, AllowList]] = {
+  def fetchAllowListForUserId(userId: UserId)(using HeaderCarrier): Future[Either[String, AllowList]] = {
     (
       for {
         orgAllowList <- fromOptionF(orgConnector.fetchOrganisationAllowList(userId), "User not found in allow list")
@@ -54,8 +54,7 @@ class AllowListService @Inject() (
     ).value
   }
 
-  def createAllowList(email: LaxEmailAddress, requestedBy: String, organisationName: OrganisationName)(implicit hc: HeaderCarrier)
-      : Future[Either[String, OrganisationAllowList]] = {
+  def createAllowList(email: LaxEmailAddress, requestedBy: String, organisationName: OrganisationName)(using HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
     (
       for {
         user      <- fromOptionF(getUserByEmail(email), s"Developer Hub user not found with email address ${email.text}")
@@ -65,11 +64,11 @@ class AllowListService @Inject() (
     ).value
   }
 
-  private def getUserByEmail(email: LaxEmailAddress)(implicit hc: HeaderCarrier): Future[Option[User]] = {
+  private def getUserByEmail(email: LaxEmailAddress)(using HeaderCarrier): Future[Option[User]] = {
     thirdPartyDeveloperConnector.fetchByEmails(Set(email)).map(users => users.headOption)
   }
 
-  def deleteAllowList(userId: UserId)(implicit hc: HeaderCarrier): Future[Either[String, Boolean]] = {
+  def deleteAllowList(userId: UserId)(using HeaderCarrier): Future[Either[String, Boolean]] = {
     orgConnector.deleteOrganisationAllowList(userId)
   }
 }

@@ -18,9 +18,9 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application => PlayApplication, Configuration, Mode}
+import play.api.{Application as PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
@@ -37,8 +37,8 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
   )
 
   trait Setup extends SubmissionsTestData with OrganisationFixtures {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    val underTest                  = app.injector.instanceOf[OrganisationConnector]
+    given HeaderCarrier = HeaderCarrier()
+    val underTest       = app.injector.instanceOf[OrganisationConnector]
 
     val submissionReviewEvent = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
 

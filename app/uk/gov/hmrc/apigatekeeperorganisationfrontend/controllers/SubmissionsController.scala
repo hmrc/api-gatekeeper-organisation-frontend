@@ -20,14 +20,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object SubmissionsController {
 
@@ -48,7 +48,7 @@ object SubmissionsController {
       "reSubmittedStatus" -> optional(text),
       "approvedStatus"    -> optional(text),
       "failedStatus"      -> optional(text)
-    )(FilterForm.apply)(FilterForm.unapply)
+    )(FilterForm.apply)(f => Some((f.control, f.submittedStatus, f.inProgressStatus, f.reSubmittedStatus, f.approvedStatus, f.failedStatus)))
   )
 }
 
@@ -59,7 +59,7 @@ class SubmissionsController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
   import SubmissionsController._
 
@@ -77,12 +77,12 @@ class SubmissionsController @Inject() (
       doSearch(form)
     }
 
-    def handleInvalidForm(form: Form[FilterForm]) = {
+    def handleInvalidForm() = {
       val defaultForm = FilterForm()
       doSearch(defaultForm)
     }
 
-    SubmissionsController.filterForm.bindFromRequest().fold(handleInvalidForm, handleValidForm)
+    SubmissionsController.filterForm.bindFromRequest().fold(_ => handleInvalidForm(), handleValidForm)
   }
 
   private def getQueryParamsFromForm(form: FilterForm): Seq[(String, String)] = {

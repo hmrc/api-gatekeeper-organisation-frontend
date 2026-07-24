@@ -18,9 +18,9 @@
 @import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcTimeline, Timeline, Event}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, GovukTable, BreadcrumbsItem, HeadCell, HtmlContent, Table, Text}
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
-@import include._
+@import include.*
 
 @import java.util.Locale
 @import java.time.ZoneId
@@ -28,7 +28,7 @@
 
 @this(layout: Layout, govukTable: GovukTable, hmrcTimeline: HmrcTimeline, govukButton: GovukButton)
 
-@(submissionReview: SubmissionReview)(implicit request: LoggedInRequest[_], messages: Messages)
+@(submissionReview: SubmissionReview)(implicit request: LoggedInRequest[?], messages: Messages)
 
 @layout(
   pageTitle = Some("HMRC API Gatekeeper - Organisation checks"),
