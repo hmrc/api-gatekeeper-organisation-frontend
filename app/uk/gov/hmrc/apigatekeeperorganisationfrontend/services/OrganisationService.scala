@@ -28,7 +28,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConn
 @Singleton
 class OrganisationService @Inject() (orgConnector: OrganisationConnector) {
 
-  def searchOrganisations(params: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[List[Organisation]] = {
+  def searchOrganisations(params: Seq[(String, String)])(using HeaderCarrier): Future[List[Organisation]] = {
     orgConnector.searchOrganisations(params)
   }
 }

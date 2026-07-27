@@ -21,9 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{SessionId => _, StringContextOps, _}
+import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 case class VatRegisteredCompany(
     name: String,
@@ -32,7 +32,7 @@ case class VatRegisteredCompany(
 
 object VatRegisteredCompany {
 
-  implicit val vatRegisteredCompanyFormat: OFormat[VatRegisteredCompany] =
+  given OFormat[VatRegisteredCompany] =
     Json.format[VatRegisteredCompany]
 }
 
@@ -41,17 +41,17 @@ case class LookupResponse(
   )
 
 object LookupResponse {
-  implicit val lookupResponseFormat: OFormat[LookupResponse] = Json.format[LookupResponse]
+  given OFormat[LookupResponse] = Json.format[LookupResponse]
 }
 
 @Singleton
 class VatRegisteredCompaniesConnector @Inject() (
     http: HttpClientV2,
     config: VatRegisteredCompaniesConnector.Config
-  )(implicit val ec: ExecutionContext
+  )(using ExecutionContext
   ) extends Logging {
 
-  def lookupVatNumber(vatNumber: String)(implicit hc: HeaderCarrier): Future[LookupResponse] = {
+  def lookupVatNumber(vatNumber: String)(using HeaderCarrier): Future[LookupResponse] = {
     http.get(url"${config.serviceBaseUrl}/vat-registered-companies/lookup/${vatNumber}")
       .execute[LookupResponse]
   }

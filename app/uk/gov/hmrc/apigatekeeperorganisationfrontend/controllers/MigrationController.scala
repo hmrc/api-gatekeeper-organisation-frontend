@@ -25,7 +25,7 @@ import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseControll
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.MigrationService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration.*
 
 @Singleton
 class MigrationController @Inject() (
@@ -37,7 +37,7 @@ class MigrationController @Inject() (
     processedListPage: ProcessedListPage,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   def controlPage(): Action[AnyContent] = loggedInOnly() { implicit request =>

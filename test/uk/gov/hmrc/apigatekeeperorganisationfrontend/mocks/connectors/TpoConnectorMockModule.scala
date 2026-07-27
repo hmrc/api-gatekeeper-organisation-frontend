@@ -29,7 +29,7 @@ trait TpoConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
     val aMock = mock[ThirdPartyOrchestratorConnector]
 
     object FetchApplicationsByAnswer {
-      def willReturn(results: List[ApplicationsByAnswer]) = when(aMock.fetchApplicationsByAnswer(*)(*)).thenReturn(Future.successful(results))
+      def willReturn(results: List[ApplicationsByAnswer]) = when(aMock.fetchApplicationsByAnswer(*)(using *)).thenReturn(Future.successful(results))
     }
 
   }

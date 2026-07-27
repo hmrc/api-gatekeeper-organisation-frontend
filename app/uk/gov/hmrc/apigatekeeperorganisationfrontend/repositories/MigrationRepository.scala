@@ -19,7 +19,7 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.repositories
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{IndexModel, IndexOptions, InsertManyOptions}
 
@@ -29,7 +29,7 @@ import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.{MigrationRecord, MigrationStatus}
 
 @Singleton
-class MigrationRepository @Inject() (mongo: MongoComponent)(implicit val ec: ExecutionContext)
+class MigrationRepository @Inject() (mongo: MongoComponent)(using ExecutionContext)
     extends PlayMongoRepository[MigrationRecord](
       collectionName = "migration",
       mongoComponent = mongo,

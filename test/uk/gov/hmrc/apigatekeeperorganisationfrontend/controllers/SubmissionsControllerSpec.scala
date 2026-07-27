@@ -25,7 +25,7 @@ import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
@@ -35,7 +35,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.S
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.WithCSRFAddToken
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.SubmissionServiceMockModule
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 class SubmissionsControllerSpec extends HmrcSpec
     with GuiceOneAppPerSuite
@@ -94,7 +94,7 @@ class SubmissionsControllerSpec extends HmrcSpec
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       SubmissionServiceMock.SearchSubmissionReviews.succeed(List(submissionReviewSubmitted))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true", "submittedStatus" -> "true"))
+      val result = controller.submissionsView(FakeRequest("GET", "/?control=true&submittedStatus=true"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
@@ -116,7 +116,7 @@ class SubmissionsControllerSpec extends HmrcSpec
         submissionReviewReSubmitted
       ))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody("control" -> "true"))
+      val result = controller.submissionsView(FakeRequest("GET", "/?control=true"))
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Submitted org")
@@ -138,13 +138,9 @@ class SubmissionsControllerSpec extends HmrcSpec
         submissionReviewReSubmitted
       ))
 
-      val result = controller.submissionsView(fakeRequest.withFormUrlEncodedBody(
-        "control"           -> "true",
-        "submittedStatus"   -> "true",
-        "inProgressStatus"  -> "true",
-        "approvedStatus"    -> "true",
-        "failedStatus"      -> "true",
-        "reSubmittedStatus" -> "true"
+      val result = controller.submissionsView(FakeRequest(
+        "GET",
+        "/?control=true&submittedStatus=true&inProgressStatus=true&approvedStatus=true&failedStatus=true&reSubmittedStatus=true"
       ))
 
       status(result) shouldBe Status.OK

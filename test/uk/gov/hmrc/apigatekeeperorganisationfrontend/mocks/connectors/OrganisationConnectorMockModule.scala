@@ -22,7 +22,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
@@ -32,65 +32,65 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     val aMock = mock[OrganisationConnector]
 
     object SearchSubmissionReviews {
-      def willReturn(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(*)).thenReturn(Future.successful(submissionReviews))
+      def willReturn(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(using *)).thenReturn(Future.successful(submissionReviews))
     }
 
     object FetchSubmissionReview {
-      def willReturn(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(*)).thenReturn(Future.successful(submissionReview))
+      def willReturn(submissionReview: Option[SubmissionReview]) = when(aMock.fetchSubmissionReview(*[SubmissionId])(using *)).thenReturn(Future.successful(submissionReview))
     }
 
     object ApproveSubmission {
-      def willReturn(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+      def willReturn(submission: Submission) = when(aMock.approveSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submission)))
     }
 
     object DeclineSubmission {
-      def willReturn(submission: Submission) = when(aMock.declineSubmission(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submission)))
+      def willReturn(submission: Submission) = when(aMock.declineSubmission(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submission)))
     }
 
     object UpdateSubmissionReview {
-      def willReturn(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(*)).thenReturn(Future.successful(Right(submissionReview)))
+      def willReturn(submissionReview: SubmissionReview) = when(aMock.updateSubmissionReview(*[SubmissionId], *, *)(using *)).thenReturn(Future.successful(Right(submissionReview)))
     }
 
     object FetchSubmission {
-      def willReturn(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(*)).thenReturn(Future.successful(submission))
+      def willReturn(submission: Option[ExtendedSubmission]) = when(aMock.fetchSubmission(*[SubmissionId])(using *)).thenReturn(Future.successful(submission))
     }
 
     object SearchOrganisations {
-      def willReturn(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(*)).thenReturn(Future.successful(organisations))
+      def willReturn(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(using *)).thenReturn(Future.successful(organisations))
 
-      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(*)
+      def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(using *)
     }
 
     object FetchByCompanyNumber {
-      def willReturn(result: Option[CompaniesHouseCompanyProfile]) = when(aMock.fetchByCompanyNumber(*)(*)).thenReturn(Future.successful(result))
+      def willReturn(result: Option[CompaniesHouseCompanyProfile]) = when(aMock.fetchByCompanyNumber(*)(using *)).thenReturn(Future.successful(result))
     }
 
     object FetchAllOrganisationAllowLists {
-      def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(*)).thenReturn(Future.successful(allowLists))
+      def willReturn(allowLists: List[OrganisationAllowList]) = when(aMock.fetchAllOrganisationAllowLists()(using *)).thenReturn(Future.successful(allowLists))
     }
 
     object FetchOrganisationAllowList {
-      def willReturn(allowList: OrganisationAllowList) = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Some(allowList)))
+      def willReturn(allowList: OrganisationAllowList) = when(aMock.fetchOrganisationAllowList(*[UserId])(using *)).thenReturn(Future.successful(Some(allowList)))
 
-      def willReturnNone() = when(aMock.fetchOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(None))
+      def willReturnNone() = when(aMock.fetchOrganisationAllowList(*[UserId])(using *)).thenReturn(Future.successful(None))
     }
 
     object CreateOrganisationAllowList {
 
       def willReturn(allowList: OrganisationAllowList) =
-        when(aMock.createOrganisationAllowList(*[UserId], *, *[OrganisationName])(*)).thenReturn(Future.successful(Right(allowList)))
+        when(aMock.createOrganisationAllowList(*[UserId], *, *[OrganisationName])(using *)).thenReturn(Future.successful(Right(allowList)))
 
       def verifyCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
-        verify(aMock).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
+        verify(aMock).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(using *)
 
       def verifyNotCalled(userId: UserId, requestedBy: String, organisationName: OrganisationName) =
-        verify(aMock, never).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(*)
+        verify(aMock, never).createOrganisationAllowList(eqTo(userId), eqTo(requestedBy), eqTo(organisationName))(using *)
     }
 
     object DeleteOrganisationAllowList {
 
       def willReturn() =
-        when(aMock.deleteOrganisationAllowList(*[UserId])(*)).thenReturn(Future.successful(Right(true)))
+        when(aMock.deleteOrganisationAllowList(*[UserId])(using *)).thenReturn(Future.successful(Right(true)))
     }
   }
 }

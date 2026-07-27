@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object DeclineSubmissionController {
   case class DeclineSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName, requestedBy: String)
@@ -44,7 +44,7 @@ object DeclineSubmissionController {
         "comment" -> optional(text(maxLength = 500)),
         "confirm" -> optional(text)
           .verifying("declinesubmission.error.confirmation.no.choice.field", _.isDefined)
-      )(DeclineSubmissionForm.apply)(DeclineSubmissionForm.unapply)
+      )(DeclineSubmissionForm.apply)(d => Some((d.comment, d.confirm)))
     )
   }
 }
@@ -57,7 +57,7 @@ class DeclineSubmissionController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   import DeclineSubmissionController._
@@ -87,8 +87,8 @@ class DeclineSubmissionController @Inject() (
           case (Some("Yes"), Some(comment)) => {
             service.declineSubmission(submissionId, request.name.get, comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
-                case Left(msg)  => BadRequest(msg)
+                case Right(_)  => Redirect(routes.DeclineSubmissionController.confirmPage(submissionId))
+                case Left(msg) => BadRequest(msg)
               })
           }
           case (Some("Yes"), None)          => {

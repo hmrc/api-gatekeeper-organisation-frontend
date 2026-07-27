@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.repositories
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -23,6 +25,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -32,6 +35,7 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationRecord
 class MigrationRepositoryISpec extends AnyWordSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[MigrationRecord]
+    with ObservableFutureImplicits
     with GuiceOneAppPerSuite
     with DefaultAwaitTimeout
     with FutureAwaits

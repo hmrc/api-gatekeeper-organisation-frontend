@@ -25,13 +25,13 @@ import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.MigrationServiceMockModule
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{MigrationFixtures, WithCSRFAddToken}
 
 class MigrationControllerSpec extends HmrcSpec

@@ -30,7 +30,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.SubmissionService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html._
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
 object ApproveSubmissionController {
   case class ApproveSubmissionViewModel(submissionId: SubmissionId, organisationName: OrganisationName)
@@ -44,7 +44,7 @@ object ApproveSubmissionController {
         "comment" -> optional(text(maxLength = 500)),
         "confirm" -> optional(text)
           .verifying("approvesubmission.error.confirmation.no.choice.field", _.isDefined)
-      )(ApproveSubmissionForm.apply)(ApproveSubmissionForm.unapply)
+      )(ApproveSubmissionForm.apply)(a => Some((a.comment, a.confirm)))
     )
   }
 }
@@ -57,7 +57,7 @@ class ApproveSubmissionController @Inject() (
     service: SubmissionService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
-  )(implicit ec: ExecutionContext
+  )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
 
   import ApproveSubmissionController._
@@ -87,8 +87,8 @@ class ApproveSubmissionController @Inject() (
           case Some("Yes") => {
             service.approveSubmission(submissionId, request.name.get, confirmData.comment)
               .map(_ match {
-                case Right(sub) => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId))
-                case Left(msg)  => BadRequest(msg)
+                case Right(_)  => Redirect(routes.ApproveSubmissionController.confirmPage(submissionId))
+                case Left(msg) => BadRequest(msg)
               })
           }
           case _           => successful(Redirect(routes.ViewSubmissionController.checkAnswersPage(submissionId)))
