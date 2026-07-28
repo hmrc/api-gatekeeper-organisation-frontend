@@ -20,7 +20,9 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.OrganisationWithAllMembersDetailsAndApplications
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
 
 trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -32,6 +34,11 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
       def succeed(organisations: List[Organisation]) = when(aMock.searchOrganisations(*)(using *)).thenReturn(Future.successful(organisations))
 
       def verifyCalled(params: Seq[(String, String)]) = verify(aMock).searchOrganisations(eqTo(params))(using *)
+    }
+
+    object FetchWithAllMembersDetails {
+      def succeed(org: OrganisationWithAllMembersDetailsAndApplications) = when(aMock.fetchWithAllDetails(*[OrganisationId])(*)).thenReturn(Future.successful(Right(org)))
+      def fails()                                                        = when(aMock.fetchWithAllDetails(*[OrganisationId])(*)).thenReturn(Future.successful(Left("Organisation not found")))
     }
   }
 }

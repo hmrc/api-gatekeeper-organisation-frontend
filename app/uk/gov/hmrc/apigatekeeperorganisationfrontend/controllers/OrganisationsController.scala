@@ -23,11 +23,12 @@ import play.api.data.Form
 import play.api.data.Forms.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.OrganisationService
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.OrganisationsListPage
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.{OrganisationDetailsPage, OrganisationsListPage}
 
 object OrganisationsController {
 
@@ -46,12 +47,20 @@ object OrganisationsController {
 class OrganisationsController @Inject() (
     mcc: MessagesControllerComponents,
     organisationsListPage: OrganisationsListPage,
+    organisationDetailsPage: OrganisationDetailsPage,
     service: OrganisationService,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(using ExecutionContext
   ) extends GatekeeperBaseController(strideAuthorisationService, mcc) with GatekeeperRoleActions {
   import OrganisationsController._
+
+  def organisationView(organisationId: OrganisationId): Action[AnyContent] = loggedInOnly() { implicit request =>
+    service.fetchWithAllDetails(organisationId).map {
+      case Right(details) => Ok(organisationDetailsPage(details))
+      case Left(error)    => NotFound(error)
+    }
+  }
 
   val organisationsView: Action[AnyContent] = loggedInOnly() { implicit request =>
     def doSearch(form: FilterForm) = {

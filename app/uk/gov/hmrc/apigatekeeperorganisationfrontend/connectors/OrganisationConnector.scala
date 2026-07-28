@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
@@ -55,6 +55,11 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   def fetchByCompanyNumber(companyNumber: String)(using HeaderCarrier): Future[Option[CompaniesHouseCompanyProfile]] = {
     http.get(url"${config.serviceBaseUrl}/company/${companyNumber}")
       .execute[Option[CompaniesHouseCompanyProfile]]
+  }
+
+  def fetchOrganisation(id: OrganisationId)(implicit hc: HeaderCarrier): Future[Option[Organisation]] = {
+    http.get(url"${config.serviceBaseUrl}/organisation/${id.value}")
+      .execute[Option[Organisation]]
   }
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(using HeaderCarrier): Future[Either[String, Submission]] = {

@@ -22,7 +22,7 @@
 
 @import java.time.ZoneOffset
 @import java.time.format.DateTimeFormatter
-
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @this(layout: Layout, govukTable: GovukTable)
 
 @(form: Form[FilterForm], organisations: List[Organisation])(implicit request: RequestHeader, messages: Messages)
@@ -34,7 +34,7 @@
 
     <h1 class="govuk-heading-l">@{messages("organisationslist.title")}</h1>
 
-    @helper.form(action = uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes.OrganisationsController.organisationsView(), Symbol("class") -> "form") {
+    @helper.form(action = routes.OrganisationsController.organisationsView(), Symbol("class") -> "form") {
         <div class="govuk-form-group js-visible">
             <label class="govuk-label govuk-!-font-weight-bold">
                 Search
@@ -60,7 +60,7 @@
                 HeadCell(content = Text("Created date"))
             )),
             rows = organisations.map(org => Seq(
-                TableRow(content = Text(org.organisationName.toString())),
+                TableRow(content = HtmlContent(s"<a href='${routes.OrganisationsController.organisationView(org.id).url}'>${org.organisationName}</a>")),
                 TableRow(content = Text(dateFormatter.format(org.createdDateTime.atOffset(ZoneOffset.UTC).toLocalDateTime)))
             ))
         ))

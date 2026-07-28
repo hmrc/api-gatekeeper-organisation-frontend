@@ -16,17 +16,20 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.services
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.OrganisationConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetRegisteredOrUnregisteredUsersResponse
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.{OrganisationConnectorMockModule, TpdConnectorMockModule, TpoConnectorMockModule}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AsyncHmrcSpec, OrganisationFixtures}
 
-class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule {
+class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMockModule with TpdConnectorMockModule with TpoConnectorMockModule {
 
   trait Setup extends FixedClock with OrganisationFixtures {
     given HeaderCarrier = HeaderCarrier()
-    val underTest       = new OrganisationService(OrganisationConnectorMock.aMock)
+    val underTest       = new OrganisationService(OrganisationConnectorMock.aMock, TpdConnectorMock.aMock, TpoConnectorMock.aMock)
   }
 
   "searchOrganisations" should {
@@ -48,6 +51,22 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
       OrganisationConnectorMock.SearchOrganisations.willReturn(List.empty)
       val result = await(underTest.searchOrganisations(Seq("organisationName" -> standardOrg.organisationName.value)))
       result shouldBe List.empty
+    }
+  }
+  "fetchWithAllDetails" should {
+    "fetch org with users" in new Setup {
+      OrganisationConnectorMock.FetchOrganisation.willReturn(standardOrg)
+      TpdConnectorMock.GetRegisteredOrUnregisteredUsers.willReturn(GetRegisteredOrUnregisteredUsersResponse(List(unknownUser)))
+      TpdConnectorMock.FetchDevelopers.willReturn(List(standardDeveloper))
+      TpoConnectorMock.FindApplicationsForOrganisation.willReturn(standardApp)
+      val result = await(underTest.fetchWithAllDetails(standardOrg.id))
+      result.value shouldBe extendedOrg
+    }
+
+    "handles no org" in new Setup {
+      OrganisationConnectorMock.FetchOrganisation.fails()
+      val result = await(underTest.fetchWithAllDetails(standardOrg.id))
+      result shouldBe Left("Organisation not found")
     }
   }
 }

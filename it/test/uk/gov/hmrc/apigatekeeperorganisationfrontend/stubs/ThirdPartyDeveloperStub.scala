@@ -19,10 +19,10 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
-import play.api.http.Status.OK
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
 
@@ -49,6 +49,38 @@ object ThirdPartyDeveloperStub {
           .willReturn(
             aResponse()
               .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object GetRegisteredOrUnregisteredUsers {
+
+    def succeeds(userId: UserId, email: LaxEmailAddress): StubMapping = {
+      stubFor(
+        post(urlPathEqualTo("/developers/get-registered-and-unregistered"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(s"""{
+                           |  "users": [ {
+                           |    "userId": "$userId",
+                           |    "email": "${email.text}",
+                           |    "isRegistered": true,
+                           |    "isVerified": true
+                           |  } ]
+                           |}""".stripMargin)
+          )
+      )
+    }
+
+    def throwsAnException() = {
+      stubFor(
+        post(urlPathEqualTo("/developers/get-registered-and-unregistered"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
           )
       )
     }

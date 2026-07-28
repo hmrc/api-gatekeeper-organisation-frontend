@@ -23,8 +23,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application as PlayApplication, Configuration, Mode}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.AppsByAnswerFixtures
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ThirdPartyOrchestratorStub
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.{AppsByAnswerFixtures, OrganisationFixtures}
 
 class ThirdPartyOrchestratorConnectorIntegrationSpec extends BaseConnectorIntegrationSpec with GuiceOneAppPerSuite {
 
@@ -32,7 +33,7 @@ class ThirdPartyOrchestratorConnectorIntegrationSpec extends BaseConnectorIntegr
     "microservice.services.third-party-orchestrator.port" -> stubPort
   )
 
-  trait Setup extends AppsByAnswerFixtures {
+  trait Setup extends AppsByAnswerFixtures with ApplicationWithCollaboratorsFixtures with OrganisationFixtures {
     given HeaderCarrier = HeaderCarrier()
     val underTest       = app.injector.instanceOf[ThirdPartyOrchestratorConnector]
     val questionType    = "vat-registration-number"
@@ -55,6 +56,19 @@ class ThirdPartyOrchestratorConnectorIntegrationSpec extends BaseConnectorIntegr
       ThirdPartyOrchestratorStub.FetchApplicationsByAnswer.fails(questionType, INTERNAL_SERVER_ERROR)
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchApplicationsByAnswer(questionType))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "fetchApplicationsForOrganisation successfully" in new Setup {
+      ThirdPartyOrchestratorStub.FetchApplicationsByOrganisation.succeeds(standardOrg.id.toString(), List(standardApp))
+      val result = await(underTest.findApplicationsForOrganisation(standardOrg.id))
+      result shouldBe List(standardApp)
+    }
+
+    "fetchApplicationsForOrganisation fails" in new Setup {
+      ThirdPartyOrchestratorStub.FetchApplicationsByOrganisation.fails(standardOrg.id.toString(), INTERNAL_SERVER_ERROR)
+      intercept[UpstreamErrorResponse] {
+        await(underTest.findApplicationsForOrganisation(standardOrg.id))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
