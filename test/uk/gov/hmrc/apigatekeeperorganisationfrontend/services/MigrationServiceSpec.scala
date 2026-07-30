@@ -18,9 +18,11 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.services
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationIdFixtures
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaMatchingAddress, SaMatchingRequest}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{LookupResponse, VatRegisteredCompany}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.{OrganisationConnectorMockModule, TpoConnectorMockModule, VatRegisteredCompaniesConnectorMockModule}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.repository.MigrationRepositoryMockModule
@@ -123,6 +125,19 @@ class MigrationServiceSpec extends AsyncHmrcSpec with TpoConnectorMockModule wit
       val result = await(underTest.processCompaniesHouse(1))
 
       result.head.status shouldBe Unverified
+    }
+  }
+
+  "matchBySa" should {
+    "match by SA and return the payload" in new Setup {
+      val request = SaMatchingRequest("1234567890", "Individual", "Bob Smith", SaMatchingAddress("1 Test Street", "AB1 2CD"))
+      val json    = Json.obj("matched" -> true)
+
+      OrganisationConnectorMock.MatchBySa.willReturn(json)
+
+      val result = await(underTest.matchBySa(request))
+
+      result shouldBe json
     }
   }
 }

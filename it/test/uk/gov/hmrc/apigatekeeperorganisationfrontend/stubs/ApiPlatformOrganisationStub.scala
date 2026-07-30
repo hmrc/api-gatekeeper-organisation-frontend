@@ -20,13 +20,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 import play.api.http.Status.OK
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.SearchOrganisationRequest
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaMatchingRequest, SearchOrganisationRequest}
 
 object ApiPlatformOrganisationStub {
 
@@ -289,6 +289,22 @@ object ApiPlatformOrganisationStub {
           .willReturn(
             aResponse()
               .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object MatchBySa {
+
+    def succeeds(request: SaMatchingRequest, response: JsValue): StubMapping = {
+      stubFor(
+        post(urlEqualTo("/matching/sa"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(response.toString())
           )
       )
     }
