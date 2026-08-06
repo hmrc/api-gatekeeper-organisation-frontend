@@ -30,7 +30,8 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.SubmissionServiceMockModule
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
@@ -87,7 +88,10 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
     val submissionReviewDeclined =
       SubmissionReview(SubmissionId.random, OrganisationName("Failed org"), instant, "bob@example.com", instant, SubmissionReview.State.Declined, List(submissionReviewEvent))
 
-    val extendedSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
+    val additionalData        = AdditionalData(Some(CompanyDetails("12345678", "Company name")))
+    val submissionWithOrgName = Submission.updateLatestAdditionalDataTo(Some(additionalData))(aSubmission)
+
+    val extendedSubmittedSubmission = submissionWithOrgName.copy(id = completedSubmissionId)
       .hasCompletelyAnsweredWith(answersToQuestions)
       .withSubmittedProgress()
 
@@ -183,7 +187,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Organisation checks")
-      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName.get)
       contentAsString(result) should include("Approve this check")
       contentAsString(result) should include("Fail this check")
     }
@@ -196,7 +200,7 @@ class ViewSubmissionControllerSpec extends AsyncHmrcSpec
 
       status(result) shouldBe Status.OK
       contentAsString(result) should include("Organisation checks")
-      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName)
+      contentAsString(result) should include(extendedSubmittedSubmission.submission.organisationName.get)
       contentAsString(result) shouldNot include("Approve this check")
       contentAsString(result) shouldNot include("Fail this check")
     }
