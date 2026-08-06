@@ -16,9 +16,14 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaboratorsFixtures
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.RegisteredOrUnregisteredUser
+import uk.gov.hmrc.apiplatform.modules.tpd.test.data.UserTestData
+import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.OrganisationWithAllMembersDetailsAndApplications
 
 object OrganisationIdData {
   val one: OrganisationId = OrganisationId.random
@@ -44,6 +49,16 @@ object OrganisationData extends FixedClock {
   val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, instant, Set(MemberData.one))
 }
 
-trait OrganisationFixtures {
+trait OrganisationFixtures extends UserTestData with LocalUserIdTracker with ApplicationWithCollaboratorsFixtures {
   val standardOrg: Organisation = OrganisationData.one
+
+  val unknownUser = RegisteredOrUnregisteredUser(userIdOne, LaxEmailAddress("example@example.com"), isRegistered = true, isVerified = false)
+
+  val extendedOrg: OrganisationWithAllMembersDetailsAndApplications = OrganisationWithAllMembersDetailsAndApplications(
+    standardOrg,
+    List(unknownUser),
+    List(standardDeveloper),
+    List(standardApp)
+  )
+
 }

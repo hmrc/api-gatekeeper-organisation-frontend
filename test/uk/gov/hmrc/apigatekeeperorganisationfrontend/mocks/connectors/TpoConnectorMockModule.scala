@@ -20,6 +20,8 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.OrganisationId
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.ThirdPartyOrchestratorConnector
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.ApplicationsByAnswer
 
@@ -32,5 +34,8 @@ trait TpoConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def willReturn(results: List[ApplicationsByAnswer]) = when(aMock.fetchApplicationsByAnswer(*)(using *)).thenReturn(Future.successful(results))
     }
 
+    object FindApplicationsForOrganisation {
+      def willReturn(result: ApplicationWithCollaborators) = when(aMock.findApplicationsForOrganisation(*[OrganisationId])(using *)).thenReturn(Future.successful(List(result)))
+    }
   }
 }

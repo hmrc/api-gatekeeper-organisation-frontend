@@ -18,7 +18,7 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.models
 
 import java.util.UUID
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 
 object RouteModels {
 
@@ -26,6 +26,13 @@ object RouteModels {
     override def toString: String = value.toString
   }
 
-  given Conversion[SimpleUserId, UserId] = sUid => UserId(sUid.value)
-  given Conversion[UserId, SimpleUserId] = uId => SimpleUserId(uId.value)
+  case class SimpleOrganisationId(value: UUID) extends AnyVal {
+    override def toString: String = value.toString
+  }
+
+  given Conversion[SimpleUserId, UserId]                 = sUid => UserId(sUid.value)
+  given Conversion[UserId, SimpleUserId]                 = uId => SimpleUserId(uId.value)
+  given Conversion[SimpleOrganisationId, OrganisationId] = oRt => OrganisationId(oRt.value)
+  given Conversion[OrganisationId, SimpleOrganisationId] = oId => SimpleOrganisationId(oId.value)
+
 }

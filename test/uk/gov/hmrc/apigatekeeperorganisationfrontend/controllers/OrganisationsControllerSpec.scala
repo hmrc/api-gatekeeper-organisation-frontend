@@ -50,13 +50,15 @@ class OrganisationsControllerSpec extends HmrcSpec
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val fakeRequest = FakeRequest("GET", "/")
-    val page        = app.injector.instanceOf[OrganisationsListPage]
+    val listPage    = app.injector.instanceOf[OrganisationsListPage]
+    val detailsPage = app.injector.instanceOf[OrganisationDetailsPage]
     val mcc         = app.injector.instanceOf[MessagesControllerComponents]
-    val controller  = new OrganisationsController(mcc, page, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
+    val controller  = new OrganisationsController(mcc, listPage, detailsPage, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
   }
 
-  "GET /" should {
+  "GET /organisations" should {
+    val fakeRequest = FakeRequest("GET", "/organisations")
+
     "return 200 with all organisations for no filter and Stride auth" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
       val standardOrg2 = standardOrg.copy(id = OrganisationId.random, organisationName = OrganisationName("Organisation 2"))
@@ -112,6 +114,50 @@ class OrganisationsControllerSpec extends HmrcSpec
       LdapAuthorisationServiceMock.Auth.notAuthorised
 
       val result = controller.organisationsView(fakeRequest)
+
+      status(result) shouldBe Status.FORBIDDEN
+    }
+  }
+
+  "GET /organisations/:oid" should {
+    val fakeRequest = FakeRequest("GET", "/organisations/123456")
+
+    "return 200 with the organisation" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrg)
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("Organisation name")
+      contentAsString(result) should include("Created date")
+      contentAsString(result) should include(standardOrg.organisationName.value)
+    }
+
+    "return 404" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchWithAllMembersDetails.fails()
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
+
+      status(result) shouldBe Status.NOT_FOUND
+    }
+
+    "return 200 for Ldap auth" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      LdapAuthorisationServiceMock.Auth.succeeds
+      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrg)
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+    }
+
+    "return 403 for incorrect auth" in new Setup {
+      StrideAuthorisationServiceMock.Auth.hasInsufficientEnrolments()
+      LdapAuthorisationServiceMock.Auth.notAuthorised
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
 
       status(result) shouldBe Status.FORBIDDEN
     }

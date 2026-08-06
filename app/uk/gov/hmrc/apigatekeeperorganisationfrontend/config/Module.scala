@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.config
 
+import java.time.Clock
+
 import com.google.inject.AbstractModule
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.actions.ForbiddenHandler
@@ -36,7 +38,7 @@ class Module extends AbstractModule {
     bind(classOf[ThirdPartyOrchestratorConnector.Config]).toProvider(classOf[ThirdPartyOrchestratorConnectorConfigProvider])
     bind(classOf[ThirdPartyDeveloperConnector.Config]).toProvider(classOf[ThirdPartyDeveloperConnectorConfigProvider])
     bind(classOf[VatRegisteredCompaniesConnector.Config]).toProvider(classOf[VatRegisteredCompaniesConnectorConfigProvider])
-
+    bind(classOf[Clock]).toInstance(Clock.systemUTC())
     bind(classOf[AppConfig]).asEagerSingleton()
   }
 }

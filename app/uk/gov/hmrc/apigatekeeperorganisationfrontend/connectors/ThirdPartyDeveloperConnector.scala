@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
-import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, GetUsersRequest}
 
 @Singleton
 class ThirdPartyDeveloperConnector @Inject() (
@@ -42,6 +42,11 @@ class ThirdPartyDeveloperConnector @Inject() (
       .withBody(Json.toJson(GetUsersRequest(users)))
       .execute[List[User]]
   }
+
+  def getRegisteredOrUnregisteredUsers(users: List[UserId])(using HeaderCarrier): Future[GetRegisteredOrUnregisteredUsersResponse] =
+    http.post(url"${config.serviceBaseUrl}/developers/get-registered-and-unregistered")
+      .withBody(Json.toJson(GetUsersRequest(users)))
+      .execute[GetRegisteredOrUnregisteredUsersResponse]
 
   def fetchByEmails(emails: Set[LaxEmailAddress])(using HeaderCarrier): Future[Seq[User]] = {
     http
