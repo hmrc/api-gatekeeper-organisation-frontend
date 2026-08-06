@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.{Inject, Singleton}
 
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -124,6 +124,12 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .execute[Either[UpstreamErrorResponse, Boolean]]
       .map(_.leftMap(failed))
   }
+
+  def matchBySa(request: SaMatchingRequest)(using HeaderCarrier): Future[JsValue] = {
+    http.post(url"${config.serviceBaseUrl}/matching/sa")
+      .withBody(Json.toJson(request))
+      .execute[JsValue]
+  }
 }
 
 object OrganisationConnector {
@@ -143,4 +149,10 @@ object OrganisationConnector {
 
   case class AddOrganisationAllowListRequest(requestedBy: String, organisationName: OrganisationName)
   given Writes[AddOrganisationAllowListRequest] = Json.writes[AddOrganisationAllowListRequest]
+
+  case class SaMatchingAddress(addressLine1: String, postcode: String)
+  given Writes[SaMatchingAddress] = Json.writes[SaMatchingAddress]
+
+  case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String, taxPayerType: String, taxPayerName: String, address: SaMatchingAddress)
+  given Writes[SaMatchingRequest] = Json.writes[SaMatchingRequest]
 }

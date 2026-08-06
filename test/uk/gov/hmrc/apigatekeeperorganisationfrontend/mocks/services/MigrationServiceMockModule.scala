@@ -21,6 +21,8 @@ import scala.concurrent.Future
 import org.mockito.ArgumentMatchersSugar
 import org.mockito.scalatest.MockitoSugar
 
+import play.api.libs.json.JsValue
+
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.MigrationRecord
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.MigrationService
 
@@ -47,6 +49,10 @@ trait MigrationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
 
     object ProcessCompaniesHouse {
       def willReturn(results: List[MigrationRecord]): Unit = when(aMock.processCompaniesHouse(*)(using *)).thenReturn(Future.successful(results))
+    }
+
+    object MatchBySa {
+      def willReturn(json: JsValue): Unit = when(aMock.matchBySa(*)(using *)).thenReturn(Future.successful(json))
     }
   }
 }

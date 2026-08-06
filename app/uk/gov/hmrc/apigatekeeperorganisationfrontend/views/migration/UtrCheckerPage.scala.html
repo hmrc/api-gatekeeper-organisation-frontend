@@ -1,0 +1,86 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.UtrCheckerForm
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
+
+@this(layout: Layout, govukButton: GovukButton, govukInput: GovukInput)
+
+@(form: Form[UtrCheckerForm], result: Option[String])(implicit request: RequestHeader, messages: Messages)
+
+@layout(
+  pageTitle = Some("HMRC API Gatekeeper - UTR Checker"),
+  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+) {
+
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">UTR Checker</h1>
+
+    @helper.form(action = routes.MigrationController.utrCheckerAction()) {
+      @helper.CSRF.formField
+
+      @govukInput(Input(
+        id = "utr",
+        name = "utr",
+        value = form("utr").value,
+        label = Label(content = Text("UTR"))
+      ))
+
+      @govukInput(Input(
+        id = "taxPayerType",
+        name = "taxPayerType",
+        value = form("taxPayerType").value,
+        label = Label(content = Text("Tax payer type"))
+      ))
+
+      @govukInput(Input(
+        id = "taxPayerName",
+        name = "taxPayerName",
+        value = form("taxPayerName").value,
+        label = Label(content = Text("Tax payer name"))
+      ))
+
+      @govukInput(Input(
+        id = "addressLine1",
+        name = "addressLine1",
+        value = form("addressLine1").value,
+        label = Label(content = Text("Address line 1"))
+      ))
+
+      @govukInput(Input(
+        id = "postcode",
+        name = "postcode",
+        value = form("postcode").value,
+        label = Label(content = Text("Postcode"))
+      ))
+
+      <div class="govuk-button-group">
+        @govukButton(Button(
+          id = Some("submitUtrChecker"),
+          isStartButton = false,
+          content = Text("Submit"),
+          preventDoubleClick = Some(true)))
+       </div>
+    }
+
+    @result.map { r =>
+      <h2 class="govuk-heading-m">Result</h2>
+      <pre class="govuk-body" id="utr-checker-result">@r</pre>
+    }
+  </div>
+}
