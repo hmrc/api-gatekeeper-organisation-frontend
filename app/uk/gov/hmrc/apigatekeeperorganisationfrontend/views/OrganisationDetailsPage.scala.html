@@ -63,7 +63,7 @@
             )),
             rows = details.collaborators.map(collab => Seq(
                 TableRow(content = collab.maybeUserDetails.map(user=>
-                    HtmlContent(s"<a href='${gatekeeperConfig.developersPageUri}?developerId=${user.userId}'>${collab.name()}</a>"))
+                    HtmlContent(s"<a href='${gatekeeperConfig.developerPageUri}?developerId=${user.userId}'>${collab.name()}</a>"))
                 .getOrElse(Text(collab.name()))),
                 TableRow(content = Text(collab.collaborator.describeRole)),
             )).toList))
