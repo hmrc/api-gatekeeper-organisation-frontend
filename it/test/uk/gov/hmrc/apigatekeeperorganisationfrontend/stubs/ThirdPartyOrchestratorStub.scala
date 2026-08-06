@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.OK
 import play.api.libs.json.Json
 
+import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.ApplicationsByAnswer
 
 object ThirdPartyOrchestratorStub {
@@ -43,6 +44,33 @@ object ThirdPartyOrchestratorStub {
     def fails(questionType: String, status: Int): StubMapping = {
       stubFor(
         get(urlEqualTo(s"/submissions/answers/$questionType"))
+          .willReturn(
+            aResponse()
+              .withStatus(status)
+          )
+      )
+    }
+  }
+
+  object FetchApplicationsByOrganisation {
+
+    def succeeds(query: String, response: List[ApplicationWithCollaborators]): StubMapping = {
+      stubFor(
+        get(urlPathEqualTo(s"/query"))
+          .withQueryParam("organisationId", equalTo(query))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(response).toString())
+          )
+      )
+    }
+
+    def fails(query: String, status: Int): StubMapping = {
+      stubFor(
+        get(urlPathEqualTo(s"/query"))
+          .withQueryParam("organisationId", equalTo(query))
           .willReturn(
             aResponse()
               .withStatus(status)

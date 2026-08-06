@@ -22,7 +22,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import play.api.libs.json.JsValue
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector
@@ -32,6 +32,11 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
 
   object OrganisationConnectorMock {
     val aMock = mock[OrganisationConnector]
+
+    object FetchOrganisation {
+      def willReturn(organisation: Organisation) = when(aMock.fetchOrganisation(*[OrganisationId])(using *)).thenReturn(Future.successful(Some(organisation)))
+      def fails()                                = when(aMock.fetchOrganisation(*[OrganisationId])(using *)).thenReturn(Future.successful(None))
+    }
 
     object SearchSubmissionReviews {
       def willReturn(submissionReviews: List[SubmissionReview]) = when(aMock.searchSubmissionReviews(*)(using *)).thenReturn(Future.successful(submissionReviews))

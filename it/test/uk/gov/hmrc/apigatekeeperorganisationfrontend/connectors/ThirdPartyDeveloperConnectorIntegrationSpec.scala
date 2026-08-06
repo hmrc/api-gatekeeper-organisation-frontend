@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
-import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.GetUsersRequest
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, GetUsersRequest, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatform.modules.tpd.emailpreferences.domain.models.EmailPreferences
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.AppsByAnswerFixtures
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ThirdPartyDeveloperStub
@@ -41,12 +41,13 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
     given HeaderCarrier = HeaderCarrier()
     val underTest       = app.injector.instanceOf[ThirdPartyDeveloperConnector]
 
-    val userId1 = UserId.random
-    val userId2 = UserId.random
-    val email1  = LaxEmailAddress("bob@fleming.com")
-    val email2  = LaxEmailAddress("bob@ewing.com")
-    val user1   = User(email1, "Bob", "Fleming", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId1)
-    val user2   = User(email2, "Bob", "Ewing", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId2)
+    val userId1        = UserId.random
+    val userId2        = UserId.random
+    val email1         = LaxEmailAddress("bob@fleming.com")
+    val email2         = LaxEmailAddress("bob@ewing.com")
+    val regOrUnregUser = RegisteredOrUnregisteredUser(userId1, email1, true, true)
+    val user1          = User(email1, "Bob", "Fleming", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId1)
+    val user2          = User(email2, "Bob", "Ewing", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId2)
 
   }
 
@@ -67,6 +68,24 @@ class ThirdPartyDeveloperConnectorIntegrationSpec extends BaseConnectorIntegrati
       ThirdPartyDeveloperStub.FetchDevelopers.fails(INTERNAL_SERVER_ERROR)
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchDevelopers(List(userId1, userId2)))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "getRegisteredOrUnregisteredUsers" should {
+    "return a list of user details" in new Setup {
+      ThirdPartyDeveloperStub.GetRegisteredOrUnregisteredUsers.succeeds(userId1, email1)
+
+      private val result = await(underTest.getRegisteredOrUnregisteredUsers(List(userId1)))
+
+      result shouldBe GetRegisteredOrUnregisteredUsersResponse(List(regOrUnregUser))
+    }
+
+    "throw an UpstreamErrorResponse when the call returns an internal server error" in new Setup {
+      ThirdPartyDeveloperStub.GetRegisteredOrUnregisteredUsers.throwsAnException()
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.getRegisteredOrUnregisteredUsers(List(userId1)))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }
