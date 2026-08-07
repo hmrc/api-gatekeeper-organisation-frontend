@@ -17,12 +17,13 @@
 @import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.LoggedInRequest
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukTable, Table, Text}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.AppConfig
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.AllowList
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 @import include.*
 
-@this(layout: Layout, govukTable: GovukTable)
+@this(layout: Layout, govukTable: GovukTable, appConfig: AppConfig)
 
 @(allowList: List[AllowList])(implicit request: LoggedInRequest[?], messages: Messages)
 
@@ -38,7 +39,7 @@
 
     <h1 class="govuk-heading-l">@{messages("allowlist.title")}</h1>
 
-    @if(request.role.isSuperUser) {
+    @if(request.role.isSuperUser && !appConfig.disableAddToAllowList) {
       <p class="govuk-body">
         <a href="@routes.AllowListController.addAllowListView()" class="govuk-link govuk-link--no-visited-state">@{messages("allowlist.adduser")}</a>
       </p>
