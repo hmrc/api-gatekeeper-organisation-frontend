@@ -77,11 +77,9 @@ class MigrationControllerSpec extends HmrcSpec
     )
 
     val validUtrCheckerFormData = Seq(
-      "utr"          -> "1234567890",
-      "taxPayerType" -> "Individual",
-      "taxPayerName" -> "Bob Smith",
-      "addressLine1" -> "1 Test Street",
-      "postcode"     -> "AB1 2CD"
+      "identifierType"  -> "UTR",
+      "identifierValue" -> "123465798",
+      "registryMarker"  -> "RED"
     )
   }
 

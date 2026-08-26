@@ -18,69 +18,59 @@
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
-@this(layout: Layout, govukButton: GovukButton, govukInput: GovukInput)
+@this(layout: Layout, govukButton: GovukButton, govukInput: GovukInput, govukSelect: GovukSelect)
 
 @(form: Form[UtrCheckerForm], result: Option[String])(implicit request: RequestHeader, messages: Messages)
 
 @layout(
-  pageTitle = Some("HMRC API Gatekeeper - UTR Checker"),
-  backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+    pageTitle = Some("HMRC API Gatekeeper - UTR Checker"),
+    backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
 ) {
 
-  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-l">UTR Checker</h1>
+        <h1 class="govuk-heading-l">UTR Checker</h1>
 
-    @helper.form(action = routes.MigrationController.utrCheckerAction()) {
-      @helper.CSRF.formField
+        @helper.form(action = routes.MigrationController.utrCheckerAction()) {
+            @helper.CSRF.formField
 
-      @govukInput(Input(
-        id = "utr",
-        name = "utr",
-        value = form("utr").value,
-        label = Label(content = Text("UTR"))
-      ))
+            @govukInput(Input(
+                id = "identifierType",
+                name = "identifierType",
+                value = form("identifierType").value,
+                label = Label(content = Text("Identifier Type"))
+            ))
 
-      @govukInput(Input(
-        id = "taxPayerType",
-        name = "taxPayerType",
-        value = form("taxPayerType").value,
-        label = Label(content = Text("Tax payer type"))
-      ))
+            @govukInput(Input(
+                id = "identifierValue",
+                name = "identifierValue",
+                value = form("identifierValue").value,
+                label = Label(content = Text("Identifier Value"))
+            ))
 
-      @govukInput(Input(
-        id = "taxPayerName",
-        name = "taxPayerName",
-        value = form("taxPayerName").value,
-        label = Label(content = Text("Tax payer name"))
-      ))
+            @govukSelect(Select(
+                id = "registryMarker",
+                name = "registryMarker",
+                label = Label(content = Text("Registry Marker")),
+                items = Seq(
+                    SelectItem(value = Some("RED"), text = "RED"),
+                    SelectItem(value = Some("AMBER"), text = "AMBER"),
+                    SelectItem(value = Some("GREEN"), text = "GREEN", selected = true)
+                )))
 
-      @govukInput(Input(
-        id = "addressLine1",
-        name = "addressLine1",
-        value = form("addressLine1").value,
-        label = Label(content = Text("Address line 1"))
-      ))
 
-      @govukInput(Input(
-        id = "postcode",
-        name = "postcode",
-        value = form("postcode").value,
-        label = Label(content = Text("Postcode"))
-      ))
+            <div class="govuk-button-group">
+            @govukButton(Button(
+                id = Some("submitUtrChecker"),
+                isStartButton = false,
+                content = Text("Submit"),
+                preventDoubleClick = Some(true)))
+            </div>
+        }
 
-      <div class="govuk-button-group">
-        @govukButton(Button(
-          id = Some("submitUtrChecker"),
-          isStartButton = false,
-          content = Text("Submit"),
-          preventDoubleClick = Some(true)))
-       </div>
-    }
-
-    @result.map { r =>
-      <h2 class="govuk-heading-m">Result</h2>
-      <pre class="govuk-body" id="utr-checker-result">@r</pre>
-    }
-  </div>
+        @result.map { r =>
+            <h2 class="govuk-heading-m">Result</h2>
+            <pre class="govuk-body" id="utr-checker-result">@r</pre>
+        }
+    </div>
 }
