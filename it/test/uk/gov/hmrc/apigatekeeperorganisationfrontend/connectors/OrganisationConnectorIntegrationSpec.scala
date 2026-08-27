@@ -32,7 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationN
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{OrganisationAllowList, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.OrganisationFixtures
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaMatchingAddress, SaMatchingRequest}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaIdentifier, SaMatchingRequest}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.repositories.MigrationRepository
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.stubs.ApiPlatformOrganisationStub
 
@@ -270,7 +270,7 @@ class OrganisationConnectorIntegrationSpec extends BaseConnectorIntegrationSpec 
   }
 
   "matchBySa" should {
-    val request = SaMatchingRequest("1234567890", "Individual", "Bob Smith", SaMatchingAddress("1 Test Street", "AB1 2CD"))
+    val request = SaMatchingRequest(SaIdentifier("utr", "123456798"), "RED")
 
     "successfully get a match" in new Setup {
       val matchJson = Json.obj("matched" -> true)

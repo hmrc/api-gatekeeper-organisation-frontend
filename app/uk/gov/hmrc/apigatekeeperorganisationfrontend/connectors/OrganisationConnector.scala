@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import com.google.inject.{Inject, Singleton}
 
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{JsValue, Json, OFormat, Writes}
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -28,14 +28,14 @@ import uk.gov.hmrc.http.client.HttpClientV2
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, OrganisationAllowList, Submission, SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.CompaniesHouseCompanyProfile
 
 @Singleton
 class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationConnector.Config)(using ExecutionContext) {
 
-  import OrganisationConnector._
+  import OrganisationConnector.*
 
   def searchSubmissionReviews(params: Seq[(String, String)])(using HeaderCarrier): Future[List[SubmissionReview]] = {
     http.get(url"${config.serviceBaseUrl}/submission-reviews?$params")
@@ -63,7 +63,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def approveSubmission(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(using HeaderCarrier): Future[Either[String, Submission]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (_: UpstreamErrorResponse) => s"Failed to approve submission $submissionId"
 
     http.post(url"${config.serviceBaseUrl}/submission/$submissionId/approve")
@@ -73,7 +73,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def declineSubmission(submissionId: SubmissionId, declinedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, Submission]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (_: UpstreamErrorResponse) => s"Failed to decline submission $submissionId"
 
     http.post(url"${config.serviceBaseUrl}/submission/$submissionId/decline")
@@ -83,7 +83,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def updateSubmissionReview(submissionId: SubmissionId, updatedBy: String, comment: String)(using HeaderCarrier): Future[Either[String, SubmissionReview]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (_: UpstreamErrorResponse) => s"Failed to update submission review $submissionId"
 
     http.put(url"${config.serviceBaseUrl}/submission-review/$submissionId")
@@ -109,7 +109,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def createOrganisationAllowList(userId: UserId, requestedBy: String, organisationName: OrganisationName)(using HeaderCarrier): Future[Either[String, OrganisationAllowList]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (_: UpstreamErrorResponse) => "Failed to create organisation allow list - check user doesn't already exist in allow list"
     http.post(url"${config.serviceBaseUrl}/allow-list/$userId")
       .withBody(Json.toJson(AddOrganisationAllowListRequest(requestedBy, organisationName)))
@@ -118,7 +118,7 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
   }
 
   def deleteOrganisationAllowList(userId: UserId)(using HeaderCarrier): Future[Either[String, Boolean]] = {
-    import cats.implicits._
+    import cats.implicits.*
     val failed = (_: UpstreamErrorResponse) => "Failed to delete organisation allow list - check user exists in allow list"
     http.delete(url"${config.serviceBaseUrl}/allow-list/$userId")
       .execute[Either[UpstreamErrorResponse, Boolean]]
@@ -150,9 +150,9 @@ object OrganisationConnector {
   case class AddOrganisationAllowListRequest(requestedBy: String, organisationName: OrganisationName)
   given Writes[AddOrganisationAllowListRequest] = Json.writes[AddOrganisationAllowListRequest]
 
-  case class SaMatchingAddress(addressLine1: String, postcode: String)
-  given Writes[SaMatchingAddress] = Json.writes[SaMatchingAddress]
-
-  case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String, taxPayerType: String, taxPayerName: String, address: SaMatchingAddress)
+  case class SaMatchingRequest(identifier: SaIdentifier, registryMarker: String)
   given Writes[SaMatchingRequest] = Json.writes[SaMatchingRequest]
+
+  case class SaIdentifier(`type`: String, value: String)
+  given Writes[SaIdentifier] = Json.writes[SaIdentifier]
 }

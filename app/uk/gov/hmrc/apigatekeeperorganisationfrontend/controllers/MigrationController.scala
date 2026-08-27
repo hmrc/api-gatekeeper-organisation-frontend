@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaMatchingAddress, SaMatchingRequest}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaIdentifier, SaMatchingRequest}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.UtrCheckerForm
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.MigrationService
@@ -34,18 +34,16 @@ import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration.*
 
 object MigrationController {
 
-  case class UtrCheckerForm(utr: String, taxPayerType: String, taxPayerName: String, addressLine1: String, postcode: String)
+  case class UtrCheckerForm(identifierType: String, identifierValue: String, registryMarker: String)
 
   object UtrCheckerForm {
 
     def form: Form[UtrCheckerForm] = Form(
       mapping(
-        "utr"          -> text,
-        "taxPayerType" -> text,
-        "taxPayerName" -> text,
-        "addressLine1" -> text,
-        "postcode"     -> text
-      )(UtrCheckerForm.apply)(f => Some((f.utr, f.taxPayerType, f.taxPayerName, f.addressLine1, f.postcode)))
+        "identifierType"  -> text,
+        "identifierValue" -> text,
+        "registryMarker"  -> text
+      )(UtrCheckerForm.apply)(f => Some((f.identifierType, f.identifierValue, f.registryMarker)))
     )
   }
 }
@@ -98,7 +96,7 @@ class MigrationController @Inject() (
 
   def utrCheckerAction(): Action[AnyContent] = loggedInOnly() { implicit request =>
     val data    = UtrCheckerForm.form.bindFromRequest().get
-    val request = SaMatchingRequest(data.utr, data.taxPayerType, data.taxPayerName, SaMatchingAddress(data.addressLine1, data.postcode))
+    val request = SaMatchingRequest(SaIdentifier(data.identifierType, data.identifierValue), data.registryMarker)
     migrationService.matchBySa(request).map(json => Ok(utrCheckerPage(UtrCheckerForm.form.fill(data), Some(Json.prettyPrint(json)))))
   }
 }
