@@ -22,6 +22,7 @@ import cats.data.NonEmptyList
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.ActualAnswer.AttachmentAnswer
 
 object AnswersViewModel {
   case class ViewQuestion(id: Question.Id, text: String, answer: String)
@@ -41,6 +42,7 @@ object AnswersViewModel {
     case ActualAnswer.CompanyNumberAnswer(value)   => Some(value)
     case ActualAnswer.NoAnswer                     => Some("n/a")
     case ActualAnswer.AcknowledgedAnswer           => None
+    case AttachmentAnswer(value)                   => Some("Uploaded")
   }
 
   private def convertQuestion(instance: Submission.Instance)(item: QuestionItem): Option[ViewQuestion] = {
