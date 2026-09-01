@@ -16,18 +16,36 @@
 
 package uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.models
 
+import java.time.format.DateTimeFormatter
+
 import cats.data.NonEmptyList
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.ActualAnswersAsText
 
 object AnswersViewModel {
   case class ViewQuestion(id: Question.Id, text: String, answer: String)
   case class ViewQuestionnaire(label: String, state: String, id: Questionnaire.Id, questions: NonEmptyList[ViewQuestion])
   case class ViewModel(submissionId: SubmissionId, instanceIndex: Int, allowUpdate: Boolean, organisationName: OrganisationName, questionnaires: List[ViewQuestionnaire])
 
-  private def convertAnswer(answer: ActualAnswer): Option[String] = Some(ActualAnswersAsText(answer))
+  private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+
+  private def convertAnswer(answer: ActualAnswer): Option[String] = answer match {
+    case ActualAnswer.SingleChoiceAnswer(value)       => Some(value)
+    case ActualAnswer.TextAnswer(value)               => Some(value)
+    case ActualAnswer.DateAnswer(value)               => Some(value.format(dateTimeFormatter))
+    case ActualAnswer.MultipleChoiceAnswer(values)    => Some(values.mkString(" "))
+    case ActualAnswer.AddressAnswer(add)              =>
+      Some(Seq(add.addressLineOne, add.addressLineTwo, add.locality, add.region, add.postalCode).filter(_.isDefined).map(_.get).mkString(", "))
+    case ActualAnswer.InternationalAddressAnswer(add) =>
+      Some(Seq(add.addressLineOne, add.addressLineTwo, add.addressLineThree, add.locality, add.region, add.postalCode, add.country).filter(_.isDefined).map(_.get).mkString(", "))
+    case ActualAnswer.NameAnswer(name)                =>
+      Some(Seq(name.firstName, name.lastName).filter(_.isDefined).map(_.get).mkString(" "))
+    case ActualAnswer.CompanyNumberAnswer(value)      => Some(value)
+    case ActualAnswer.NoAnswer                        => Some("n/a")
+    case ActualAnswer.AcknowledgedAnswer              => None
+    case ActualAnswer.AttachmentAnswer(value)         => Some("Uploaded")
+  }
 
   private def convertQuestion(instance: Submission.Instance)(item: QuestionItem): Option[ViewQuestion] = {
     val id = item.question.id
