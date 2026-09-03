@@ -26,8 +26,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
 import uk.gov.hmrc.apiplatform.modules.gkauth.controllers.GatekeeperBaseController
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationService, StrideAuthorisationService}
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaIdentifier, SaMatchingRequest}
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.UtrCheckerForm
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{IndividualMatchingRequest, SaIdentifier, SaMatchingRequest}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.MigrationController.{IndividualMatchingForm, UtrCheckerForm}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.actions.GatekeeperRoleActions
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.services.MigrationService
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.migration.*
@@ -46,6 +46,20 @@ object MigrationController {
       )(UtrCheckerForm.apply)(f => Some((f.identifierType, f.identifierValue, f.registryMarker)))
     )
   }
+
+  case class IndividualMatchingForm(firstName: String, lastName: String, nino: String, dateOfBirth: String)
+
+  object IndividualMatchingForm {
+
+    def form: Form[IndividualMatchingForm] = Form(
+      mapping(
+        "firstName"   -> text,
+        "lastName"    -> text,
+        "nino"        -> text,
+        "dateOfBirth" -> text
+      )(IndividualMatchingForm.apply)(f => Some((f.firstName, f.lastName, f.nino, f.dateOfBirth)))
+    )
+  }
 }
 
 @Singleton
@@ -57,6 +71,7 @@ class MigrationController @Inject() (
     migrationDetailPage: MigrationDetailPage,
     processedListPage: ProcessedListPage,
     utrCheckerPage: UtrCheckerPage,
+    individualMatchingPage: IndividualMatchingPage,
     strideAuthorisationService: StrideAuthorisationService,
     val ldapAuthorisationService: LdapAuthorisationService
   )(using ExecutionContext
@@ -98,5 +113,15 @@ class MigrationController @Inject() (
     val data    = UtrCheckerForm.form.bindFromRequest().get
     val request = SaMatchingRequest(SaIdentifier(data.identifierType, data.identifierValue), data.registryMarker)
     migrationService.matchBySa(request).map(json => Ok(utrCheckerPage(UtrCheckerForm.form.fill(data), Some(Json.prettyPrint(json)))))
+  }
+
+  def individualMatching(): Action[AnyContent] = loggedInOnly() { implicit request =>
+    Future.successful(Ok(individualMatchingPage(IndividualMatchingForm.form, None)))
+  }
+
+  def individualMatchingAction(): Action[AnyContent] = loggedInOnly() { implicit request =>
+    val data    = IndividualMatchingForm.form.bindFromRequest().get
+    val request = IndividualMatchingRequest(data.firstName, data.lastName, data.nino, data.dateOfBirth)
+    migrationService.matchIndividual(request).map(json => Ok(individualMatchingPage(IndividualMatchingForm.form.fill(data), Some(Json.prettyPrint(json)))))
   }
 }

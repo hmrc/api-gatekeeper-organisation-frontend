@@ -54,5 +54,9 @@ trait MigrationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar
     object MatchBySa {
       def willReturn(json: JsValue): Unit = when(aMock.matchBySa(*)(using *)).thenReturn(Future.successful(json))
     }
+
+    object MatchIndividual {
+      def willReturn(json: JsValue): Unit = when(aMock.matchIndividual(*)(using *)).thenReturn(Future.successful(json))
+    }
   }
 }

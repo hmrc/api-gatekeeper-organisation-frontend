@@ -56,13 +56,14 @@ class MigrationControllerSpec extends HmrcSpec
       with StrideAuthorisationServiceMockModule
       with LdapAuthorisationServiceMockModule {
 
-    val fakeRequest         = FakeRequest("GET", "/").withCSRFToken
-    val controlPage         = app.injector.instanceOf[MigrationControlPage]
-    val adminPage           = app.injector.instanceOf[MigrationAdminPage]
-    val processedListPage   = app.injector.instanceOf[ProcessedListPage]
-    val migrationDetailPage = app.injector.instanceOf[MigrationDetailPage]
-    val utrCheckerPage      = app.injector.instanceOf[UtrCheckerPage]
-    val mcc                 = app.injector.instanceOf[MessagesControllerComponents]
+    val fakeRequest            = FakeRequest("GET", "/").withCSRFToken
+    val controlPage            = app.injector.instanceOf[MigrationControlPage]
+    val adminPage              = app.injector.instanceOf[MigrationAdminPage]
+    val processedListPage      = app.injector.instanceOf[ProcessedListPage]
+    val migrationDetailPage    = app.injector.instanceOf[MigrationDetailPage]
+    val utrCheckerPage         = app.injector.instanceOf[UtrCheckerPage]
+    val individualMatchingPage = app.injector.instanceOf[IndividualMatchingPage]
+    val mcc                    = app.injector.instanceOf[MessagesControllerComponents]
 
     val controller = new MigrationController(
       mcc,
@@ -72,6 +73,7 @@ class MigrationControllerSpec extends HmrcSpec
       migrationDetailPage,
       processedListPage,
       utrCheckerPage,
+      individualMatchingPage,
       StrideAuthorisationServiceMock.aMock,
       LdapAuthorisationServiceMock.aMock
     )
@@ -80,6 +82,13 @@ class MigrationControllerSpec extends HmrcSpec
       "identifierType"  -> "UTR",
       "identifierValue" -> "123465798",
       "registryMarker"  -> "RED"
+    )
+
+    val validIndividualMatchingFormData = Seq(
+      "firstName"   -> "John",
+      "lastName"    -> "Smith",
+      "nino"        -> "AA123456A",
+      "dateOfBirth" -> "1990-01-01"
     )
   }
 
@@ -160,6 +169,25 @@ class MigrationControllerSpec extends HmrcSpec
       MigrationServiceMock.MatchBySa.willReturn(json)
 
       val result = controller.utrCheckerAction()(FakeRequest("POST", "/").withCSRFToken.withFormUrlEncodedBody(validUtrCheckerFormData*))
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("true")
+    }
+
+    "return 200 for individualMatching" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+
+      val result = controller.individualMatching()(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include("National Insurance number")
+    }
+
+    "return 200 for individualMatchingAction with a match result" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+
+      val json = Json.obj("matched" -> true)
+      MigrationServiceMock.MatchIndividual.willReturn(json)
+
+      val result = controller.individualMatchingAction()(FakeRequest("POST", "/").withCSRFToken.withFormUrlEncodedBody(validIndividualMatchingFormData*))
       status(result) shouldBe Status.OK
       contentAsString(result) should include("true")
     }
