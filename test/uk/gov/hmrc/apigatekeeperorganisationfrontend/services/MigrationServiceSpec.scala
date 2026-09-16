@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationIdFixtures
-import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{SaIdentifier, SaMatchingRequest}
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.OrganisationConnector.{IndividualMatchingRequest, SaIdentifier, SaMatchingRequest}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.connectors.{LookupResponse, VatRegisteredCompany}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.connectors.{OrganisationConnectorMockModule, TpoConnectorMockModule, VatRegisteredCompaniesConnectorMockModule}
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.repository.MigrationRepositoryMockModule
@@ -136,6 +136,19 @@ class MigrationServiceSpec extends AsyncHmrcSpec with TpoConnectorMockModule wit
       OrganisationConnectorMock.MatchBySa.willReturn(json)
 
       val result = await(underTest.matchBySa(request))
+
+      result shouldBe json
+    }
+  }
+
+  "matchIndividual" should {
+    "match the individual and return the payload" in new Setup {
+      val request = IndividualMatchingRequest("John", "Smith", "AA123456A", "1990-01-01")
+      val json    = Json.obj("matched" -> true)
+
+      OrganisationConnectorMock.MatchIndividual.willReturn(json)
+
+      val result = await(underTest.matchIndividual(request))
 
       result shouldBe json
     }

@@ -103,5 +103,9 @@ trait OrganisationConnectorMockModule extends MockitoSugar with ArgumentMatchers
     object MatchBySa {
       def willReturn(json: JsValue) = when(aMock.matchBySa(*)(using *)).thenReturn(Future.successful(json))
     }
+
+    object MatchIndividual {
+      def willReturn(json: JsValue) = when(aMock.matchIndividual(*)(using *)).thenReturn(Future.successful(json))
+    }
   }
 }

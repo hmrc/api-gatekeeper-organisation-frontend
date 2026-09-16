@@ -130,6 +130,12 @@ class OrganisationConnector @Inject() (http: HttpClientV2, config: OrganisationC
       .withBody(Json.toJson(request))
       .execute[JsValue]
   }
+
+  def matchIndividual(request: IndividualMatchingRequest)(using HeaderCarrier): Future[JsValue] = {
+    http.post(url"${config.serviceBaseUrl}/matching/individual")
+      .withBody(Json.toJson(request))
+      .execute[JsValue]
+  }
 }
 
 object OrganisationConnector {
@@ -155,4 +161,7 @@ object OrganisationConnector {
 
   case class SaIdentifier(`type`: String, value: String)
   given Writes[SaIdentifier] = Json.writes[SaIdentifier]
+
+  case class IndividualMatchingRequest(firstName: String, lastName: String, nino: String, dateOfBirth: String)
+  given Writes[IndividualMatchingRequest] = Json.writes[IndividualMatchingRequest]
 }
