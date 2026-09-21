@@ -5,7 +5,7 @@ object AppDependencies {
   private val bootstrapVersion    = "10.7.0"
   private val hmrcMongoVersion    = "2.13.0"
   private val commonDomainVersion = "1.4.0"
-  private val orgDomainVersion    = "1.15.0"
+  private val orgDomainVersion    = "1.18.0"
   private val tpdDomainVersion    = "1.3.0"
   private val tpaDomainVersion    = "1.6.0"
 
@@ -15,7 +15,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "api-platform-organisation-domain" % orgDomainVersion,
     "uk.gov.hmrc"       %% "api-platform-tpd-domain"          % tpdDomainVersion,
     "uk.gov.hmrc"       %% "api-platform-application-domain"  % tpaDomainVersion,
-    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"       % "13.11.0",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"       % "13.13.0",
     "uk.gov.hmrc"       %% "internal-auth-client-play-30"     % "4.4.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"               % hmrcMongoVersion
   )
