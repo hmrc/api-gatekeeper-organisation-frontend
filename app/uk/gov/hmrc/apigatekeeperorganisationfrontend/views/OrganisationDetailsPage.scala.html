@@ -14,58 +14,167 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.{ApplicationFormatter, OrganisationWithAllMembersDetailsAndApplications}
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.models.{ApplicationFormatter, CollaboratorWithUserDetails, OrganisationWithAllMembersDetailsAndApplications}
+@import uk.gov.hmrc.apiplatform.modules.applications.core.domain.models.ApplicationWithCollaborators
+@import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationAddress
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table.{HeadCell, TableRow}
 
-@import java.time.format.DateTimeFormatter
 @import java.time.{Clock, LocalDateTime, ZoneOffset}
-@import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.GatekeeperConfig
+@import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.{AppConfig, GatekeeperConfig}
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 
-@this(layout: Layout, govukTable: GovukTable, govukSummaryList: GovukSummaryList, clock: Clock, gatekeeperConfig: GatekeeperConfig)
+@this(layout: Layout, govukTable: GovukTable, clock: Clock, gatekeeperConfig: GatekeeperConfig, appConfig: AppConfig)
 
 @(details: OrganisationWithAllMembersDetailsAndApplications)(implicit request: RequestHeader, messages: Messages)
+
+@members = @{ details.collaborators.filterNot(_.collaborator.isResponsibleIndividual).toList }
+
+@responsibleIndividuals = @{ details.collaborators.filter(_.collaborator.isResponsibleIndividual).toList }
 
 @layout(
     pageTitle = Some(s"HMRC API Gatekeeper - ${details.organisation.organisationName}"),
     currentOrg = true,
-    backLink = Some(BackLink.mimicsBrowserBackButtonViaJavaScript)
+    breadcrumbs = Seq(
+        BreadcrumbsItem(Text(messages("organisationdetails.breadcrumb.home")), Some("/api-gatekeeper")),
+        BreadcrumbsItem(Text(messages("organisationdetails.breadcrumb.organisations")), Some(routes.OrganisationsController.organisationsView().url))
+    )
 ) {
-    <h1 class="govuk-heading-l">@{
-        details.organisation.organisationName
-    }</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">
+                <span class="govuk-caption-l">@messages("organisationdetails.caption")</span>
+                @details.organisation.organisationName
+            </h1>
+        </div>
 
-    @defining(DateTimeFormatter.ofPattern("dd MMMM yyyy")) { dateFormatter =>
-        @govukSummaryList(SummaryList(rows = Seq(
-            SummaryListRow(key = Key(content = Text("Organisation name")), value = Value(content = Text(details.organisation.organisationName.toString))),
-            SummaryListRow(key = Key(content = Text("Organisation type")), value = Value(content = Text(details.organisation.organisationType.toString))),
-            SummaryListRow(key = Key(content = Text("Created date")), value = Value(content = Text(dateFormatter.format(details.organisation.createdDateTime.atOffset(ZoneOffset.UTC).toLocalDateTime))))),
-        ))
+        <div class="govuk-grid-column-two-thirds">
+            @applicationsTile
+            @membersTile
+        </div>
+        <div class="govuk-grid-column-one-third">
+            @organisationDetailsTile
+        </div>
+    </div>
+}
 
-        @govukTable(Table(
-            head = Some(Seq(
-                HeadCell(content = Text("Application name")),
-                HeadCell(content = Text("Environment")),
-                HeadCell(content = Text("Last api call")),
-            )),
-            rows = details.applications.map(app => Seq(
-                TableRow(content = HtmlContent(s"<a href='${gatekeeperConfig.applicationsPageUri}/${app.details.id}'>${app.details.name}</a>")),
-                TableRow(content = Text(app.details.deployedTo.toString)),
-                TableRow(content = Text(ApplicationFormatter.getLastAccess(app)(LocalDateTime.now(clock)))),
-            )
-            )))
+@applicationsTile = {
+    <div class="govuk-summary-card" id="application-tile">
+        <div class="govuk-summary-card__content">
+            <h2 class="govuk-heading-m">@messages("organisationdetails.applications")</h2>
+            @if(details.applications.isEmpty) {
+                <p class="govuk-body">@messages("organisationdetails.applications.none")</p>
+            } else {
+                @govukTable(Table(
+                    classes = "govuk-table--small-text-until-tablet",
+                    caption = Some(messages("organisationdetails.applications")),
+                    captionClasses = "govuk-table__caption--m govuk-visually-hidden",
+                    firstCellIsHeader = true,
+                    head = Some(Seq(
+                        HeadCell(content = Text(messages("organisationdetails.applications.name"))),
+                        HeadCell(content = Text(messages("organisationdetails.applications.environment"))),
+                        HeadCell(content = Text(messages("organisationdetails.applications.lastapicall")))
+                    )),
+                    rows = details.applications.zipWithIndex.map { case (app, index) => Seq(
+                        TableRow(content = HtmlContent(applicationLink(app)), attributes = Map("id" -> s"app-name-$index")),
+                        TableRow(content = Text(app.details.deployedTo.displayText), attributes = Map("id" -> s"app-env-$index")),
+                        TableRow(content = Text(ApplicationFormatter.getLastAccess(app)(LocalDateTime.now(clock))), attributes = Map("id" -> s"app-last-call-$index"))
+                    ) }
+                ))
+            }
+        </div>
+    </div>
+}
 
-        @govukTable(Table(
-            head = Some(Seq(
-                HeadCell(content = Text("Name")),
-                HeadCell(content = Text("Role")),
-            )),
-            rows = details.collaborators.map(collab => Seq(
-                TableRow(content = collab.maybeUserDetails.map(user=>
-                    HtmlContent(s"<a href='${gatekeeperConfig.developerPageUri}?developerId=${user.userId}'>${collab.name()}</a>"))
-                .getOrElse(Text(collab.name()))),
-                TableRow(content = Text(collab.collaborator.describeRole)),
-            )).toList))
+@membersTile = {
+    <div class="govuk-summary-card" id="members-tile">
+        <div class="govuk-summary-card__content">
+            <h2 class="govuk-heading-m">@messages("organisationdetails.members")</h2>
+            @if(members.isEmpty) {
+                <p class="govuk-body">@messages("organisationdetails.members.none")</p>
+            } else {
+                @govukTable(Table(
+                    classes = "govuk-table--small-text-until-tablet",
+                    caption = Some(messages("organisationdetails.members")),
+                    captionClasses = "govuk-table__caption--m govuk-visually-hidden",
+                    firstCellIsHeader = true,
+                    head = Some(Seq(
+                        HeadCell(content = Text(messages("organisationdetails.members.name"))),
+                        HeadCell(content = Text(messages("organisationdetails.members.role")))
+                    )),
+                    rows = members.zipWithIndex.map { case (collab, index) => Seq(
+                        TableRow(content = HtmlContent(developerLink(collab)), attributes = Map("id" -> s"member-name-$index")),
+                        TableRow(content = Text(collab.collaborator.role.displayText), attributes = Map("id" -> s"member-role-$index"))
+                    ) }
+                ))
+            }
+        </div>
+    </div>
+}
+
+@organisationDetailsTile = {
+    <div class="govuk-summary-card" id="organisation-details-tile">
+        <div class="govuk-summary-card__content">
+            <h2 class="govuk-heading-m govuk-!-margin-top-4">@messages("organisationdetails.details")</h2>
+
+            @if(responsibleIndividuals.nonEmpty) {
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.responsibleindividuals")</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    @for((ri, index) <- responsibleIndividuals.zipWithIndex) {
+                        <li id="responsible-individual-@index">@developerLink(ri)</li>
+                    }
+                </ul>
+            }
+
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.dateregistered")</h3>
+            <p class="govuk-body" id="date-registered">@ApplicationFormatter.dateFormatter.format(details.organisation.createdDateTime.atOffset(ZoneOffset.UTC).toLocalDate)</p>
+
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.companytype")</h3>
+            <p class="govuk-body" id="company-type">@details.organisation.organisationType.displayText</p>
+
+            @details.organisation.companyNumber.map { companyNumber =>
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.companynumber")</h3>
+                <p class="govuk-body">
+                    <a class="govuk-link govuk-link--no-visited-state" id="company-number" href="@{s"${appConfig.companiesHouseCompanyPageUrl}/$companyNumber"}" target="_blank" rel="noreferrer noopener">@companyNumber<br>@messages("organisationdetails.opensinnewtab")</a>
+                </p>
+            }
+
+            @defining(addressLines(details.organisation.address)) { lines =>
+                @if(lines.nonEmpty) {
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.registeredaddress")</h3>
+                    <p class="govuk-body" id="registered-address">
+                        @for((line, index) <- lines.zipWithIndex) {
+                            @line@if(index < lines.size - 1){<br>}
+                        }
+                    </p>
+                }
+            }
+
+            @details.organisation.websiteUrl.map { website =>
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-1">@messages("organisationdetails.website")</h3>
+                <p class="govuk-body">
+                    <a class="govuk-link govuk-link--no-visited-state" id="website" href="@website" target="_blank" rel="noreferrer noopener">@website<br>@messages("organisationdetails.opensinnewtab")</a>
+                </p>
+            }
+        </div>
+    </div>
+}
+
+@applicationLink(app: ApplicationWithCollaborators) = {
+    <a class="govuk-link govuk-link--no-visited-state" href="@{s"${gatekeeperConfig.applicationsPageUri}/${app.details.id}"}">@app.details.name</a>
+}
+
+@developerLink(collab: CollaboratorWithUserDetails) = {
+    @collab.maybeUserDetails match {
+        case Some(user) => {
+            <a class="govuk-link govuk-link--no-visited-state" href="@{s"${gatekeeperConfig.developerPageUri}?developerId=${user.userId}"}">@collab.name()</a>
+        }
+        case None => {@collab.name()}
+    }
+}
+
+@addressLines(address: Option[OrganisationAddress]) = @{
+    address.toSeq.flatMap { a =>
+        Seq(a.careOf, a.premises, a.poBox, a.addressLineOne, a.addressLineTwo, a.addressLineThree, a.locality, a.region, a.postalCode, a.country).flatten
     }
 }

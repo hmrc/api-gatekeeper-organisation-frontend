@@ -56,8 +56,8 @@ class OrganisationServiceSpec extends AsyncHmrcSpec with OrganisationConnectorMo
   "fetchWithAllDetails" should {
     "fetch org with users" in new Setup {
       OrganisationConnectorMock.FetchOrganisation.willReturn(standardOrg)
-      TpdConnectorMock.GetRegisteredOrUnregisteredUsers.willReturn(GetRegisteredOrUnregisteredUsersResponse(List(unknownUser)))
-      TpdConnectorMock.FetchDevelopers.willReturn(List(standardDeveloper))
+      TpdConnectorMock.GetRegisteredOrUnregisteredUsers.willReturn(GetRegisteredOrUnregisteredUsersResponse(orgMembers))
+      TpdConnectorMock.FetchDevelopers.willReturn(orgUserDetails)
       TpoConnectorMock.FindApplicationsForOrganisation.willReturn(standardApp)
       val result = await(underTest.fetchWithAllDetails(standardOrg.id))
       result.value shouldBe extendedOrg

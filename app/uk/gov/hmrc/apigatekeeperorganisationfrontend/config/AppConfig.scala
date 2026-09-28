@@ -24,4 +24,5 @@ import play.api.Configuration
 class AppConfig @Inject() (config: Configuration) {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val disableAddToAllowList: Boolean       = config.getOptional[Boolean]("disable-add-to-allow-list").getOrElse(false)
+  val companiesHouseCompanyPageUrl: String = config.get[String]("companies-house.company-page-url")
 }
