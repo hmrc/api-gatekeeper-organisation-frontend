@@ -61,6 +61,27 @@ declinesubmissionconfirm.back = Back to organisation checks
 
 organisationslist.title = Organisations
 
+organisationdetails.caption = Organisations
+organisationdetails.breadcrumb.home = Home
+organisationdetails.breadcrumb.organisations = Organisations
+organisationdetails.applications = Applications
+organisationdetails.applications.name = Name
+organisationdetails.applications.environment = Environment
+organisationdetails.applications.lastapicall = Last API call
+organisationdetails.applications.none = No applications
+organisationdetails.members = Organisation members
+organisationdetails.members.name = Name
+organisationdetails.members.role = Organisation role
+organisationdetails.members.none = No organisation members
+organisationdetails.details = Organisation details
+organisationdetails.responsibleindividuals = Responsible individuals
+organisationdetails.dateregistered = Date registered
+organisationdetails.companytype = Company type
+organisationdetails.companynumber = Company registration number
+organisationdetails.registeredaddress = Registered address
+organisationdetails.website = Website
+organisationdetails.opensinnewtab = (opens in a new tab)
+
 allowlist.title = Organisation allow list
 allowlist.adduser = Add a user to the allow list
 allowlist.subtitle = Users on the allow list

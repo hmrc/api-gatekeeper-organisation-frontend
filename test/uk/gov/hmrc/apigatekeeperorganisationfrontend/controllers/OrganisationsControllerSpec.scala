@@ -18,6 +18,7 @@ package uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.jsoup.Jsoup
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import play.api.Application
@@ -32,6 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.gkauth.domain.models.GatekeeperRoles
 import uk.gov.hmrc.apiplatform.modules.gkauth.services.{LdapAuthorisationServiceMockModule, StrideAuthorisationServiceMockModule}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apigatekeeperorganisationfrontend.config.AppConfig
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.mocks.services.OrganisationServiceMockModule
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 import uk.gov.hmrc.apigatekeeperorganisationfrontend.{OrganisationFixtures, WithCSRFAddToken}
@@ -53,6 +55,7 @@ class OrganisationsControllerSpec extends HmrcSpec
     val listPage    = app.injector.instanceOf[OrganisationsListPage]
     val detailsPage = app.injector.instanceOf[OrganisationDetailsPage]
     val mcc         = app.injector.instanceOf[MessagesControllerComponents]
+    val appConfig   = app.injector.instanceOf[AppConfig]
     val controller  = new OrganisationsController(mcc, listPage, detailsPage, OrganisationServiceMock.aMock, StrideAuthorisationServiceMock.aMock, LdapAuthorisationServiceMock.aMock)
   }
 
@@ -124,14 +127,85 @@ class OrganisationsControllerSpec extends HmrcSpec
 
     "return 200 with the organisation" in new Setup {
       StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
-      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrg)
+      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrgWithMultipleApplications)
 
       val result = controller.organisationView(OrganisationId.random)(fakeRequest)
 
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("Organisation name")
-      contentAsString(result) should include("Created date")
       contentAsString(result) should include(standardOrg.organisationName.value)
+
+      contentAsString(result) should include(prodAppWithLastAccess.details.name)
+      contentAsString(result) should include("Production")
+      contentAsString(result) should include("03 January 2020")
+
+      contentAsString(result) should include(sandboxAppWithNoLastAccess.details.name)
+      contentAsString(result) should include("Sandbox")
+      contentAsString(result) should include("No API called")
+
+      contentAsString(result) should include("firstName1 lastName1")
+      val membersTile = Jsoup.parse(contentAsString(result)).getElementById("members-tile")
+      membersTile.text should not include "Joe Bloggs"
+
+      contentAsString(result) should include("Responsible individuals")
+      contentAsString(result) should include("Joe Bloggs")
+
+      contentAsString(result) should include("Date registered")
+      contentAsString(result) should include("02 January 2020")
+
+      contentAsString(result) should include("Company type")
+      contentAsString(result) should include("UK limited company")
+    }
+
+    "return 200 with the organisation and its extra organisation data" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrgWithExtraData)
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+
+      contentAsString(result) should include("Company registration number")
+      contentAsString(result) should include("08947216")
+
+      contentAsString(result) should include("Registered address")
+      contentAsString(result) should include("Easy Soft Limited")
+      contentAsString(result) should include("Unit 12")
+      contentAsString(result) should include("PO Box 42")
+      contentAsString(result) should include("Stoxley Industrial Park")
+      contentAsString(result) should include("Stoxley Park Avenue")
+      contentAsString(result) should include("Stoxley")
+      contentAsString(result) should include("Canningley")
+      contentAsString(result) should include("West Yorkshire")
+      contentAsString(result) should include("CI8 2JS")
+      contentAsString(result) should include("United Kingdom")
+
+      contentAsString(result) should include("Website")
+      contentAsString(result) should include("http://easysoft.co.uk")
+
+      val companyNumberLink = Jsoup.parse(contentAsString(result)).getElementById("company-number")
+      companyNumberLink.attr("href") shouldBe s"${appConfig.companiesHouseCompanyPageUrl}/08947216"
+    }
+
+    "return 200 with an organisation with no extra organisation data" in new Setup {
+      StrideAuthorisationServiceMock.Auth.succeeds(GatekeeperRoles.USER)
+      OrganisationServiceMock.FetchWithAllMembersDetails.succeed(extendedOrgWithMinimalData)
+
+      val result = controller.organisationView(OrganisationId.random)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) should include(orgWithMinimalData.organisationName.value)
+      contentAsString(result) should include("No applications")
+      contentAsString(result) should include("No organisation members")
+
+      contentAsString(result) should include("Date registered")
+      contentAsString(result) should include("02 January 2020")
+
+      contentAsString(result) should include("Company type")
+      contentAsString(result) should include("Sole trader")
+
+      contentAsString(result) shouldNot include("Company registration number")
+      contentAsString(result) shouldNot include("Registered address")
+      contentAsString(result) shouldNot include("Website")
     }
 
     "return 404" in new Setup {
