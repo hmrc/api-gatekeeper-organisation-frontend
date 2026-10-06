@@ -18,6 +18,14 @@
 
 @(model: ViewModel)
 
+@replaceToken(text: String, token: String, value: => String): String = @{
+    if(text.contains(token)) text.replace(token, value) else text
+}
+
+@renderText(text: String): String = @{
+    replaceToken(text, "{companyName}", model.organisationName.value)
+}
+
   @for(questionnaire <- model.questionnaires.toList) {
     <h2 class="app-task-list__section">
         @questionnaire.label
@@ -26,7 +34,7 @@
     <dl class="govuk-summary-list govuk-!-margin-bottom-9">
       @for(question <- questionnaire.questions.toList) {
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key no-bold width-50">@question.text</dt>
+          <dt class="govuk-summary-list__key no-bold width-50">@renderText(question.text)</dt>
           <dd class="govuk-summary-list__value width-20">@question.answer</dd>
           <dd class="govuk-summary-list__actions width-10">
           </dd>
