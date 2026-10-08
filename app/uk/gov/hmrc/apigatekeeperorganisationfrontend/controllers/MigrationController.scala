@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
+import play.api.data.Forms.*
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 
@@ -47,17 +47,17 @@ object MigrationController {
     )
   }
 
-  case class IndividualMatchingForm(firstName: String, lastName: String, nino: String, dateOfBirth: String)
+  case class IndividualMatchingForm(identifierType: String, identifierValue: String, registryMarker: String, excludeDeceased: Boolean)
 
   object IndividualMatchingForm {
 
     def form: Form[IndividualMatchingForm] = Form(
       mapping(
-        "firstName"   -> text,
-        "lastName"    -> text,
-        "nino"        -> text,
-        "dateOfBirth" -> text
-      )(IndividualMatchingForm.apply)(f => Some((f.firstName, f.lastName, f.nino, f.dateOfBirth)))
+        "identifierType"  -> text,
+        "identifierValue" -> text,
+        "registryMarker"  -> text,
+        "excludeDeceased" -> boolean
+      )(IndividualMatchingForm.apply)(f => Some((f.identifierType, f.identifierValue, f.registryMarker, f.excludeDeceased)))
     )
   }
 }
@@ -121,7 +121,7 @@ class MigrationController @Inject() (
 
   def individualMatchingAction(): Action[AnyContent] = loggedInOnly() { implicit request =>
     val data    = IndividualMatchingForm.form.bindFromRequest().get
-    val request = IndividualMatchingRequest(data.firstName, data.lastName, data.nino, data.dateOfBirth)
+    val request = IndividualMatchingRequest(SaIdentifier(data.identifierType, data.identifierValue), data.registryMarker, data.excludeDeceased)
     migrationService.matchIndividual(request).map(json => Ok(individualMatchingPage(IndividualMatchingForm.form.fill(data), Some(Json.prettyPrint(json)))))
   }
 }

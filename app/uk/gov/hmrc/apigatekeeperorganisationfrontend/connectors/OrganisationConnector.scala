@@ -162,6 +162,6 @@ object OrganisationConnector {
   case class SaIdentifier(`type`: String, value: String)
   given Writes[SaIdentifier] = Json.writes[SaIdentifier]
 
-  case class IndividualMatchingRequest(firstName: String, lastName: String, nino: String, dateOfBirth: String)
+  case class IndividualMatchingRequest(identifier: SaIdentifier, registryMarker: String, excludeDeceased: Boolean)
   given Writes[IndividualMatchingRequest] = Json.writes[IndividualMatchingRequest]
 }
