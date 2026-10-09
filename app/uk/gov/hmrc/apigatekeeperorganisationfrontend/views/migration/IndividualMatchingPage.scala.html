@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.controllers.routes
 @import uk.gov.hmrc.apigatekeeperorganisationfrontend.views.html.*
 
-@this(layout: Layout, govukButton: GovukButton, govukInput: GovukInput)
+@this(layout: Layout, govukButton: GovukButton, govukInput: GovukInput, govukRadios: GovukRadios, govukSelect: GovukSelect)
 
 @(form: Form[IndividualMatchingForm], result: Option[String])(implicit request: RequestHeader, messages: Messages)
 
@@ -32,39 +32,42 @@
         <h1 class="govuk-heading-l">Individual Matching</h1>
 
         @helper.form(action = routes.MigrationController.individualMatchingAction()) {
+
             @helper.CSRF.formField
 
             @govukInput(Input(
-                id = "firstName",
-                name = "firstName",
-                value = form("firstName").value,
-                label = Label(content = Text("First name"))
+                id = "identifierType",
+                name = "identifierType",
+                value = form("identifierType").value,
+                label = Label(content = Text("Identifier Type"))
             ))
 
             @govukInput(Input(
-                id = "lastName",
-                name = "lastName",
-                value = form("lastName").value,
-                label = Label(content = Text("Last name"))
+                id = "identifierValue",
+                name = "identifierValue",
+                value = form("identifierValue").value,
+                label = Label(content = Text("Identifier Value"))
             ))
 
-            @govukInput(Input(
-                id = "nino",
-                name = "nino",
-                value = form("nino").value,
-                label = Label(content = Text("National Insurance number"))
-            ))
+            @govukSelect(Select(
+                id = "registryMarker",
+                name = "registryMarker",
+                label = Label(content = Text("Registry Marker")),
+                items = Seq(
+                    SelectItem(value = Some("RED"), text = "RED"),
+                    SelectItem(value = Some("AMBER"), text = "AMBER"),
+                    SelectItem(value = Some("GREEN"), text = "GREEN", selected = true)
+                )))
 
-            @govukInput(Input(
-                id = "dateOfBirth",
-                name = "dateOfBirth",
-                value = form("dateOfBirth").value,
-                label = Label(content = Text("Date of birth (yyyy-MM-dd)"))
+            @govukRadios(Radios(
+                fieldset = Some(Fieldset(legend = Some(Legend(content = Text("Exclude Deceased"))))),
+                name = "excludeDeceased",
+                items = Seq(RadioItem(value = Some("true"), content = Text("True")), RadioItem(value = Some("false"), content = Text("False")))
             ))
 
             <div class="govuk-button-group">
             @govukButton(Button(
-                id = Some("submitIndividualMatching"),
+                id = Some("submitUtrChecker"),
                 isStartButton = false,
                 content = Text("Submit"),
                 preventDoubleClick = Some(true)))

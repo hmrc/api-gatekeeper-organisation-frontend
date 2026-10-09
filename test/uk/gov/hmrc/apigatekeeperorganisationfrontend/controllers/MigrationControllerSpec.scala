@@ -85,10 +85,10 @@ class MigrationControllerSpec extends HmrcSpec
     )
 
     val validIndividualMatchingFormData = Seq(
-      "firstName"   -> "John",
-      "lastName"    -> "Smith",
-      "nino"        -> "AA123456A",
-      "dateOfBirth" -> "1990-01-01"
+      "identifierType"  -> "UTR",
+      "identifierValue" -> "123465798",
+      "registryMarker"  -> "RED",
+      "excludeDeceased" -> "true"
     )
   }
 
@@ -178,7 +178,7 @@ class MigrationControllerSpec extends HmrcSpec
 
       val result = controller.individualMatching()(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsString(result) should include("National Insurance number")
+      contentAsString(result) should include("Exclude Deceased")
     }
 
     "return 200 for individualMatchingAction with a match result" in new Setup {

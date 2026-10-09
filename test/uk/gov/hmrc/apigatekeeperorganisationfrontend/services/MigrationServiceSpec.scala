@@ -143,7 +143,7 @@ class MigrationServiceSpec extends AsyncHmrcSpec with TpoConnectorMockModule wit
 
   "matchIndividual" should {
     "match the individual and return the payload" in new Setup {
-      val request = IndividualMatchingRequest("John", "Smith", "AA123456A", "1990-01-01")
+      val request = IndividualMatchingRequest(SaIdentifier("utr", "123456798"), "RED", true)
       val json    = Json.obj("matched" -> true)
 
       OrganisationConnectorMock.MatchIndividual.willReturn(json)
