@@ -47,6 +47,8 @@ object AnswersViewModel {
     case ActualAnswer.NoAnswer                        => Some("n/a")
     case ActualAnswer.AcknowledgedAnswer              => None
     case ActualAnswer.AttachmentAnswer(value)         => Some("Uploaded")
+    case ActualAnswer.ConditionalTextAnswer(ConditionalText(Some("Yes"), text)) => Some(text.getOrElse("n/a"))
+    case ActualAnswer.ConditionalTextAnswer(_)                                  => Some("n/a")
   }
 
   private def convertQuestion(instance: Submission.Instance)(item: QuestionItem): Option[ViewQuestion] = {
