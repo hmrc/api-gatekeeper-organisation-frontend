@@ -31,22 +31,22 @@ object AnswersViewModel {
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
   private def convertAnswer(answer: ActualAnswer): Option[String] = answer match {
-    case ActualAnswer.SingleChoiceAnswer(value)       => Some(value)
-    case ActualAnswer.TextAnswer(value)               => Some(value)
-    case ActualAnswer.DateAnswer(value)               => Some(value.format(dateTimeFormatter))
-    case ActualAnswer.MultipleChoiceAnswer(values)    => Some(values.mkString(" "))
-    case ActualAnswer.AddressAnswer(add)              =>
+    case ActualAnswer.SingleChoiceAnswer(value)                                 => Some(value)
+    case ActualAnswer.TextAnswer(value)                                         => Some(value)
+    case ActualAnswer.DateAnswer(value)                                         => Some(value.format(dateTimeFormatter))
+    case ActualAnswer.MultipleChoiceAnswer(values)                              => Some(values.mkString(" "))
+    case ActualAnswer.AddressAnswer(add)                                        =>
       Some(Seq(add.addressLineOne, add.addressLineTwo, add.locality, add.region, add.postalCode).filter(_.isDefined).map(_.get).mkString(", "))
-    case ActualAnswer.InternationalAddressAnswer(add) =>
+    case ActualAnswer.InternationalAddressAnswer(add)                           =>
       Some(Seq(add.addressLineOne, add.addressLineTwo, add.addressLineThree, add.locality, add.region, add.postalCode, add.country).filter(_.isDefined).map(_.get).mkString(", "))
-    case ActualAnswer.NameAnswer(name)                =>
+    case ActualAnswer.NameAnswer(name)                                          =>
       Some(Seq(name.firstName, name.lastName).filter(_.isDefined).map(_.get).mkString(" "))
-    case ActualAnswer.ConfirmNameAnswer(name)         =>
+    case ActualAnswer.ConfirmNameAnswer(name)                                   =>
       Some(Seq(name.firstName, name.lastName).filter(_.isDefined).map(_.get).mkString(" "))
-    case ActualAnswer.CompanyNumberAnswer(value)      => Some(value)
-    case ActualAnswer.NoAnswer                        => Some("n/a")
-    case ActualAnswer.AcknowledgedAnswer              => None
-    case ActualAnswer.AttachmentAnswer(value)         => Some("Uploaded")
+    case ActualAnswer.CompanyNumberAnswer(value)                                => Some(value)
+    case ActualAnswer.NoAnswer                                                  => Some("n/a")
+    case ActualAnswer.AcknowledgedAnswer                                        => None
+    case ActualAnswer.AttachmentAnswer(value)                                   => Some("Uploaded")
     case ActualAnswer.ConditionalTextAnswer(ConditionalText(Some("Yes"), text)) => Some(text.getOrElse("n/a"))
     case ActualAnswer.ConditionalTextAnswer(_)                                  => Some("n/a")
   }

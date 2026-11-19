@@ -146,7 +146,7 @@ class OrganisationsControllerSpec extends HmrcSpec
       val membersTile = Jsoup.parse(contentAsString(result)).getElementById("members-tile")
       membersTile.text should not include "Joe Bloggs"
 
-      contentAsString(result) should include("Responsible individuals")
+      contentAsString(result) should include("Senior responsible individuals")
       contentAsString(result) should include("Joe Bloggs")
 
       contentAsString(result) should include("Date registered")
